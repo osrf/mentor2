@@ -1,13 +1,7 @@
-cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
-
 include ( ${QT_USE_FILE} )
 
 link_directories(
   ${Boost_LIBRARY_DIRS}
-)
-
-include_directories(
-  ${CMAKE_SOURCE_DIR}/deps
 )
 
 set (sources
