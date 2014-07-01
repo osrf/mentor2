@@ -52,6 +52,8 @@ if (NOT QT4_FOUND)
 endif()
 
 add_subdirectory(CMLEditor)
+add_subdirectory(SimpleMOOC)
+add_subdirectory(MOOCUI)
 
 
 ########### Add uninstall target ###############
