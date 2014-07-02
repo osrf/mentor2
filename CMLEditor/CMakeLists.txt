@@ -5,14 +5,22 @@ link_directories(
 )
 
 set (sources
+  CMLEditor.cc
+  CMLEditorPalette.cc
   CMLEditorPlugin.cc
+  CMLEditorView.cc
+  CMLEditorWidget.cc
 )
 
 set (qt_headers
+  CMLEditor.hh
+  CMLEditorPalette.hh
+  CMLEditorView.hh
 )
 
 set (headers
   CMLEditorPlugin.hh
+  CMLEditorWidget.hh
 )
 
 set (resources resources.qrc)

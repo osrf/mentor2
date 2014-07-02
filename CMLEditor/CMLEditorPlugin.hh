@@ -15,27 +15,25 @@
  *
 */
 
-#include <gazebo/gui/qt.hh>
-#include <gazebo/gui/GuiIface.hh>
-#include "CMLEditorPlugin.hh"
+#include <gazebo/gazebo.hh>
 
-using namespace gazebo;
-
-/////////////////////////////////////////////////
-CMLEditorPlugin::~CMLEditorPlugin()
+namespace gazebo
 {
+  class CMLEditorPlugin : public SystemPlugin
+  {
+    /// \brief Destructor
+    public: virtual ~CMLEditorPlugin();
+
+    /// \brief Load the plugin.
+    public: virtual void Load(int /*_argc*/, char ** /*_argv*/);
+
+    /// \brief Initialize the plugin.
+    private: virtual void Init();
+
+    /// \brief Event callback when the gazebo main window has been intialized.
+    private: void OnMainWindowReady();
+
+    /// \brief A list of connections.
+    private: std::vector<event::ConnectionPtr> connections;
+  };
 }
-
-/////////////////////////////////////////////////
-void CMLEditorPlugin::Load(int /*_argc*/, char ** /*_argv*/)
-{
-}
-
-/////////////////////////////////////////////////
-void CMLEditorPlugin::Init()
-{
-
-}
-
-// Register this plugin with the simulator
-GZ_REGISTER_SYSTEM_PLUGIN(CMLEditorPlugin)

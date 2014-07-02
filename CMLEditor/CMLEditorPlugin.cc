@@ -15,18 +15,42 @@
  *
 */
 
-#include "gazebo/gazebo.hh"
+#include <gazebo/gui/qt.h>
+#include <gazebo/gui/GuiIface.hh>
+#include <gazebo/gui/MainWindow.hh>
+#include <gazebo/gui/GuiEvents.hh>
 
-namespace gazebo
+#include "CMLEditor.hh"
+#include "CMLEditorPlugin.hh"
+
+using namespace gazebo;
+
+/////////////////////////////////////////////////
+CMLEditorPlugin::~CMLEditorPlugin()
 {
-  class CMLEditorPlugin : public SystemPlugin
-  {
-    public: virtual ~CMLEditorPlugin();
-
-    public: virtual void Load(int /*_argc*/, char ** /*_argv*/);
-
-    private: virtual void Init();
-
-    private: std::vector<event::ConnectionPtr> connections;
-  };
 }
+
+/////////////////////////////////////////////////
+void CMLEditorPlugin::Load(int /*_argc*/, char ** /*_argv*/)
+{
+}
+
+/////////////////////////////////////////////////
+void CMLEditorPlugin::Init()
+{
+  this->connections.push_back(
+      gui::Events::ConnectMainWindowReady(
+      boost::bind(&CMLEditorPlugin::OnMainWindowReady, this)));
+}
+
+/////////////////////////////////////////////////
+void CMLEditorPlugin::OnMainWindowReady()
+{
+  gui::MainWindow *mainWindow = gui::get_main_window();
+  gui::CMLEditor *editor = new gui::CMLEditor(mainWindow);
+  std::cerr << " main window ready " << std::endl;
+}
+
+
+// Register this plugin with the simulator
+GZ_REGISTER_SYSTEM_PLUGIN(CMLEditorPlugin)
