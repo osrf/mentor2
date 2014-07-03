@@ -18,7 +18,8 @@
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GuiEvents.hh"
-//#include "gazebo/gui/qt.h"
+
+#include "MOOCUIWidget.hh"
 #include "MOOCUIPlugin.hh"
 
 using namespace gazebo;
@@ -50,6 +51,16 @@ void MOOCUIPlugin::OnMainWindowReady()
   //rendering::UserCameraPtr userCam;
   gui::MainWindow *mainWindow = gui::get_main_window();
   QMenu *menu = new QMenu(QString("MOOC"));
+
+  QAction* loginAct = new QAction(QString("&Login"), menu );
+  loginAct->setStatusTip(QString("Login to Mentor 2 Learning Companion"));
+  
+  MOOCUIWidget *widget = new MOOCUIWidget(mainWindow);
+  
+  QObject::connect(loginAct, SIGNAL(triggered()), widget, SLOT(LoginMOOC()));
+
+  
+  menu->addAction(loginAct);
   mainWindow->AddMenu(menu);
 }
 
