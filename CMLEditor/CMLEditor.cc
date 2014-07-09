@@ -46,8 +46,7 @@ CMLEditor::CMLEditor(MainWindow *_mainWindow)
   this->mainWindow->GetRenderWidget()->InsertWidget(0,
       this->CMLEditorWidget);
 
-
-  std::cerr << " insert widget " << std::endl;
+  this->OnEdit(true);
 }
 
 /////////////////////////////////////////////////

@@ -46,12 +46,12 @@ CMLEditorPalette::CMLEditorPalette(QWidget *_parent)
         QStringList(QString("Components")));
   this->componentTreeWidget->addTopLevelItem(componentsItem);
 
-  /*QTreeWidgetItem *componentsChildItem =
+  QTreeWidgetItem *componentsChildItem =
     new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
-  componentsItem->addChild(componentsChildItem);*/
+  componentsItem->addChild(componentsChildItem);
 
   // Shapes buttons
-  QWidget *modelWidget = new QWidget(this);
+  QWidget *componentWidget = new QWidget(this);
   QGridLayout *componentsLayout = new QGridLayout;
 
   // cylinder button
@@ -61,9 +61,10 @@ CMLEditorPalette::CMLEditorPalette(QWidget *_parent)
   //connect(componentButton, SIGNAL(clicked()), this, SLOT(OnCylinder()));
 
   componentsLayout->addWidget(componentButton, 0, 0);
-  modelWidget->setLayout(componentsLayout);
+  componentWidget->setLayout(componentsLayout);
 
-  this->componentTreeWidget->setItemWidget(componentsItem, 0, modelWidget);
+  this->componentTreeWidget->setItemWidget(
+      componentsChildItem, 0, componentWidget);
   componentsItem->setExpanded(true);
 
   /*// save buttons
@@ -76,13 +77,36 @@ CMLEditorPalette::CMLEditorPalette(QWidget *_parent)
   QPushButton *doneButton = new QPushButton(tr("Done"));
   connect(doneButton, SIGNAL(clicked()), this, SLOT(OnDone()));
 
-  QHBoxLayout *buttonsLayout = new QHBoxLayout;
-  buttonsLayout->addWidget(discardButton);
-  buttonsLayout->addWidget(this->saveButton);
-  buttonsLayout->addWidget(doneButton);
-  buttonsLayout->setAlignment(Qt::AlignCenter);*/
+  QHBoxLayout *navigationLayout = new QHBoxLayout;
+  navigationLayout->addWidget(discardButton);
+  navigationLayout->addWidget(this->saveButton);
+  navigationLayout->addWidget(doneButton);
+  navigationLayout->setAlignment(Qt::AlignCenter);*/
 
-  mainLayout->addWidget(this->componentTreeWidget);
+
+/*  QFrame *frame = new QFrame;
+  QVBoxLayout *frameLayout = new QVBoxLayout;
+  frameLayout->addWidget(this->componentTreeWidget, 0);
+  frameLayout->setContentsMargins(0, 0, 0, 0);
+  frame->setLayout(frameLayout);*/
+
+  this->backButton = new QPushButton(tr("Back"));
+  connect(this->backButton, SIGNAL(clicked()), this, SLOT(OnBack()));
+  this->backButton->setEnabled(false);
+
+  //QPushButton *homeButton = new QPushButton(tr("Home"));
+  //connect(homeButton, SIGNAL(clicked()), this, SLOT(OnHome()));
+
+  QHBoxLayout *navigationLayout = new QHBoxLayout;
+  navigationLayout->addWidget(this->backButton);
+  //navigationLayout->addWidget(homeButton);
+  navigationLayout->setAlignment(Qt::AlignCenter);
+
+  this->pageStackWidget = new QStackedWidget(this);
+  this->pageStackWidget->addWidget(this->componentTreeWidget);
+
+  mainLayout->addWidget(this->pageStackWidget);
+  mainLayout->addLayout(navigationLayout);
 
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0, 0, 0, 0);
@@ -95,4 +119,23 @@ CMLEditorPalette::CMLEditorPalette(QWidget *_parent)
 /////////////////////////////////////////////////
 CMLEditorPalette::~CMLEditorPalette()
 {
+}
+
+/////////////////////////////////////////////////
+void CMLEditorPalette::OnBack()
+{
+  int index = this->pageStackWidget->currentIndex();
+  if (index > 0)
+  {
+    if (--index == 0)
+      this->backButton->setEnabled(false);
+    this->pageStackWidget->setCurrentIndex(index);
+  }
+}
+
+/////////////////////////////////////////////////
+void CMLEditorPalette::OnItemSelection(QTreeWidgetItem *_item, int /*_column*/)
+{
+  if (_item && _item->childCount() > 0)
+    _item->setExpanded(!_item->isExpanded());
 }

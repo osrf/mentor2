@@ -41,8 +41,22 @@ namespace gazebo
       /// \brief Destructor
       public: ~CMLEditorPalette();
 
+      /// \brief Received item selection user input.
+      /// \param[in] _item Item selected.
+      /// \param[in] _column Column index.
+      private slots: void OnItemSelection(QTreeWidgetItem *_item, int _column);
+
+      /// \brief Qt callback when the back button is pushed.
+      private slots: void OnBack();
+
       /// \brief Widget that display components.
       private: QTreeWidget *componentTreeWidget;
+
+      /// \brief Widget that handles pagination.
+      private: QStackedWidget *pageStackWidget;
+
+      /// \brief Back button for page navigation.
+      private: QPushButton *backButton;
     };
   }
 }

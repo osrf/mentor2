@@ -11,6 +11,9 @@ set (sources
   CMLEditorPlugin.cc
   CMLEditorView.cc
   CMLEditorWidget.cc
+  GrabberHandle.cc
+  RectItem.cc
+  RotateHandle.cc
 )
 
 set (qt_headers
@@ -18,11 +21,14 @@ set (qt_headers
   CMLEditorItem.hh
   CMLEditorPalette.hh
   CMLEditorView.hh
+  RectItem.hh
 )
 
 set (headers
   CMLEditorPlugin.hh
   CMLEditorWidget.hh
+  GrabberHandle.hh
+  RotateHandle.hh
 )
 
 set (resources resources.qrc)
