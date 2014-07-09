@@ -15,6 +15,7 @@
  *
 */
 
+#include "CMLEditorItem.hh"
 #include "CMLEditorView.hh"
 
 using namespace gazebo;
@@ -59,13 +60,50 @@ void CMLEditorView::contextMenuEvent(QContextMenuEvent *_event)
 /////////////////////////////////////////////////
 void CMLEditorView::wheelEvent(QWheelEvent *_event)
 {
+  int numSteps = (_event->delta()/8) / 15;
+  QMatrix mat = matrix();
+  QPointF mousePosition = _event->pos();
+
+  mat.translate((width()/2) - mousePosition.x(), (height()/2) -
+    mousePosition.y());
+
+  double scaleFactor = 1.15;
+
+  if (numSteps > 0)
+  {
+    mat.scale(numSteps*scaleFactor, numSteps*scaleFactor);
+    this->viewScale *= numSteps*scaleFactor;
+  }
+  else
+  {
+    mat.scale(-1/(numSteps*scaleFactor), -1/(numSteps*scaleFactor));
+    this->viewScale *= -1/(numSteps*scaleFactor);
+  }
+  mat.translate(mousePosition.x() - (this->width()/2),
+      mousePosition.y() -(this->height()/2));
+  this->setMatrix(mat);
+
   _event->accept();
 }
 
 /////////////////////////////////////////////////
 void CMLEditorView::mousePressEvent(QMouseEvent *_event)
 {
-  QGraphicsView::mousePressEvent(_event);
+  if (_event->button() != Qt::RightButton)
+  {
+    QGraphicsItem *mouseItem =
+        this->scene()->itemAt(this->mapToScene(_event->pos()));
+    if (mouseItem && !mouseItem->isSelected())
+    {
+      CMLEditorItem *item = dynamic_cast<CMLEditorItem *>(mouseItem);
+      if (item)
+      {
+        this->scene()->clearSelection();
+        mouseItem->setSelected(true);
+      }
+    }
+    QGraphicsView::mousePressEvent(_event);
+  }
 }
 
 /////////////////////////////////////////////////

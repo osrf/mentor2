@@ -6,6 +6,7 @@ link_directories(
 
 set (sources
   CMLEditor.cc
+  CMLEditorItem.cc
   CMLEditorPalette.cc
   CMLEditorPlugin.cc
   CMLEditorView.cc
@@ -14,6 +15,7 @@ set (sources
 
 set (qt_headers
   CMLEditor.hh
+  CMLEditorItem.hh
   CMLEditorPalette.hh
   CMLEditorView.hh
 )

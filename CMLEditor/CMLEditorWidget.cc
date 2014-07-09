@@ -27,17 +27,17 @@ CMLEditorWidget::CMLEditorWidget(QWidget *_parent)
 {
   this->setObjectName("CMLEditorWidget");
 
-  CMLEditorView *view = new CMLEditorView();
   this->scene = new QGraphicsScene();
+  CMLEditorView *view = new CMLEditorView(_parent);
 
   QColor c(250, 250, 250);
   QBrush brush(c, Qt::SolidPattern);
   this->scene->setBackgroundBrush(brush);
 
-  this->minimumWidth = 1240*2;
+/*  this->minimumWidth = 1240*2;
   this->minimumHeight = 1024*2;
   this->scene->setSceneRect(-this->minimumWidth/2, -this->minimumHeight/2,
-      this->minimumWidth, this->minimumHeight);
+      this->minimumWidth, this->minimumHeight);*/
   QHBoxLayout *canvasLayout = new QHBoxLayout(this);
   canvasLayout->addWidget(view);
   canvasLayout->setAlignment(Qt::AlignHCenter);
@@ -47,6 +47,7 @@ CMLEditorWidget::CMLEditorWidget(QWidget *_parent)
   view->centerOn(QPointF(0, 0));
   view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
   view->setDragMode(QGraphicsView::ScrollHandDrag);
+  view->show();
 
   canvasLayout->setContentsMargins(0, 0, 0, 0);
   canvasLayout->setSpacing(0);
