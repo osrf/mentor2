@@ -51,6 +51,7 @@ if (NOT QT4_FOUND)
   BUILD_ERROR("Missing: Qt4")
 endif()
 
+add_subdirectory(msgs)
 add_subdirectory(CMLEditor)
 add_subdirectory(SimpleMOOC)
 add_subdirectory(MOOCUI)

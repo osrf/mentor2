@@ -1,0 +1,9 @@
+
+package SimpleMOOC_msgs.msgs;
+
+message SimpleMOOCLoginRequest
+{
+  required string url      = 1;
+  required string username = 2;
+  required string password = 3;
+}

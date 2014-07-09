@@ -89,7 +89,7 @@ CMLEditorPalette::CMLEditorPalette(QWidget *_parent)
 
 /*  this->saved = false;
   this->saveLocation = QDir::homePath().toStdString();
-  this->modelName = "default";*
+  this->modelName = "default";*/
 }
 
 /////////////////////////////////////////////////
