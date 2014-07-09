@@ -50,7 +50,7 @@ void MOOCUIPlugin::OnMainWindowReady()
   // Get a pointer to the active user camera
   //rendering::UserCameraPtr userCam;
   gui::MainWindow *mainWindow = gui::get_main_window();
-  QMenu *menu = new QMenu(QString("MOOC"));
+  QMenu *menu = new QMenu(QString("&MOOC"));
 
   QAction* loginAct = new QAction(QString("&Login"), menu );
   loginAct->setStatusTip(QString("Login to Mentor 2 Learning Companion"));
