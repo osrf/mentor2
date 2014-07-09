@@ -16,14 +16,16 @@
 */
 
 #include "gazebo/gazebo.hh"
+#include <gazebo/gui/qt.h>
 
 namespace gazebo
 {
   class MOOCUIPlugin : public SystemPlugin
   {
+
     public: virtual ~MOOCUIPlugin();
     public: virtual void Load(int /*_argc*/, char ** /*_argv*/);
-        
+      
     private: virtual void Init();
     private: void OnMainWindowReady();
     private: std::vector<event::ConnectionPtr> connections;
