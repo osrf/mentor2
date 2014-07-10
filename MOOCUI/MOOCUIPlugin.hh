@@ -20,14 +20,22 @@
 
 namespace gazebo
 {
+
   class MOOCUIPlugin : public SystemPlugin
   {
-
+    /// \brief dtor
     public: virtual ~MOOCUIPlugin();
+
+    /// \brief called when plugin is loaded
     public: virtual void Load(int /*_argc*/, char ** /*_argv*/);
-      
+
+    /// \brief plugin initialization
     private: virtual void Init();
+
+    /// \brief called by Gazebo after the main window has been setup
     private: void OnMainWindowReady();
+
+    /// \brief callbacks (to connect to the main window ready event)
     private: std::vector<event::ConnectionPtr> connections;
   };
 }

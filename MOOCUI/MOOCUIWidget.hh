@@ -17,21 +17,41 @@
 
 #include <gazebo/gui/qt.h>
 #include <gazebo/gazebo.hh>
+
 #include "SimpleMOOC.pb.h"
+#include "MOOCLoginDialog.hh"
+
+typedef const boost::shared_ptr<const SimpleMOOC_msgs::msgs::LoginResponse> ConstLoginResponsePtr;
 
 namespace gazebo
 {
   class MOOCUIWidget : public QWidget
   {
     Q_OBJECT
+
+    /// \brief ctor
     public: MOOCUIWidget(QWidget *_parent = 0);
+    /// \brief dtor
     public: virtual ~MOOCUIWidget();
 
+    /// \brief QT callback (MOOC/Login menu) 
+    public slots: void LoginMOOC();
 
-    public slots: void LoginMOOC();        
+    /// \brief pub/sub node to communicate with gzserver
     private: gazebo::transport::NodePtr node;
+
+    /// \brief Gazebo topics publisher
     private: gazebo::transport::PublisherPtr pub;
-    private: bool isLoggedIn;
+
+    // \brief Gazebo topics subscriber
+    private: gazebo::transport::SubscriberPtr sub;
+
+    /// \brief called everytime a login response  message is received.
+    private: void OnLoginResponse(ConstLoginResponsePtr &_msg);   
+ 
+    /// \brief login dialog
+    gui::MOOCLoginDialog dialog;
+    // private: bool isLoggedIn;
   };
 }
 

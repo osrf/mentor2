@@ -26,33 +26,6 @@ using namespace gui;
 using namespace std;
 
 
-LearningCompanion:: LearningCompanion(const char* url, const char* user, const char* pass)
-  :url(url), user(user), pass(pass)
-{
-
-}
-
-
-bool LearningCompanion::Login(std::string &msg)
-{
-/*
-    bool isLoggedIn = false;
-    // verify login credentials
-    CURL *curl = curl_easy_init();
-    curl_easy_setopt(curl, CURLOPT_URL, url.c_str() );
-    CURLcode res = curl_easy_perform(curl);
-    curl_easy_cleanup(curl);
-    if(res != CURLE_OK) {
-     cerr << "Login to " << url << " failed: " << curl_easy_strerror(res) << endl;
-    } else {
-      isLoggedIn = true;
-    }
-    cout << "User " << user << "  is logged in? :  " << isLoggedIn << endl;
-    return isLoggedIn;
-*/
-}
-
-
 /////////////////////////////////////////////////
 MOOCLoginDialog::MOOCLoginDialog::MOOCLoginDialog(QWidget *_parent, const char* defaultUrl)
     : QDialog(_parent), url(defaultUrl)
@@ -126,13 +99,11 @@ void MOOCLoginDialog::slotAcceptLogin()
   password = pass.toStdString();
   url = u.toStdString();
 
-  LearningCompanion server(url.c_str(), username.c_str(), password.c_str());
   labelInfo->setText("Connecting...");  
   qApp->processEvents();
 
   std::string msg;  
-  //if( server.Login(msg))
-//  {
+
 //  cout << "MOOCLoginDialog::slotAcceptLogin" << endl;
 //  cout << "  URL: " << url << endl;
 //  cout << "  USER: " << username << endl;
@@ -140,7 +111,6 @@ void MOOCLoginDialog::slotAcceptLogin()
     emit acceptLogin(u, user, pass);
     // close the dialog with success exit code
     accept();
-//  }
 
 }
 

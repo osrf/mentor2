@@ -18,9 +18,7 @@
 #include <iostream>
 #include <curl/curl.h>
 
-#include "MOOCLoginDialog.hh"
 #include "MOOCUIWidget.hh"
-#include "SimpleMOOC.pb.h"
 
 using namespace gazebo;
 using namespace std;
@@ -28,44 +26,58 @@ using namespace std;
 
 
 MOOCUIWidget::MOOCUIWidget(QWidget *_parent)
-  : QWidget(_parent), isLoggedIn(false),
-    node(new gazebo::transport::Node())
+  : QWidget(_parent),
+    node(new gazebo::transport::Node()),
+    dialog(this, "https://mentor2.companion.org")
 {
   node->Init();
-  pub = node->Advertise<SimpleMOOC_msgs::msgs::SimpleMOOCLoginRequest>("~/MOOC");
+  pub = node->Advertise<SimpleMOOC_msgs::msgs::LoginRequest>("~/MOOC");
+  sub = node->Subscribe("~/MOOCResponse", &MOOCUIWidget::OnLoginResponse, this);
 }
  
 
 MOOCUIWidget::~MOOCUIWidget()
 {
+  cout << "MOOCUIWidget::~MOOCUIWidget()" << endl;
 }
 
 void MOOCUIWidget::LoginMOOC()
 {
-  std::cout << "LOGIN to the MOOC" << std::endl;
+  std::cout << "MOOCUI login" << std::endl;
   gui::MOOCLoginDialog dialog(this, "https://mentor2.companion.org");
 
   if(dialog.exec() == QDialog::Rejected) {
     cout << "MOOCUIWidget::LoginMOOC CANCELLED" << endl;
   } else {
-    cout << "MOOCUIWidget::LoginMOOC Accepted " << endl;
-    cout << "  user: " << dialog.getUsername() << endl;
-    cout << "  pass: " << dialog.getPassword() << endl;
-    cout << "  url:  " << dialog.getUrl() << endl;
-
-
-    SimpleMOOC_msgs::msgs::SimpleMOOCLoginRequest msg;
-   //loginPub->WaitForConnection();
+    SimpleMOOC_msgs::msgs::LoginRequest msg;
     msg.set_url(dialog.getUrl());
     msg.set_username(dialog.getUsername());
     msg.set_password(dialog.getPassword());
-    cout << "PUB ... " << endl;
     pub->Publish(msg);
-    cout<< "LISHED!!! " << endl;
 
+    cout << "Login request sent [";
+    cout << dialog.getUrl() << ", ";
+    cout << dialog.getUsername() << ", ";
+    cout << dialog.getPassword() << "]"; 
+    cout << endl;
   } 
 }
 
+void MOOCUIWidget::OnLoginResponse(ConstLoginResponsePtr &_msg )
+{
+  cout << "MOOCUI Login response received: ";
+  cout << " success: " << _msg->success();
+  cout << " msg: " << _msg->msg();
+  cout << endl;
 
+  if(_msg->success()) {
+    cout << "LOGIN confirmed";
+  }
+  else {
+    // alert!
+    cout << "ALERT??????" << endl;
+  }
+
+}
 
 

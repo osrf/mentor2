@@ -24,30 +24,37 @@ using namespace gazebo;
 using namespace std;
 
 
-MOOCRestApi::MOOCRestApi(const char* url, const char* user, const char* pass)
-  :url(url), user(user), pass(pass)
+MOOCRestApi::MOOCRestApi()
+  :isLoggedIn(false)
 {
 
 }
 
-
-bool MOOCRestApi::Login()
+MOOCRestApi::~MOOCRestApi()
 {
+  cout << "~MOOCRestApi()" << endl;    
+}
 
 
-    bool isLoggedIn = false;
-/*    // verify login credentials
+void MOOCRestApi::Login(const char* url, const char* user, const char* pass)
+{
+    this->url = url;
+    this->user = user;
+    this->pass = pass;
+
+    isLoggedIn = false;
+
+    cout << "MOOCRestApi::Login" << endl;
+    // verify login credentials
     CURL *curl = curl_easy_init();
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str() );
     CURLcode res = curl_easy_perform(curl);
     curl_easy_cleanup(curl);
     if(res != CURLE_OK) {
-     cerr << "Login to " << url << " failed: " << curl_easy_strerror(res) << endl;
-    } else {
-      isLoggedIn = true;
+      cerr << "Login to " << url << " failed: " << curl_easy_strerror(res) << endl;
+      throw MOOCException(curl_easy_strerror(res));
     }
-*/
+    isLoggedIn = true;
     cout << "User " << user << "  is logged in? :  " << isLoggedIn << endl;
-    return isLoggedIn;
 }
 

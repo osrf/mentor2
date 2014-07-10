@@ -27,13 +27,22 @@ namespace gazebo
 
   class MOOCRestApi
   {
-    public: MOOCRestApi(const char* url, const char* user, const char* pass);
-    public: bool Login();
+    /// \brief ctor
+    public: MOOCRestApi();
 
-    private:
-      std::string url;
-      std::string user;
-      std::string pass;
+    /// \brief dtor
+    public: virtual ~MOOCRestApi();
+
+    /// \brief Connects to the MOOC. Returns true if successful
+    public: bool Login(const char* url, const char* user, const char* pass);
+    
+    private: std::string url;
+
+    private: std::string user;
+
+    private: std::string pass;
+
+    private: bool isLoggedIn;
   };
 }
 

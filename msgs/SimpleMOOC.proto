@@ -1,9 +1,15 @@
 
 package SimpleMOOC_msgs.msgs;
 
-message SimpleMOOCLoginRequest
+message LoginRequest
 {
   required string url      = 1;
   required string username = 2;
   required string password = 3;
+}
+
+message LoginResponse
+{
+  required bool success = 1;
+  required string msg   = 2;
 }
