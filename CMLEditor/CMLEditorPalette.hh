@@ -40,6 +40,9 @@ namespace gazebo
 
       /// \brief Destructor
       public: ~CMLEditorPalette();
+
+      /// \brief Widget that display components.
+      private: QTreeWidget *componentTreeWidget;
     };
   }
 }
