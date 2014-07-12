@@ -19,12 +19,17 @@
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GuiEvents.hh"
 
-#include "MOOCUIWidget.hh"
 #include "MOOCUIPlugin.hh"
 
 using namespace gazebo;
 using namespace std;
 
+
+MOOCUIPlugin::MOOCUIPlugin()
+  :widget(NULL)
+{
+  cout << "MOOCUIPlugin()" << endl;
+}
 
 MOOCUIPlugin::~MOOCUIPlugin()
 {
@@ -43,8 +48,19 @@ void MOOCUIPlugin::Init()
       gui::Events::ConnectMainWindowReady(
       boost::bind(&MOOCUIPlugin::OnMainWindowReady, this)));
 
+  this->connections.push_back(
+        event::Events::ConnectPreRender(
+        boost::bind(&MOOCUIPlugin::Update, this)));
+
   std::cerr << "MOOCUIPlugin::Init()" <<  std::endl;
 
+}
+
+void MOOCUIPlugin::Update()
+{
+  if(widget) {
+    widget->Update();
+  }
 }
 
 void MOOCUIPlugin::OnMainWindowReady()
@@ -56,7 +72,7 @@ void MOOCUIPlugin::OnMainWindowReady()
   gui::MainWindow *mainWindow = gui::get_main_window();
   // create a global widget instance, to act as a global QT object
   // the MOOCUIPlugin class is not a QT object
-  MOOCUIWidget *widget = new MOOCUIWidget(mainWindow);
+  widget = new MOOCUIWidget(mainWindow);
   QObject::connect(loginAct, SIGNAL(triggered()), widget, SLOT(LoginMOOC()));
   menu->addAction(loginAct);
   mainWindow->AddMenu(menu);

@@ -15,6 +15,10 @@
  *
 */
 
+#ifndef _MOOCUI_LOGIN_DIALOG_HH_
+#define _MOOCUI_LOGIN_DIALOG_HH_
+
+
 #include "MOOCLoginDialog.hh"
 #include "MOOCUIWidget.hh"
 #include <iostream>
@@ -115,6 +119,6 @@ void MOOCLoginDialog::slotAcceptLogin()
 }
 
 
-
+#endif
 
 

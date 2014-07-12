@@ -63,6 +63,7 @@ void SimpleMOOCPlugin::OnLoginRequest(ConstLoginRequestPtr &_msg )
   // alert the user via the gui plugin
   pub->Publish(msg);
 }
+
 // plugin registration
 GZ_REGISTER_SYSTEM_PLUGIN(SimpleMOOCPlugin)
 

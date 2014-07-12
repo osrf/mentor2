@@ -36,11 +36,11 @@ MOOCRestApi::~MOOCRestApi()
 }
 
 
-void MOOCRestApi::Login(const char* url, const char* user, const char* pass)
+void MOOCRestApi::Login(const char* urlStr, const char* userStr, const char* passStr)
 {
-    this->url = url;
-    this->user = user;
-    this->pass = pass;
+    this->url = urlStr;
+    this->user = userStr;
+    this->pass = passStr;
 
     isLoggedIn = false;
 

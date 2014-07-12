@@ -17,7 +17,7 @@
 
 #include <gazebo/gazebo.hh>
 #include "SimpleMOOC.pb.h"
-
+#include "MOOCRestApi.hh"
 
 typedef const boost::shared_ptr<const SimpleMOOC_msgs::msgs::LoginRequest> ConstLoginRequestPtr;
 
@@ -53,6 +53,9 @@ namespace gazebo
 
     /// \brief Gazebo events
     private: std::vector<event::ConnectionPtr> connections;
+
+    /// \brief REST calls
+    private: MOOCRestApi restApi;
   };
 
 }

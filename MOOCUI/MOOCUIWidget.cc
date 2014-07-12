@@ -15,9 +15,8 @@
  *
 */
 
-#include <iostream>
 #include <curl/curl.h>
-
+#include <QMessageBox>
 #include "MOOCUIWidget.hh"
 
 using namespace gazebo;
@@ -74,10 +73,21 @@ void MOOCUIWidget::OnLoginResponse(ConstLoginResponsePtr &_msg )
     cout << "LOGIN confirmed";
   }
   else {
-    // alert!
-    cout << "ALERT??????" << endl;
+    // add msg to queue for later processing from
+    // the GUI thread
+    // msgQueue.push_back(_msg);
+    msgLoginRespQ.push_back(_msg);
   }
 
 }
 
-
+void  MOOCUIWidget::Update()
+{
+  // Login problem?
+  while(!msgLoginRespQ.empty()) {
+    ConstLoginResponsePtr msg = msgLoginRespQ.front();
+    msgLoginRespQ.pop_front();
+    QMessageBox::critical(this, tr("MOOC Login error"),tr(msg->msg().c_str()) );
+    
+  }
+}
