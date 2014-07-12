@@ -55,13 +55,19 @@ void SimpleMOOCPlugin::OnLoginRequest(ConstLoginRequestPtr &_msg )
   cout << _msg->url() << ", ";
   cout << _msg->username() << ", ";
   cout << _msg->password() << "]" << endl;
-
-
-  SimpleMOOC_msgs::msgs::LoginResponse msg;
-  msg.set_success(false);
-  msg.set_msg("Not implelemented");
-  // alert the user via the gui plugin
-  pub->Publish(msg);
+ 
+  try {
+    restApi.Login(_msg->url().c_str(), _msg->username().c_str(), _msg->password().c_str() );
+  }
+  catch(MOOCException &x) {
+    SimpleMOOC_msgs::msgs::LoginResponse msg;
+    msg.set_success(false);
+    std::string errorMsg ("There was a problem trying to login the Mentor2 Learning companion: ");
+    errorMsg += x.what();
+    msg.set_msg(errorMsg);
+    // alert the user via the gui plugin
+    pub->Publish(msg);
+  }
 }
 
 // plugin registration
