@@ -22,8 +22,8 @@
 #include "SimpleMOOC.pb.h" 
 #include "MOOCLoginDialog.hh"
 
-typedef const boost::shared_ptr<const SimpleMOOC_msgs::msgs::LoginResponse> ConstLoginResponsePtr;
-// typedef const boost::shared_ptr<const ::google::protobuf::Message> ConstProtobufMsgPtr;
+
+typedef const boost::shared_ptr<const SimpleMOOC_msgs::msgs::RestResponse> ConstRestResponsePtr;
 
 namespace gazebo
 {
@@ -48,8 +48,8 @@ namespace gazebo
     // \brief Gazebo topics subscriber
     private: gazebo::transport::SubscriberPtr sub;
 
-    /// \brief called everytime a login response  message is received.
-    private: void OnLoginResponse(ConstLoginResponsePtr &_msg);   
+    /// \brief called everytime a response  message is received.
+    private: void OnResponse(ConstRestResponsePtr &_msg);   
 
     /// \brief called before rendering, from the GUI thread
     /// this is called from the plugin's update
@@ -58,8 +58,7 @@ namespace gazebo
     /// \brief login dialog
     private: gui::MOOCLoginDialog dialog;
     
-   private: std::list< boost::shared_ptr<const SimpleMOOC_msgs::msgs::LoginResponse> > msgLoginRespQ;
-//    private: std::vector< const boost::shared_ptr<const ::google::protobuf::Message> > msgQueue;
+   private: std::list< boost::shared_ptr<const SimpleMOOC_msgs::msgs::RestResponse> > msgRespQ;
 
  };
 }

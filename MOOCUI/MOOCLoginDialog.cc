@@ -93,6 +93,7 @@ MOOCLoginDialog::MOOCLoginDialog::MOOCLoginDialog(QWidget *_parent, const char* 
 
 }
 
+
 void MOOCLoginDialog::slotAcceptLogin()
 {
   QString user = editUsername->text();

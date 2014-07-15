@@ -25,36 +25,55 @@ using namespace std;
 
 
 MOOCRestApi::MOOCRestApi()
-  :isLoggedIn(false)
 {
 
 }
 
 MOOCRestApi::~MOOCRestApi()
 {
-  cout << "~MOOCRestApi()" << endl;    
 }
 
 
-void MOOCRestApi::Login(const char* urlStr, const char* userStr, const char* passStr)
+std::string MOOCRestApi::Login(const char* urlStr, const char* userStr, const char* passStr)
 {
-    this->url = urlStr;
-    this->user = userStr;
-    this->pass = passStr;
+  this->url = urlStr;
+  this->user = userStr;
+  this->pass = passStr;
+  std::string resp = this->Request(urlStr);
+  this->isLoggedIn = true;
+  return resp;
+}
 
-    isLoggedIn = false;
 
-    cout << "MOOCRestApi::Login" << endl;
+std::string MOOCRestApi::Request(const char* _req)
+{
+
+    // this->url = "https://97.76.231.101/events/all";
+    cout << "MOOCRestApi::Request" << endl;
     // verify login credentials
     CURL *curl = curl_easy_init();
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str() );
+
+    bool secure = false;
+    if(!secure)
+    {
+      // skip peer verification
+      curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+      // skip host verification
+      curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+    }
+    curl_easy_setopt(curl, CURLOPT_HTTPAUTH, (long)CURLAUTH_ANY);
+
+    // set user name and password for the authentication  
+    string userpass = this->user + ":" + this->pass;
+    curl_easy_setopt(curl, CURLOPT_USERPWD, userpass.c_str());
+    
     CURLcode res = curl_easy_perform(curl);
     curl_easy_cleanup(curl);
     if(res != CURLE_OK) {
-      cerr << "Login to " << url << " failed: " << curl_easy_strerror(res) << endl;
+      cerr << "Request to " << url << " failed: " << curl_easy_strerror(res) << endl;
       throw MOOCException(curl_easy_strerror(res));
     }
-    isLoggedIn = true;
-    cout << "User " << user << "  is logged in? :  " << isLoggedIn << endl;
+    return std::string("watta watta watta");
 }
 

@@ -15,11 +15,15 @@
  *
 */
 
+#ifndef _SIMPLE_MOOC_PLUGIN_HH_
+#define _SIMPLE_MOOC_PLUGIN_HH_
+
+
 #include <gazebo/gazebo.hh>
 #include "SimpleMOOC.pb.h"
 #include "MOOCRestApi.hh"
 
-typedef const boost::shared_ptr<const SimpleMOOC_msgs::msgs::LoginRequest> ConstLoginRequestPtr;
+typedef const boost::shared_ptr<const SimpleMOOC_msgs::msgs::RestRequest> ConstRestRequestPtr;
 
 
 namespace gazebo
@@ -37,11 +41,14 @@ namespace gazebo
     public: virtual void Load(int /*_argc*/, char ** /*_argv*/);
 
     /// \brief  called everytime a message is received.
-    public: void OnLoginRequest(ConstLoginRequestPtr &_msg );
+    public: void OnRestRequest(ConstRestRequestPtr &_msg );
     
     /// \brief Plugin initialization
     private: virtual void Init();
     
+    /// \brief Entry point for the request processing thread
+    private: void RunRequestQ();
+
     /// \brief Gazebo pub/sub node
     private: gazebo::transport::NodePtr node;
     
@@ -56,8 +63,23 @@ namespace gazebo
 
     /// \brief REST calls
     private: MOOCRestApi restApi;
-  };
+
+    /// \brief a flag to interrupt message processing
+    private: bool stopMsgProcessing;
+ 
+    /// \brief a list toaccumulate pending request    
+    private: std::list< boost::shared_ptr<const SimpleMOOC_msgs::msgs::RestRequest> > msgRequestQ;
+
+    /// \brief a thread to process requests without stopping the simulation
+    private: boost::thread requestQThread;
+
+    /// \brief a mutex to ensure integrity of the request list
+    private: boost::mutex requestQMutex;
+
+ };
 
 }
+
+#endif
 
 

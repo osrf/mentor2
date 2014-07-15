@@ -30,8 +30,8 @@ MOOCUIWidget::MOOCUIWidget(QWidget *_parent)
     dialog(this, "https://mentor2.companion.org")
 {
   node->Init();
-  pub = node->Advertise<SimpleMOOC_msgs::msgs::LoginRequest>("~/MOOC");
-  sub = node->Subscribe("~/MOOCResponse", &MOOCUIWidget::OnLoginResponse, this);
+  pub = node->Advertise<SimpleMOOC_msgs::msgs::RestRequest>("~/MOOCRequest");
+  sub = node->Subscribe("~/MOOCResponse", &MOOCUIWidget::OnResponse, this);
 }
  
 
@@ -48,7 +48,7 @@ void MOOCUIWidget::LoginMOOC()
   if(dialog.exec() == QDialog::Rejected) {
     cout << "MOOCUIWidget::LoginMOOC CANCELLED" << endl;
   } else {
-    SimpleMOOC_msgs::msgs::LoginRequest msg;
+    SimpleMOOC_msgs::msgs::RestRequest msg;
     msg.set_url(dialog.getUrl());
     msg.set_username(dialog.getUsername());
     msg.set_password(dialog.getPassword());
@@ -62,7 +62,7 @@ void MOOCUIWidget::LoginMOOC()
   } 
 }
 
-void MOOCUIWidget::OnLoginResponse(ConstLoginResponsePtr &_msg )
+void MOOCUIWidget::OnResponse(ConstRestResponsePtr &_msg )
 {
   cout << "MOOCUI Login response received: ";
   cout << " success: " << _msg->success();
@@ -76,7 +76,7 @@ void MOOCUIWidget::OnLoginResponse(ConstLoginResponsePtr &_msg )
     // add msg to queue for later processing from
     // the GUI thread
     // msgQueue.push_back(_msg);
-    msgLoginRespQ.push_back(_msg);
+    msgRespQ.push_back(_msg);
   }
 
 }
@@ -84,9 +84,9 @@ void MOOCUIWidget::OnLoginResponse(ConstLoginResponsePtr &_msg )
 void  MOOCUIWidget::Update()
 {
   // Login problem?
-  while(!msgLoginRespQ.empty()) {
-    ConstLoginResponsePtr msg = msgLoginRespQ.front();
-    msgLoginRespQ.pop_front();
+  while(!msgRespQ.empty()) {
+    ConstRestResponsePtr msg = msgRespQ.front();
+    msgRespQ.pop_front();
     QMessageBox::critical(this, tr("MOOC Login error"),tr(msg->msg().c_str()) );
     
   }

@@ -34,7 +34,11 @@ namespace gazebo
     public: virtual ~MOOCRestApi();
 
     /// \brief Connects to the MOOC. Returns true if successful
-    public: void Login(const char* url, const char* user, const char* pass);
+    public: std::string Login(const char* url, const char* user, const char* pass);
+
+    /// \brief a Request/Response
+    /// \return the response
+    public: std::string Request(const char* request);
     
     private: std::string url;
 
