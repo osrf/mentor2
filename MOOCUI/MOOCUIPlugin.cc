@@ -19,19 +19,26 @@
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GuiEvents.hh"
 
-#include "MOOCUIWidget.hh"
 #include "MOOCUIPlugin.hh"
 
 using namespace gazebo;
+using namespace std;
+
+
+MOOCUIPlugin::MOOCUIPlugin()
+  :widget(NULL)
+{
+  cout << "MOOCUIPlugin()" << endl;
+}
 
 MOOCUIPlugin::~MOOCUIPlugin()
 {
-  //if (this->userCam)
-  //  this->userCam->EnableSaveFrame(false);
+  cout << "~MOOCUIPlugin()" << endl;
 }
 
 void MOOCUIPlugin::Load(int /*_argc*/, char ** /*_argv*/)
 {
+  cout << "MOOCUIPlugin::Load()" << endl;
 }
 
 void MOOCUIPlugin::Init()
@@ -41,25 +48,32 @@ void MOOCUIPlugin::Init()
       gui::Events::ConnectMainWindowReady(
       boost::bind(&MOOCUIPlugin::OnMainWindowReady, this)));
 
-  std::cerr << " Hello World " <<  std::endl;
+  this->connections.push_back(
+        event::Events::ConnectPreRender(
+        boost::bind(&MOOCUIPlugin::Update, this)));
 
+  std::cerr << "MOOCUIPlugin::Init()" <<  std::endl;
+
+}
+
+void MOOCUIPlugin::Update()
+{
+  if(widget) {
+    widget->Update();
+  }
 }
 
 void MOOCUIPlugin::OnMainWindowReady()
 {
-  // Get a pointer to the active user camera
-  //rendering::UserCameraPtr userCam;
-  gui::MainWindow *mainWindow = gui::get_main_window();
+  // add menu for this plugin
   QMenu *menu = new QMenu(QString("&MOOC"));
-
   QAction* loginAct = new QAction(QString("&Login"), menu );
   loginAct->setStatusTip(QString("Login to Mentor 2 Learning Companion"));
-  
-  MOOCUIWidget *widget = new MOOCUIWidget(mainWindow);
-  
+  gui::MainWindow *mainWindow = gui::get_main_window();
+  // create a global widget instance, to act as a global QT object
+  // the MOOCUIPlugin class is not a QT object
+  widget = new MOOCUIWidget(mainWindow);
   QObject::connect(loginAct, SIGNAL(triggered()), widget, SLOT(LoginMOOC()));
-
-  
   menu->addAction(loginAct);
   mainWindow->AddMenu(menu);
 }

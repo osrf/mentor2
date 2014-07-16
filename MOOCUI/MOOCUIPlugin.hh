@@ -15,20 +15,44 @@
  *
 */
 
+#ifndef _MOOCUI_PLUGIN_HH_
+#define _MOOCUI_PLUGIN_HH_
+
+
 #include "gazebo/gazebo.hh"
 #include <gazebo/gui/qt.h>
 
+#include "MOOCUIWidget.hh"
+
 namespace gazebo
 {
+
   class MOOCUIPlugin : public SystemPlugin
   {
+    /// \brief ctor
+    public: MOOCUIPlugin();
 
+    /// \brief dtor
     public: virtual ~MOOCUIPlugin();
+
+    /// \brief called when plugin is loaded
     public: virtual void Load(int /*_argc*/, char ** /*_argv*/);
-      
+
+    /// \brief plugin initialization
     private: virtual void Init();
+
+    /// \brief called by Gazebo after the main window has been setup
     private: void OnMainWindowReady();
+
+    /// \brief called from the GUI thread before rendering
+    private: void Update();
+
+    /// \brief callbacks (to connect to the main window ready event)
     private: std::vector<event::ConnectionPtr> connections;
+
+    private: MOOCUIWidget *widget;
   };
 }
+
+#endif
 

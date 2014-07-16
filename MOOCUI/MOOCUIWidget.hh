@@ -15,23 +15,52 @@
  *
 */
 
-#include <gazebo/gui/qt.h>
+#ifndef _MOOCUI_WIDGET_HH_
+#define _MOOCUI_WIDGET_HH_
+
 #include <gazebo/gazebo.hh>
-#include "SimpleMOOC.pb.h"
+#include "SimpleMOOC.pb.h" 
+#include "MOOCLoginDialog.hh"
+
+
+typedef const boost::shared_ptr<const SimpleMOOC_msgs::msgs::RestResponse> ConstRestResponsePtr;
 
 namespace gazebo
 {
   class MOOCUIWidget : public QWidget
   {
     Q_OBJECT
+
+    /// \brief ctor
     public: MOOCUIWidget(QWidget *_parent = 0);
+    /// \brief dtor
     public: virtual ~MOOCUIWidget();
 
+    /// \brief QT callback (MOOC/Login menu) 
+    public slots: void LoginMOOC();
 
-    public slots: void LoginMOOC();        
+    /// \brief pub/sub node to communicate with gzserver
     private: gazebo::transport::NodePtr node;
+
+    /// \brief Gazebo topics publisher
     private: gazebo::transport::PublisherPtr pub;
-    private: bool isLoggedIn;
-  };
+
+    // \brief Gazebo topics subscriber
+    private: gazebo::transport::SubscriberPtr sub;
+
+    /// \brief called everytime a response  message is received.
+    private: void OnResponse(ConstRestResponsePtr &_msg);   
+
+    /// \brief called before rendering, from the GUI thread
+    /// this is called from the plugin's update
+    public: void Update();
+ 
+    /// \brief login dialog
+    private: gui::MOOCLoginDialog dialog;
+    
+   private: std::list< boost::shared_ptr<const SimpleMOOC_msgs::msgs::RestResponse> > msgRespQ;
+
+ };
 }
 
+#endif

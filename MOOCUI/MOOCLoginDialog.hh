@@ -24,17 +24,6 @@
 namespace gazebo
 {
 
-  class LearningCompanion
-  {
-    public: LearningCompanion(const char* url, const char* user, const char* pass);
-    public: bool Login(std::string &msg); 
-
-    private:
-      std::string url;
-      std::string user;
-      std::string pass;
-  };
-
   namespace gui
   {
 
@@ -50,36 +39,44 @@ namespace gazebo
         MOOCLoginDialog(QWidget *_parent = 0, const char* defautlUrl= "");
 
       signals:
+        /// \brief emitted when the user presses the login button
         void acceptLogin(QString &url, QString& username, QString& password);
 
       public slots:
+        
         void slotAcceptLogin();
 
-      private:
-        /// \brief A label for the url component
-        QLabel *labelUrl;
-        /// \brief A label for the username component
-        QLabel *labelUsername;
-        /// \brief A label for the password
-        QLabel *labelPassword;
-        /// \brief A text field for the default url
-        QLineEdit* editUrl;
-        /// \brief A text field to enter the user name
-        QLineEdit* editUsername;
-        /// \brief A text field to enter the password
-        QLineEdit* editPassword;
+      /// \brief A label for the url component
+      private: QLabel *labelUrl;
 
-        /// \brief A label to displau errors and information
-        QLabel *labelInfo;
+      /// \brief A label for the username component
+      private: QLabel *labelUsername;
 
-        /// \brief The standard dialog buttons
-        QDialogButtonBox *buttons;
+      /// \brief A label for the password
+      private: QLabel *labelPassword;
 
+      /// \brief A text field for the default url
+      private: QLineEdit* editUrl;
+
+      /// \brief A text field to enter the user name
+      private: QLineEdit* editUsername;
+
+      /// \brief A text field to enter the password
+      private: QLineEdit* editPassword;
+
+      /// \brief A label to displau errors and information
+      private: QLabel *labelInfo;
+
+      /// \brief The standard dialog buttons
+      private: QDialogButtonBox *buttons;
+      
+      /// \brief getters
       public: std::string getUsername() {return username;}
       public: std::string getPassword() {return password;}
       public: std::string getUrl() {return url;}
 
       private:
+        /// \brief login information
         std::string username;
         std::string password;
         std::string url;

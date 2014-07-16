@@ -29,7 +29,8 @@ namespace gazebo
   // standard runtime error
   class MOOCException : public std::runtime_error
   {
-
+    public: MOOCException(const char*m) :std::runtime_error(m){}
+        
   };
 }
 
