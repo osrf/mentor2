@@ -179,16 +179,13 @@ std::string MOOCRestApi::Login(const char* urlStr, const char* userStr, const ch
   this->user = "myuser";
   this->pass = "mypass";
 
-  string json = "{ \"Type\": \"GAZEBO_OBJECTIVE_COMPLETED\", \"Results\": { \
-        \"startTime\": \"2014-07-08T16:01:18.636Z\", \
-        \"completedAt\": \"2014-07-08T16:23:15.636Z\", \
-        \"timeSpent\": \"1087.3\", \
-        \"world\": \"simple.world\", \
-        \"score\": \"11\", \
-        \"issues\": [\"Simple MOOC plugin\", \"connecting pully\"] \
-    }, \
-    \"Resources\": [\"intro.mpg\", \"lesson1.mpg\"], \
-    \"userid\": \"myuser\"  }";
+  string json = "{ \"Type\": \"GAZEBO_OBJECTIVE_COMPLETED\", \"Results\": { ";
+  json += "\"startTime\": \"2014-07-08T16:01:18.636Z\", ";
+  json += "\"completedAt\": \"2014-07-08T16:23:15.636Z\", ";
+  json += "\"timeSpent\": \"1087.3\", \"world\": \"simple.world\", ";
+  json += "\"score\": \"11\", \"issues\": [\"Simple MOOC plugin\", ";
+  json += "\"connecting pully\"] }, \"Resources\": [\"intro.mpg\", ";
+  json += "\"lesson1.mpg\"], \"userid\": \"myuser\"  }";
 
    cout << endl << endl << json << endl << endl;
 
@@ -259,14 +256,12 @@ std::string MOOCRestApi::Request(const char* _reqUrl, const char* _postJsonStr)
   struct curl_slist *slist = NULL;
   if(_postJsonStr)
   {
-    std::string json(_postJsonStr);
     curl_easy_setopt (curl, CURLOPT_UPLOAD, 0L);  // disable PUT
     curl_easy_setopt(curl, CURLOPT_POST, 1); // enable POST
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json.c_str());
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, json.length());
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, _postJsonStr);
 
     slist = curl_slist_append(slist, "Content-Type: application/json");
-    curl_slist_append(headers, "charsets: utf-8");
+    slist = curl_slist_append(slist, "charsets: utf-8");
 //    slist = curl_slist_append( slist, "Expect:");
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, slist);
   }
