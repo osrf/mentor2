@@ -38,7 +38,7 @@ namespace gazebo
 
     /// \brief a Request/Response
     /// \return the response
-    public: std::string Request(const char* request);
+    public: std::string Request(const char* request, const char *postStr = NULL);
     
     private: std::string url;
 

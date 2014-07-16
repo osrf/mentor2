@@ -29,6 +29,8 @@ MOOCUIWidget::MOOCUIWidget(QWidget *_parent)
     node(new gazebo::transport::Node()),
     dialog(this, "https://mentor2.companion.org")
 {
+
+  cout << "MOOCUIWidget::MOOCUIWidget node setup" << endl;
   node->Init();
   pub = node->Advertise<SimpleMOOC_msgs::msgs::RestRequest>("~/MOOCRequest");
   sub = node->Subscribe("~/MOOCResponse", &MOOCUIWidget::OnResponse, this);
@@ -65,12 +67,13 @@ void MOOCUIWidget::LoginMOOC()
 void MOOCUIWidget::OnResponse(ConstRestResponsePtr &_msg )
 {
   cout << "MOOCUI Login response received: ";
-  cout << " success: " << _msg->success();
-  cout << " msg: " << _msg->msg();
-  cout << endl;
+  cout << " success: " << _msg->success() << endl;
+  cout << " msg:  " << _msg->msg() << endl;
+  cout << " req:  " << _msg->req() << endl;
+  cout << " resp: " << _msg->resp()<< endl;
 
   if(_msg->success()) {
-    cout << "LOGIN confirmed";
+    cout << "";
   }
   else {
     // add msg to queue for later processing from

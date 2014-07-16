@@ -71,7 +71,7 @@ namespace gazebo
     private: std::list< boost::shared_ptr<const SimpleMOOC_msgs::msgs::RestRequest> > msgRequestQ;
 
     /// \brief a thread to process requests without stopping the simulation
-    private: boost::thread requestQThread;
+    private: boost::thread *requestQThread;
 
     /// \brief a mutex to ensure integrity of the request list
     private: boost::mutex requestQMutex;

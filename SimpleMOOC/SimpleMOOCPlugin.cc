@@ -24,7 +24,8 @@ using namespace std;
 SimpleMOOCPlugin::SimpleMOOCPlugin()
   :node(new gazebo::transport::Node()),
   stopMsgProcessing(false),
-  requestQThread(boost::thread( boost::bind(&SimpleMOOCPlugin::RunRequestQ, this))) 
+//  requestQThread(boost::thread( boost::bind(&SimpleMOOCPlugin::RunRequestQ, this))) 
+  requestQThread(NULL)
 {
   
 }
@@ -37,21 +38,20 @@ SimpleMOOCPlugin::~SimpleMOOCPlugin()
   sub.reset();
   // tell the requestQ to stop precessing
   stopMsgProcessing = true;
-  if(this->requestQThread.joinable()) {
-    this->requestQThread.join();
+  if(this->requestQThread->joinable()) {
+    this->requestQThread->join();
+    delete this->requestQThread;
   }
   cout << "SimpleMOOCPlugin::~SimpleMOOCPlugin()" << endl;
 }
 
 void SimpleMOOCPlugin::Init()
 {
-  std::cerr << "Simple MOOC server plugin Init()" <<  std::endl;
+  std::cerr << "SimpleMOOCPlugin setting up pubs/sub node" <<  std::endl;
   // setup our node for communication
   node->Init();
-  pub = node->Advertise<SimpleMOOC_msgs::msgs::RestResponse>("~/MOOCResponse");
-  sub = node->Subscribe("~/MOOCRequest", &SimpleMOOCPlugin::OnRestRequest, this);  
-
-
+  sub = node->Subscribe("~/MOOCRequest", &SimpleMOOCPlugin::OnRestRequest, this);
+  requestQThread = new boost::thread( boost::bind(&SimpleMOOCPlugin::RunRequestQ, this));
 }
 
 void SimpleMOOCPlugin::Load(int /*_argc*/, char ** /*_argv*/)
@@ -76,6 +76,7 @@ void SimpleMOOCPlugin::OnRestRequest(ConstRestRequestPtr &_msg )
 void SimpleMOOCPlugin::RunRequestQ()
 {
   cout << "SimpleMOOCPlugin::RunRequestQ THREAD started" << endl;
+  pub = node->Advertise<SimpleMOOC_msgs::msgs::RestResponse>("~/MOOCResponse");
   while (!stopMsgProcessing) {
     gazebo::common::Time::MSleep(50);
     try{
@@ -109,7 +110,7 @@ void SimpleMOOCPlugin::RunRequestQ()
           SimpleMOOC_msgs::msgs::RestResponse msg;
           msg.set_success(true);
           msg.set_resp(resp.c_str());
-          cout << "SUCCESS ... publishing to MOOCUI" << endl;
+          cout << "SUCCESS ... publishing to MOOCUI: " << resp << endl;
           this->pub->Publish(msg);          
         }
         catch(MOOCException &x)
@@ -120,7 +121,7 @@ void SimpleMOOCPlugin::RunRequestQ()
           errorMsg += x.what();
           msg.set_msg(errorMsg);
           // alert the user via the gui plugin
-          cerr << "ERROR in request... publising to MOOCUI" << endl;
+          cerr << "ERROR in request... publising to MOOCUI: " << errorMsg << endl;
           this->pub->Publish(msg);
         }
       }

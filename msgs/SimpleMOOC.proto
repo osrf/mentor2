@@ -4,15 +4,15 @@ package SimpleMOOC_msgs.msgs;
 message RestRequest
 {
   required string url      = 1;
-  required string username = 2;
-  required string password = 3;
+  optional string username = 2;
+  optional string password = 3;
 }
 
 
 message RestResponse
 {
   required bool success = 1;
-  required string msg   = 2;
-  required string req   = 3;
-  required string resp  = 4;
+  optional string msg   = 2;
+  optional string req   = 3;
+  optional string resp  = 4;
 }
