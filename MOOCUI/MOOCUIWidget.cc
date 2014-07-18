@@ -29,7 +29,7 @@ MOOCUIWidget::MOOCUIWidget(QWidget *_parent)
     node(new gazebo::transport::Node()),
     dialog(this, "https://mentor2.companion.org")
 {
-
+  
   cout << "MOOCUIWidget::MOOCUIWidget node setup" << endl;
   node->Init();
   pub = node->Advertise<SimpleMOOC_msgs::msgs::RestRequest>("~/MOOCRequest");
@@ -45,7 +45,6 @@ MOOCUIWidget::~MOOCUIWidget()
 void MOOCUIWidget::LoginMOOC()
 {
   std::cout << "MOOCUI login" << std::endl;
-  gui::MOOCLoginDialog dialog(this, "https://mentor2.companion.org");
 
   if(dialog.exec() == QDialog::Rejected) {
     cout << "MOOCUIWidget::LoginMOOC CANCELLED" << endl;
@@ -64,24 +63,38 @@ void MOOCUIWidget::LoginMOOC()
   } 
 }
 
+
+/*
+void MOOCUIWidget::PostLearningEvent()
+
+  string json = "{ \"Type\": \""; 
+  json += type;
+  json +=  "\", \"Results\": { ";
+  json += "\"startTime\": \"2014-07-08T16:01:18.636Z\", ";
+  json += "\"completedAt\": \"2014-07-08T16:23:15.636Z\", ";
+  json += "\"timeSpent\": \"1087.3\", \"world\": \"simple.world\", ";
+  json += "\"score\": \""; 
+  std::string d = boost::lexical_cast<std::string>(score);
+  json += d;
+  json += "\", \"issues\": [\"Simple MOOC plugin\", ";
+  json += "\"connecting pully\"] }, \"Resources\": [\"intro.mpg\", ";
+  json += "\"lesson1.mpg\"], \"userid\": \"myuser\"  }";
+
+ route =  "/events/new" 
+
+*/
+
+
 void MOOCUIWidget::OnResponse(ConstRestResponsePtr &_msg )
 {
-  cout << "MOOCUI Login response received: ";
-  cout << " success: " << _msg->success() << endl;
+  cout << "MOOCUI Login response received:" << endl;
+  cout << " type: " << _msg->type() << endl;
   cout << " msg:  " << _msg->msg() << endl;
-  cout << " req:  " << _msg->req() << endl;
-  cout << " resp: " << _msg->resp()<< endl;
 
-  if(_msg->success()) {
-    cout << "";
-  }
-  else {
-    // add msg to queue for later processing from
-    // the GUI thread
-    // msgQueue.push_back(_msg);
-    msgRespQ.push_back(_msg);
-  }
-
+  // add msg to queue for later processing from
+  // the GUI thread
+  // msgQueue.push_back(_msg);
+  msgRespQ.push_back(_msg);
 }
 
 void  MOOCUIWidget::Update()
@@ -90,7 +103,9 @@ void  MOOCUIWidget::Update()
   while(!msgRespQ.empty()) {
     ConstRestResponsePtr msg = msgRespQ.front();
     msgRespQ.pop_front();
-    QMessageBox::critical(this, tr("MOOC Login error"),tr(msg->msg().c_str()) );
-    
+    if(msg->type().c_str() == string("Error")) 
+      QMessageBox::critical(this, tr("MOOC"),tr(msg->msg().c_str()) );
+    else
+      QMessageBox::information(this, tr("MOOC"),tr(msg->msg().c_str()) );
   }
 }

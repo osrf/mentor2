@@ -33,12 +33,16 @@ namespace gazebo
     /// \brief dtor
     public: virtual ~MOOCRestApi();
 
-    /// \brief Connects to the MOOC. Returns true if successful
+    /// \brief Connects to the MOOC. 
+    /// \returns MOOC version information
     public: std::string Login(const char* url, const char* user, const char* pass);
+
+    /// \brief Notify the MOOC of a learning event
+    public: void PostLearningEvent(const char* route, const char *json);
 
     /// \brief a Request/Response
     /// \return the response
-    public: std::string Request(const char* request, const char *postStr = NULL);
+    private: std::string Request(const char* request, const char *postStr = NULL);
     
     private: std::string url;
 

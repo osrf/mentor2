@@ -24,7 +24,6 @@ using namespace std;
 SimpleMOOCPlugin::SimpleMOOCPlugin()
   :node(new gazebo::transport::Node()),
   stopMsgProcessing(false),
-//  requestQThread(boost::thread( boost::bind(&SimpleMOOCPlugin::RunRequestQ, this))) 
   requestQThread(NULL)
 {
   
@@ -35,7 +34,8 @@ SimpleMOOCPlugin::~SimpleMOOCPlugin()
   //if (this->userCam)
   //  this->userCam->EnableSaveFrame(false);
   node.reset();
-  sub.reset();
+  subEvent.reset();
+  subRequest.reset();
   // tell the requestQ to stop precessing
   stopMsgProcessing = true;
   if(this->requestQThread->joinable()) {
@@ -50,13 +50,22 @@ void SimpleMOOCPlugin::Init()
   std::cerr << "SimpleMOOCPlugin setting up pubs/sub node" <<  std::endl;
   // setup our node for communication
   node->Init();
-  sub = node->Subscribe("~/MOOCRequest", &SimpleMOOCPlugin::OnRestRequest, this);
+  subRequest = node->Subscribe("~/MOOCRequest", &SimpleMOOCPlugin::OnRestRequest, this);
+  subEvent = node->Subscribe("~/MOOCEvent", &SimpleMOOCPlugin::OnMoocEvent, this);
   requestQThread = new boost::thread( boost::bind(&SimpleMOOCPlugin::RunRequestQ, this));
 }
 
 void SimpleMOOCPlugin::Load(int /*_argc*/, char ** /*_argv*/)
 {
   std::cerr << "Simple MOOC server plugin Load()" <<  std::endl;
+  
+}
+
+void SimpleMOOCPlugin::OnMoocEvent(ConstMOOCEventPtr &_msg )
+{
+  cout << "SimpleMOOCPlugin::OnMOOCEvent ";
+//   cout << "[" << _msg.route() << ", " << _msg.jsonData() << "]"  << endl; 
+  cout << endl;
 }
 
 void SimpleMOOCPlugin::OnRestRequest(ConstRestRequestPtr &_msg )
@@ -72,16 +81,56 @@ void SimpleMOOCPlugin::OnRestRequest(ConstRestRequestPtr &_msg )
 
 }
 
+void SimpleMOOCPlugin::ProcessRequest(ConstRestRequestPtr _msg)
+{
+  try
+  {
+    std::string resp;
+    resp = restApi.Login(_msg->url().c_str(), _msg->username().c_str(), _msg->password().c_str());
+  }
+  catch(MOOCException &x)
+  {
+    SimpleMOOC_msgs::msgs::RestResponse msg;
+    std::string errorMsg ("There was a problem trying to login the MOOC: ");
+    errorMsg += x.what();
+    msg.set_type("Error");
+    msg.set_msg(errorMsg);
+    // alert the user via the gui plugin
+    cerr << "ERROR in request... publising to MOOCUI: " << errorMsg << endl;
+    this->pub->Publish(msg);
+  } 
+}
+
+void SimpleMOOCPlugin::ProcessMOOCEvent(ConstMOOCEventPtr _msg)
+{
+  try
+  {
+    restApi.PostLearningEvent(_msg->route().c_str(), _msg->json().c_str());
+  }
+  catch(MOOCException &x)
+  {
+    SimpleMOOC_msgs::msgs::RestResponse msg;
+    std::string errorMsg ("There was a problem trying to post data to the MOOC: ");
+    errorMsg += x.what();
+    msg.set_type("Error");
+    msg.set_msg(errorMsg);
+    // alert the user via the gui plugin
+    cerr << "ERROR POSTING to MOOC: " << errorMsg << endl;
+    this->pub->Publish(msg);
+  } 
+}
 
 void SimpleMOOCPlugin::RunRequestQ()
 {
   cout << "SimpleMOOCPlugin::RunRequestQ THREAD started" << endl;
   pub = node->Advertise<SimpleMOOC_msgs::msgs::RestResponse>("~/MOOCResponse");
+
   while (!stopMsgProcessing) {
     gazebo::common::Time::MSleep(50);
     try{
       boost::shared_ptr<const SimpleMOOC_msgs::msgs::RestRequest> req;
-      // Grab the mutex and remove first message in the queue
+      boost::shared_ptr<const SimpleMOOC_msgs::msgs::MOOCEvent> event;
+      // Grab the mutex and remove first message in each queue
       {
         boost::mutex::scoped_lock lock(this->requestQMutex);
         if(!msgRequestQ.empty())
@@ -89,46 +138,26 @@ void SimpleMOOCPlugin::RunRequestQ()
           req = msgRequestQ.front();
           msgRequestQ.pop_front();
         }
+        if(!msgEventQ.empty())
+        {
+          event = msgEventQ.front();
+          msgEventQ.pop_front();
+        }
       }
 
       if(req)
       {
-        // if the password field is set, then this is a login attempt
-        try
-        {
-          std::string resp;
-          if( req->password().length() > 0)
-          {
-            cout << "PROCESSING... " << endl;
-            resp = restApi.Login(req->url().c_str(), req->username().c_str(), req->password().c_str());
-          }
-          else
-          {
-            resp = restApi.Request(req->url().c_str());
-          }
-          // send the response back to the client
-          SimpleMOOC_msgs::msgs::RestResponse msg;
-          msg.set_success(true);
-          msg.set_resp(resp.c_str());
-          cout << "SUCCESS ... publishing to MOOCUI: " << resp << endl;
-          this->pub->Publish(msg);          
-        }
-        catch(MOOCException &x)
-        {
-          SimpleMOOC_msgs::msgs::RestResponse msg;
-          msg.set_success(false);
-          std::string errorMsg ("There was a problem trying to communicate with the Mentor2 Learning companion: ");
-          errorMsg += x.what();
-          msg.set_msg(errorMsg);
-          // alert the user via the gui plugin
-          cerr << "ERROR in request... publising to MOOCUI: " << errorMsg << endl;
-          this->pub->Publish(msg);
-        }
+        this->ProcessRequest(req);
+      }
+      if(event)
+      {
+        this->ProcessMOOCEvent(event);
       }
     }
     catch(...) {
       cerr << "Unhandled exception while processing request message" << endl;
     }
+    
   }
   cout << "SimpleMOOCPlugin::RunRequestQ THREAD started" << endl;
 }

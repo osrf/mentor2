@@ -11,8 +11,13 @@ message RestRequest
 
 message RestResponse
 {
-  required bool success = 1;
+  required string type  = 1;
   optional string msg   = 2;
-  optional string req   = 3;
-  optional string resp  = 4;
 }
+
+message MOOCEvent
+{
+  required string route = 1;
+  required string json =2;
+}
+

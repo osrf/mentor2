@@ -24,6 +24,7 @@
 #include "MOOCRestApi.hh"
 
 typedef const boost::shared_ptr<const SimpleMOOC_msgs::msgs::RestRequest> ConstRestRequestPtr;
+typedef const boost::shared_ptr<const SimpleMOOC_msgs::msgs::MOOCEvent> ConstMOOCEventPtr;
 
 
 namespace gazebo
@@ -42,18 +43,29 @@ namespace gazebo
 
     /// \brief  called everytime a message is received.
     public: void OnRestRequest(ConstRestRequestPtr &_msg );
-    
+   
+    public: void OnMoocEvent(ConstMOOCEventPtr &_msg);
+ 
     /// \brief Plugin initialization
     private: virtual void Init();
     
     /// \brief Entry point for the request processing thread
     private: void RunRequestQ();
 
+    /// \brief Process a RestRequest message from the requestThread
+    private: void ProcessRequest(ConstRestRequestPtr _msg);
+
+    /// \brief Process a MOOCEvent messsage from the requestThread
+    private: void ProcessMOOCEvent(ConstMOOCEventPtr _msg);
+
     /// \brief Gazebo pub/sub node
     private: gazebo::transport::NodePtr node;
     
-    /// \brief Gazebo subscriber
-    private: gazebo::transport::SubscriberPtr sub;
+    /// \brief Gazebo subscriber for login requests
+    private: gazebo::transport::SubscriberPtr subRequest;
+    
+    /// \brief Gazebo subscriber for MOOC events (ex: scoring)
+    private: gazebo::transport::SubscriberPtr subEvent;
 
     /// \brief Gazebo publisher
     private: gazebo::transport::PublisherPtr pub;
@@ -67,9 +79,12 @@ namespace gazebo
     /// \brief a flag to interrupt message processing
     private: bool stopMsgProcessing;
  
-    /// \brief a list toaccumulate pending request    
+    /// \brief a list to accumulate pending request    
     private: std::list< boost::shared_ptr<const SimpleMOOC_msgs::msgs::RestRequest> > msgRequestQ;
 
+    /// \brief a list to accumulate pending request    
+    private: std::list< boost::shared_ptr<const SimpleMOOC_msgs::msgs::MOOCEvent> > msgEventQ;
+ 
     /// \brief a thread to process requests without stopping the simulation
     private: boost::thread *requestQThread;
 

@@ -104,7 +104,7 @@ void MOOCLoginDialog::slotAcceptLogin()
   password = pass.toStdString();
   url = u.toStdString();
 
-  labelInfo->setText("Connecting...");  
+//  labelInfo->setText("Connecting...");  
   qApp->processEvents();
 
   std::string msg;  

@@ -29,7 +29,7 @@ using namespace std;
 
 
 struct data {
-  char trace_ascii; /* 1 or 0 */
+  char trace_ascii; // 1 or 0
 };
 
 static
@@ -76,7 +76,7 @@ void dump(const char *text,
         break;
       }
     }
-    fputc('\n', stream); /* newline */
+    fputc('\n', stream); // newline
   }
   fflush(stream);
 }
@@ -88,12 +88,12 @@ int my_trace(CURL *handle, curl_infotype type,
 {
   struct data *config = (struct data *)userp;
   const char *text;
-  (void)handle; /* prevent compiler warning */
+  (void)handle; // prevent compiler warning
 
   switch (type) {
   case CURLINFO_TEXT:
     fprintf(stderr, "== Info: %s", data);
-  default: /* in case a new one is introduced to shock us */
+  default: // in case a new one is introduced to shock us
     return 0;
 
   case CURLINFO_HEADER_OUT:
@@ -161,43 +161,24 @@ MOOCRestApi::~MOOCRestApi()
 }
 
 
-std::string post(const char *url, const char *user, const char *pass, const char *json)
+void MOOCRestApi::PostLearningEvent(const char* _route, const char *_json)
 {
-
-
+  string resp;
+  resp = this->Request(_route, _json);
 }
-
 
 std::string MOOCRestApi::Login(const char* urlStr, const char* userStr, const char* passStr)
 {
   this->url = urlStr;
   this->user = userStr;
   this->pass = passStr;
-//  std::string resp = this->Request(urlStr);
 
-  this->url = "https://97.76.231.101/events/new";
-  this->user = "myuser";
-  this->pass = "mypass";
-
-  string json = "{ \"Type\": \"GAZEBO_OBJECTIVE_COMPLETED\", \"Results\": { ";
-  json += "\"startTime\": \"2014-07-08T16:01:18.636Z\", ";
-  json += "\"completedAt\": \"2014-07-08T16:23:15.636Z\", ";
-  json += "\"timeSpent\": \"1087.3\", \"world\": \"simple.world\", ";
-  json += "\"score\": \"11\", \"issues\": [\"Simple MOOC plugin\", ";
-  json += "\"connecting pully\"] }, \"Resources\": [\"intro.mpg\", ";
-  json += "\"lesson1.mpg\"], \"userid\": \"myuser\"  }";
-
-   cout << endl << endl << json << endl << endl;
-
+  string path = "/";  
   string resp;
-  resp = this->Request("https://97.76.231.101/events/new", json.c_str());
-//  resp = this->Request("https://97.76.231.101/events/all");
-
-//  this->isLoggedIn = true;
+  resp = this->Request(path.c_str());
 
   return resp;
 }
-
 
 std::string MOOCRestApi::Request(const char* _reqUrl, const char* _postJsonStr)
 {
@@ -207,18 +188,27 @@ std::string MOOCRestApi::Request(const char* _reqUrl, const char* _postJsonStr)
   if(this->user.empty())
     throw MOOCException("No user specified for the Learning Companion. Please login.");
 
-  // this->url = "https://97.76.231.101/events/all";
-  cout << "MOOCRestApi::Request" << endl;
-  // verify login credentials
+  string path = url + _reqUrl;
   CURL *curl = curl_easy_init();
-  curl_easy_setopt(curl, CURLOPT_URL, url.c_str() );
+  curl_easy_setopt(curl, CURLOPT_URL, path.c_str() );
+ 
+  // in case things go wrong 
+  bool debug = true;
+  if(debug)
+  {
+    cout << "MOOCRestApi::Request" << endl;
+    cout << "  path: " << path << endl;
+    cout << "  data: " << _postJsonStr << endl;
+    cout << endl;
 
+    struct data config;
+    config.trace_ascii = 1; //  enable ascii tracing
+    curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
+    curl_easy_setopt(curl, CURLOPT_DEBUGDATA, &config);
 
-  struct data config;
-  config.trace_ascii = 1; /* enable ascii tracing */
-  curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
-  curl_easy_setopt(curl, CURLOPT_DEBUGDATA, &config);
-
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+    curl_easy_setopt(curl, CURLOPT_HEADER, 1L);
+  }
 
   struct MemoryStruct chunk;
   chunk.memory = (char*) malloc(1);  // will be grown as needed by the realloc above
@@ -247,10 +237,10 @@ std::string MOOCRestApi::Request(const char* _reqUrl, const char* _postJsonStr)
   string userpass = this->user + ":" + this->pass;
   curl_easy_setopt(curl, CURLOPT_USERPWD, userpass.c_str());
 
-
-  // when things go wrong
-  curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
-  curl_easy_setopt(curl, CURLOPT_HEADER, 1L);
+  // 5 sec connection timeout
+  curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 10);
+  // 10 sec total timeout
+  // curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10);
 
   // is this a POST?
   struct curl_slist *slist = NULL;
@@ -262,19 +252,25 @@ std::string MOOCRestApi::Request(const char* _reqUrl, const char* _postJsonStr)
 
     slist = curl_slist_append(slist, "Content-Type: application/json");
     slist = curl_slist_append(slist, "charsets: utf-8");
-//    slist = curl_slist_append( slist, "Expect:");
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, slist);
   }
 
   CURLcode res = curl_easy_perform(curl);
+  // get HTTP response code
+  long http_code = 0;
+  curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &http_code);
   curl_easy_cleanup(curl);
   if(res != CURLE_OK) {
     cerr << "Request to " << url << " failed: " << curl_easy_strerror(res) << endl;
     throw MOOCException(curl_easy_strerror(res));
   }
-
   // copy the data into a string
   std::string response(chunk.memory, chunk.size);
+
+  if(http_code != 200) {
+    cerr << "Request to " << url << " error: " << response << endl;
+    throw MOOCException(response.c_str()); 
+  }
 
   // clean up
   curl_slist_free_all(slist);
