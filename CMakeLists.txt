@@ -55,7 +55,7 @@ add_subdirectory(msgs)
 add_subdirectory(CMLEditor)
 add_subdirectory(SimpleMOOC)
 add_subdirectory(MOOCUI)
-
+add_subdirectory(scoring)
 
 ########### Add uninstall target ###############
 configure_file(
