@@ -1,0 +1,189 @@
+<?xml version="1.0"?>
+<sdf version="1.4">
+  <world name="default">
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <plugin name="scoring" filename="libScoringPlugin.so">
+
+    <session></session>
+
+    <region>
+      <name>start</name>
+      <volume>
+          <!-- min and max are sdf::Vector3-->
+          <min>-3 -3 0</min>
+          <max>3 3 3</max>
+     </volume>
+    </region>
+
+    <region>
+      <name>end</name>
+      <volume>
+        <min>7 7 0</min>
+        <max>13 13 3</max>
+      </volume>
+    </region>
+
+    <!-- when the simulation state changes (pause/play) -->
+    <event>
+      <name>Sim</name>
+      <type>simState</type>
+    </event>
+    
+    <!-- bounding box intersection event-->
+    <event>
+      <name>boxiInStart</name>
+      <type>inclusion</type>
+      <model>unit_box_1</model>
+      <region>start</region>
+    </event>
+
+    <!-- bounding box inclusion event -->
+    <event>
+      <name>boxInEnd</name>
+      <type>inclusion</type>
+      <model>unit_box_1</model>
+      <region>end</region>
+    </event>
+
+    <!-- contact between models -->
+<!--    <event>
+      <name>box_to_box></name>
+      <type>contact</type>
+      <model>unit_box_1</model>
+      <model>unit_box_2</model>
+    </event>    -->
+
+    <!-- detect sudden movement (fall)  -->
+    <event>
+      <type>motion</type>
+      <name>fall</name>
+      <model>unit_box_1</model>
+      <accel>9</accel>
+      <vel>5</vel>
+    </event>
+    </plugin>
+
+    <!-- first box of two -->
+    <model name='unit_box_1'>
+      <pose>1 -1 0.5 0 -0 0</pose>
+      <link name='link'>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+        <velocity_decay>
+          <linear>0</linear>
+          <angular>0</angular>
+        </velocity_decay>
+        <self_collide>0</self_collide>
+        <kinematic>0</kinematic>
+        <gravity>1</gravity>
+      </link>
+      <static>0</static>
+    </model>
+
+   <!-- second box of two -->
+    <model name='unit_box_2'>
+      <pose>0 -5 0.5 0 -0 0</pose>
+      <link name='link'>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+        <velocity_decay>
+          <linear>0</linear>
+          <angular>0</angular>
+        </velocity_decay>
+        <self_collide>0</self_collide>
+        <kinematic>0</kinematic>
+        <gravity>1</gravity>
+      </link>
+      <static>0</static>
+    </model>
+
+
+
+
+  </world>
+</sdf>
