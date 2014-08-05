@@ -1,3 +1,5 @@
+add_subdirectory(QGVCore)
+
 include ( ${QT_USE_FILE} )
 
 link_directories(
@@ -40,8 +42,12 @@ QT4_ADD_RESOURCES(resources_RCC ${resources})
 
 include_directories(${GAZEBO_INCLUDE_DIRS} ${OGRE_INCLUDE_DIRS})
 include_directories(${OGRE-Terrain_INCLUDE_DIRS})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/QGVCore)
 
 link_directories(${GAZEBO_LIBRARY_DIRS} ${OGRE_LIBRARY_DIRS})
 
 add_library(CMLEditorPlugin SHARED ${sources} ${headers_MOC} ${headers} ${resources_RCC})
-target_link_libraries(CMLEditorPlugin ${GAZEBO_libraries} ${OGRE_LIBRARIES})
+target_link_libraries(CMLEditorPlugin
+    qgvcore
+    ${GAZEBO_libraries}
+    ${OGRE_LIBRARIES})

@@ -23,6 +23,9 @@ list (APPEND CPACK_SOURCE_IGNORE_FILES ";TODO;/.hg/;.hgignore;.swp$;/build/")
 set (CPACK_SOURCE_PACKAGE_FILE_NAME "@PROJECT_NAME@-@GDK_VERSION_FULL@")
 include (CPack)
 
+# Extending the Module path with the local module path of desuto
+SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+
 
 #####################################
 # Set the default build type
@@ -38,7 +41,7 @@ if (PKG_CONFIG_FOUND)
   pkg_check_modules(GAZEBO gazebo>=3.0.0 REQUIRED)
   pkg_check_modules(OGRE OGRE)
   pkg_check_modules(OGRE-Terrain OGRE-Terrain)
-
+#  pkg_check_modules(GVC libgvc)
 else()
   message(FATAL_ERROR "pkg-config is required; please install it")
 endif()
@@ -48,8 +51,14 @@ find_package(Boost ${MIN_BOOST_VERSION} REQUIRED system filesystem regex thread)
 find_package(Protobuf REQUIRED)
 find_package (Qt4)
 if (NOT QT4_FOUND)
-  BUILD_ERROR("Missing: Qt4")
+  MESSAGE("Qt4 not found")
 endif()
+
+find_package (Graphviz)
+if (NOT QT4_FOUND)
+  MESSAGE("Graphviz not found")
+endif()
+
 
 add_subdirectory(msgs)
 add_subdirectory(CMLEditor)

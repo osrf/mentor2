@@ -15,6 +15,12 @@
  *
 */
 
+#include "gazebo/common/Events.hh"
+#include "gazebo/rendering/RenderEvents.hh"
+#include <gazebo/transport/Node.hh>
+
+#include "QGVCore/QGVScene.h"
+
 #include "CMLEditorView.hh"
 #include "CMLEditorWidget.hh"
 
@@ -27,7 +33,7 @@ CMLEditorWidget::CMLEditorWidget(QWidget *_parent)
 {
   this->setObjectName("CMLEditorWidget");
 
-  this->scene = new QGraphicsScene();
+  this->scene = new QGVScene("qgv", this);
   CMLEditorView *view = new CMLEditorView(_parent);
 
   QColor c(250, 250, 250);
@@ -52,6 +58,19 @@ CMLEditorWidget::CMLEditorWidget(QWidget *_parent)
   canvasLayout->setContentsMargins(0, 0, 0, 0);
   canvasLayout->setSpacing(0);
   this->setLayout(canvasLayout);
+
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init();
+
+  this->modelInfoSub = this->node->Subscribe("~/model/info",
+      &CMLEditorWidget::OnModelMsg, this);
+  this->sceneSub = this->node->Subscribe("~/scene",
+      &CMLEditorWidget::OnSceneMsg, this);
+
+
+  this->receiveMutex = new boost::mutex();
+  this->connections.push_back(event::Events::ConnectPreRender(
+      boost::bind(&CMLEditorWidget::PreRender, this)));
 }
 
 /////////////////////////////////////////////////
@@ -69,4 +88,35 @@ void CMLEditorWidget::resizeEvent(QResizeEvent *_event)
   boundingHeight = std::max(boundingHeight, this->scene->sceneRect().height());
   this->scene->setSceneRect(-boundingWidth/2, -boundingHeight/2,
       boundingWidth, boundingHeight);
+}
+
+/////////////////////////////////////////////////
+void CMLEditorWidget::OnSceneMsg(ConstScenePtr &_msg)
+{
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  this->sceneMsgs.push_back(_msg);
+}
+
+/////////////////////////////////////////////////
+void CMLEditorWidget::OnModelMsg(ConstModelPtr &_msg)
+{
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  this->modelMsgs.push_back(_msg);
+}
+
+/////////////////////////////////////////////////
+bool CMLEditorWidget::ProcessSceneMsg(ConstScenePtr &_msg)
+{
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool CMLEditorWidget::ProcessModelMsg(const msgs::Model &_msg)
+{
+  return true;
+}
+
+//////////////////////////////////////////////////
+void CMLEditorWidget::PreRender()
+{
 }
