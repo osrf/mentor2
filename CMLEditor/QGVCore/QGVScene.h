@@ -52,6 +52,7 @@ public:
 
     void loadLayout(const QString &text);
     void applyLayout();
+    void clearLayout();
     void clear();
 
 
@@ -85,6 +86,8 @@ private:
     QList<QGVNode*> _nodes;
     QList<QGVEdge*> _edges;
     QList<QGVSubGraph*> _subGraphs;
+
+		bool init;
 };
 
 #endif // QGVSCENE_H

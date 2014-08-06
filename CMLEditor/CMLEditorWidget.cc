@@ -19,8 +19,10 @@
 #include "gazebo/rendering/RenderEvents.hh"
 #include <gazebo/transport/Node.hh>
 
-#include "QGVCore/QGVScene.h"
+//#include "QGVCore/QGVScene.h"
 
+#include "CMLNode.hh"
+#include "CMLEditorScene.hh"
 #include "CMLEditorView.hh"
 #include "CMLEditorWidget.hh"
 
@@ -33,7 +35,22 @@ CMLEditorWidget::CMLEditorWidget(QWidget *_parent)
 {
   this->setObjectName("CMLEditorWidget");
 
-  this->scene = new QGVScene("qgv", this);
+  this->scene = new CMLEditorScene(this);
+  /*this->scene = new QGVScene("qgvscene", this);
+
+  //Configure scene attributes
+  //this->scene->setGraphAttribute("label", "qgvscene");
+  this->scene->setGraphAttribute("splines", "ortho");
+  this->scene->setGraphAttribute("rankdir", "LR");
+  //_scene->setGraphAttribute("concentrate", "true"); //Error !
+  this->scene->setGraphAttribute("nodesep", "0.4");
+
+  this->scene->setNodeAttribute("shape", "box");
+  this->scene->setNodeAttribute("style", "filled");
+  this->scene->setNodeAttribute("fillcolor", "white");
+  this->scene->setNodeAttribute("height", "1.2");
+  this->scene->setEdgeAttribute("minlen", "3");*/
+
   CMLEditorView *view = new CMLEditorView(_parent);
 
   QColor c(250, 250, 250);
@@ -107,16 +124,64 @@ void CMLEditorWidget::OnModelMsg(ConstModelPtr &_msg)
 /////////////////////////////////////////////////
 bool CMLEditorWidget::ProcessSceneMsg(ConstScenePtr &_msg)
 {
+  for (int i = 0; i < _msg->model_size(); ++i)
+    this->ProcessModelMsg(_msg->model(i));
+
   return true;
 }
 
 /////////////////////////////////////////////////
 bool CMLEditorWidget::ProcessModelMsg(const msgs::Model &_msg)
 {
+  //QGVNode *node = this->scene->addNode(tr(_msg.name().c_str()));
+  CMLNode *node = this->scene->AddNode(_msg.name());
+  //this->graphNodes.push_back(node);
+
+  //this->scene->clearLayout();
+  //Layout scene
+  //this->scene->applyLayout();
+
+  //Fit in view
+  //ui->graphicsView->fitInView(_scene->sceneRect(), Qt::KeepAspectRatio);
   return true;
 }
 
 //////////////////////////////////////////////////
 void CMLEditorWidget::PreRender()
 {
+  static SceneMsgs_L::iterator sIter;
+  static ModelMsgs_L::iterator modelIter;
+
+  SceneMsgs_L sceneMsgsCopy;
+  ModelMsgs_L modelMsgsCopy;
+
+  {
+    boost::mutex::scoped_lock lock(*this->receiveMutex);
+
+    std::copy(this->sceneMsgs.begin(), this->sceneMsgs.end(),
+              std::back_inserter(sceneMsgsCopy));
+    this->sceneMsgs.clear();
+
+    std::copy(this->modelMsgs.begin(), this->modelMsgs.end(),
+              std::back_inserter(modelMsgsCopy));
+    this->modelMsgs.clear();
+  }
+
+  // Process the scene messages. DO THIS FIRST
+  for (sIter = sceneMsgsCopy.begin(); sIter != sceneMsgsCopy.end();)
+  {
+    if (this->ProcessSceneMsg(*sIter))
+      sceneMsgsCopy.erase(sIter++);
+    else
+      ++sIter;
+  }
+
+  // Process the model messages.
+  for (modelIter = modelMsgsCopy.begin(); modelIter != modelMsgsCopy.end();)
+  {
+    if (this->ProcessModelMsg(**modelIter))
+      modelMsgsCopy.erase(modelIter++);
+    else
+      ++modelIter;
+  }
 }

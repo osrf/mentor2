@@ -35,9 +35,16 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/private)
 
 add_library(qgvcore SHARED ${sources} ${headers_MOC} ${headers} ${resources_RCC})
 
+link_directories(${GRAPHVIZ_CGRAPH_PKG_LIBRARY_DIRS})
+
+MESSAGE(" ${GRAPHVIZ_GVC_PKG_LIBRARIES} ")
+
 target_link_libraries(qgvcore
   ${QT_LIBRARIES}
-  ${GRAPHVIZ_GVC_PKG_LIBRARIES}
+#  ${GRAPHVIZ_CGRAPH_PKG_LIBRARIES}
+#  ${GRAPHVIZ_CDT_PKG_LIBRARIES}
+#  ${GRAPHVIZ_GVC_PKG_LIBRARIES}
+#  ${GRAPHVIZ_GVC_PKG_LIBRARIES}
   ${GRAPHVIZ_GVC_LIBRARY}
   ${GRAPHVIZ_CGRAPH_LIBRARY}
   ${GRAPHVIZ_CDT_LIBRARY}

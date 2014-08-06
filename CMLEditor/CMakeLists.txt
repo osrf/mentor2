@@ -1,4 +1,4 @@
-add_subdirectory(QGVCore)
+#add_subdirectory(QGVCore)
 
 include ( ${QT_USE_FILE} )
 
@@ -7,12 +7,15 @@ link_directories(
 )
 
 set (sources
+  CMLEdge.cc
   CMLEditor.cc
   CMLEditorItem.cc
   CMLEditorPalette.cc
   CMLEditorPlugin.cc
+  CMLEditorScene.cc
   CMLEditorView.cc
   CMLEditorWidget.cc
+  CMLNode.cc
   GrabberHandle.cc
   RectItem.cc
   RotateHandle.cc
@@ -22,13 +25,16 @@ set (qt_headers
   CMLEditor.hh
   CMLEditorItem.hh
   CMLEditorPalette.hh
+  CMLEditorScene.hh
   CMLEditorView.hh
   RectItem.hh
 )
 
 set (headers
+  CMLEdge.hh
   CMLEditorPlugin.hh
   CMLEditorWidget.hh
+  CMLNode.hh
   GrabberHandle.hh
   RotateHandle.hh
 )
@@ -48,6 +54,6 @@ link_directories(${GAZEBO_LIBRARY_DIRS} ${OGRE_LIBRARY_DIRS})
 
 add_library(CMLEditorPlugin SHARED ${sources} ${headers_MOC} ${headers} ${resources_RCC})
 target_link_libraries(CMLEditorPlugin
-    qgvcore
+#    qgvcore
     ${GAZEBO_libraries}
     ${OGRE_LIBRARIES})

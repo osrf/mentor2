@@ -24,10 +24,15 @@
 #include <gazebo/gui/qt.h>
 
 
+//class QGVScene;
+//class QGVNode;
+
 namespace gazebo
 {
   namespace gui
   {
+    class CMLEditorScene;
+
     /// \class CMLEditorWidget CMLEditorWidget.hh
     /// \brief The parent widget of the CML editor
     class CMLEditorWidget : public QWidget
@@ -63,7 +68,9 @@ namespace gazebo
       private: void PreRender();
 
       /// \brief Qt Graphics Scene where graphics items are drawn in
-      private: QGraphicsScene *scene;
+//      private: QGVScene *scene;
+//      private: QGraphicsScene *scene;
+      private: CMLEditorScene *scene;
 
       /// \brief Minimum width of the Qt graphics scene
       private: int minimumWidth;
@@ -99,6 +106,8 @@ namespace gazebo
 
       /// \brief Communication Node
       private: transport::NodePtr node;
+
+      //private: std::vector<QGVNode *> graphNodes;
     };
   }
 }

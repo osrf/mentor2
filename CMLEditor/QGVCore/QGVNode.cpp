@@ -22,7 +22,7 @@ License along with this library.
 #include <QGVNodePrivate.h>
 #include <QDebug>
 #include <QPainter>
-
+#include <iostream>
 QGVNode::QGVNode(QGVNodePrivate *node, QGVScene *scene): _node(node), _scene(scene)
 {
     setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -104,21 +104,24 @@ void QGVNode::setIcon(const QImage &icon)
 
 void QGVNode::updateLayout()
 {
+    std::cerr <<" node update layout "<< std::endl;
+
     prepareGeometryChange();
 		qreal width = ND_width(_node->node())*DotDefaultDPI;
 		qreal height = ND_height(_node->node())*DotDefaultDPI;
-
+    std::cerr <<" node update layout 1" << std::endl;
     //Node Position (center)
 		qreal gheight = QGVCore::graphHeight(_scene->_graph->graph());
 		setPos(QGVCore::centerToOrigin(QGVCore::toPoint(ND_coord(_node->node()), gheight), width, height));
 
     //Node on top
     setZValue(1);
-
+    std::cerr <<" node update layout 2 " << ND_shape(_node->node())->name << " "
+      << width << " " << height<< std::endl;
     //Node path
 		_path = QGVCore::toPath(ND_shape(_node->node())->name, (polygon_t*)ND_shape_info(_node->node()), width, height);
     _pen.setWidth(1);
-
+    std::cerr <<" node update layout 3" << std::endl;
     _brush.setStyle(QGVCore::toBrushStyle(getAttribute("style")));
     _brush.setColor(QGVCore::toColor(getAttribute("fillcolor")));
     _pen.setColor(QGVCore::toColor(getAttribute("color")));

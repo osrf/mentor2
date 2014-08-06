@@ -26,7 +26,6 @@ include (CPack)
 # Extending the Module path with the local module path of desuto
 SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
-
 #####################################
 # Set the default build type
 if (NOT CMAKE_BUILD_TYPE)
@@ -54,10 +53,10 @@ if (NOT QT4_FOUND)
   MESSAGE("Qt4 not found")
 endif()
 
-find_package (Graphviz)
-if (NOT QT4_FOUND)
-  MESSAGE("Graphviz not found")
-endif()
+#find_package (Graphviz)
+#if (NOT QT4_FOUND)
+#  MESSAGE("Graphviz not found")
+#endif()
 
 
 add_subdirectory(msgs)

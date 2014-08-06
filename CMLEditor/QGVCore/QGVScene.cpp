@@ -29,12 +29,13 @@ License along with this library.
 #include <QGVGvcPrivate.h>
 #include <QGVEdgePrivate.h>
 #include <QGVNodePrivate.h>
-
+#include <iostream>
 QGVScene::QGVScene(const QString &name, QObject *parent) : QGraphicsScene(parent)
 {
 		_context = new QGVGvcPrivate(gvContext());
 		_graph = new QGVGraphPrivate(agopen(name.toLocal8Bit().data(), Agdirected, NULL));
     //setGraphAttribute("fontname", QFont().family());
+    this->init = false;
 }
 
 QGVScene::~QGVScene()
@@ -63,12 +64,13 @@ void QGVScene::setEdgeAttribute(const QString &name, const QString &value)
 
 QGVNode *QGVScene::addNode(const QString &label)
 {
-		Agnode_t *node = agnode(_graph->graph(), NULL, TRUE);
+		Agnode_t *node = agnode(_graph->graph(), label.toLocal8Bit().data(), TRUE);
     if(node == NULL)
     {
         qWarning()<<"Invalid node :"<<label;
         return 0;
     }
+
 		QGVNode *item = new QGVNode(new QGVNodePrivate(node), this);
     item->setLabel(label);
     addItem(item);
@@ -150,7 +152,12 @@ void QGVScene::loadLayout(const QString &text)
 
 void QGVScene::applyLayout()
 {
-		if(gvLayout(_context->context(), _graph->graph(), "dot") != 0)
+  if (!this->init)
+  {
+    gvFreeLayout(_context->context(), _graph->graph());
+    //agclose(_graph->graph());
+
+    if(gvLayout(_context->context(), _graph->graph(), "dot") != 0)
     {
         /*
          * Si plantage ici :
@@ -160,7 +167,10 @@ void QGVScene::applyLayout()
         qCritical()<<"Layout render error"<<agerrors()<<QString::fromLocal8Bit(aglasterr());
         return;
     }
+//    this->init = true;
+  }
 
+  return;
     //Debug output
 		//gvRenderFilename(_context->context(), _graph->graph(), "canon", "debug.dot");
 		//gvRenderFilename(_context->context(), _graph->graph(), "png", "debug.png");
@@ -184,6 +194,16 @@ void QGVScene::applyLayout()
     }
 
     update();
+}
+
+void QGVScene::clearLayout()
+{
+  if (_graph->graph())
+  {
+    gvFreeLayout(_context->context(), _graph->graph());
+    agclose(_graph->graph());
+  }
+  QGraphicsScene::clear();
 }
 
 void QGVScene::clear()
