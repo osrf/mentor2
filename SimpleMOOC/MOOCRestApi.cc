@@ -26,7 +26,7 @@
 using namespace gazebo;
 using namespace std;
 
-
+bool trace_requests = false;
 
 struct data {
   char trace_ascii; // 1 or 0
@@ -116,7 +116,8 @@ int my_trace(CURL *handle, curl_infotype type,
     break;
   }
 
-  dump(text, stderr, (unsigned char *)data, size, config->trace_ascii);
+  if(trace_requests)
+    dump(text, stderr, (unsigned char *)data, size, config->trace_ascii);
   return 0;
 }
 
@@ -164,11 +165,17 @@ MOOCRestApi::~MOOCRestApi()
 void MOOCRestApi::PostLearningEvent(const char* _route, const char *_json)
 {
   string resp;
-  resp = this->Request(_route, _json);
+  Post post;
+  post.route = _route;
+  post.json = _json;
+  this->posts.push_back(post);
+// resp = this->Request(_route, _json);
+  SendUnpostedPosts();
 }
 
 std::string MOOCRestApi::Login(const char* urlStr, const char* userStr, const char* passStr)
 {
+  this->isLoggedIn = false;
   this->url = urlStr;
   this->user = userStr;
   this->pass = passStr;
@@ -177,7 +184,22 @@ std::string MOOCRestApi::Login(const char* urlStr, const char* userStr, const ch
   string resp;
   resp = this->Request(path.c_str());
 
+  this->isLoggedIn = true;
+  this->SendUnpostedPosts();
   return resp;
+}
+
+void MOOCRestApi::SendUnpostedPosts()
+{
+  if(this->isLoggedIn)
+  {
+    while(!this->posts.empty())
+    {
+      Post post = this->posts.front();
+      this->Request(post.route.c_str(), post.json.c_str());
+      this->posts.pop_front();
+    }
+  }
 }
 
 std::string MOOCRestApi::Request(const char* _reqUrl, const char* _postJsonStr)

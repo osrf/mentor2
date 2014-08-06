@@ -20,6 +20,7 @@
 #ifndef _MOOC_REST_API_HH_
 #define _MOOC_REST_API_HH_
 
+#include <list>
 #include "MOOCException.hh"
 
 namespace gazebo
@@ -44,13 +45,30 @@ namespace gazebo
     /// \return the response
     private: std::string Request(const char* request, const char *postStr = NULL);
     
+    /// \brief Login information: MOOC host url
     private: std::string url;
 
+    /// \brief Login information: MOOC username 
     private: std::string user;
 
+    /// \brief Login information: MOOC password
     private: std::string pass;
 
+    /// \brief True when a previous Login attempt was successful
     private: bool isLoggedIn;
+
+    /// \brief A post: what (json) and where (route)
+    private: struct Post 
+      {
+        std::string route;
+        std::string json;
+      };
+
+    /// \brief List of unposted posts. Posts await when isLoggedIn is false
+    private: std::list<Post> posts;
+
+    /// \brief Sends unposted posts
+    private: void SendUnpostedPosts();
   };
 }
 

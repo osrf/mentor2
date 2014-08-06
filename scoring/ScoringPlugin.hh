@@ -75,7 +75,10 @@ namespace gazebo
   
     /// \brief An event source can be used to enable other events
     public: virtual bool IsActive();
-  
+ 
+    /// \brief Get current event specific data
+    public: virtual std::string GetEventData();
+ 
     /// \brief Name of the event.
     public: std::string name;
 
@@ -118,6 +121,8 @@ namespace gazebo
     /// brief True if the simulation is paused.
     private: bool isPaused;
   };
+
+  
   
   class  InRegionEventSource: public EventSource
   {
@@ -134,6 +139,9 @@ namespace gazebo
 
     /// Documentation Inherited
     public: virtual void Load(const sdf::ElementPtr &_sdf);
+
+    /// Documentation Inherited 
+    public: virtual std::string GetEventData();
 
     /// \brief The model used for the in region check.
     private: std::string modelName;
@@ -162,7 +170,13 @@ namespace gazebo
     public: void Init();
   
     public: void Update();
-  
+
+    /// \b callback for ~/model/info topic
+    public: void OnModelInfo(ConstModelPtr &_msg);
+
+    /// \b callback for ~/request
+    public: void OnRequest(ConstRequestPtr &_msg);
+ 
     /// \brief world pointer to get simulation state
     private: physics::WorldPtr world;
   
@@ -173,7 +187,19 @@ namespace gazebo
     private: event::ConnectionPtr updateConnection;
   
     private: std::map<std::string, RegionPtr> regions;
+
     private: std::vector<EventSourcePtr> events;
+
+    /// \brief a way to send messages to the MOOC topic (to the REST)
+    private: transport::PublisherPtr pub;
+
+    /// \brief subscription to the model/info
+    private: transport::SubscriberPtr spawnSub;
+
+    /// \brief known models that have been spawned already
+    private: std::set<std::string> models;
+    /// \brief subscription to remove models
+    private: transport::SubscriberPtr requestSub;
   };
   
 
