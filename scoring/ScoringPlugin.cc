@@ -11,7 +11,7 @@ EventSource::EventSource(physics::WorldPtr _world)
 {
   this->name = "";
   this->world = _world;
-  this->active = false;
+  this->active = true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -26,7 +26,13 @@ void EventSource::Load(const sdf::ElementPtr &_sdf)
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
+std::string EventSource::GetEventData()
+{
+  return "";
+}
+
+///////////////////////////////////////////////////////////////////////////////
 bool EventSource::IsActive()
 {
   return this->active;
@@ -95,7 +101,6 @@ void InRegionEventSource::Load(const sdf::ElementPtr &_sdf)
   else
     gzerr << this->name << " is missing a reigon element" << std::endl;
 
-std::cerr << " getting region name done " << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -132,6 +137,23 @@ bool InRegionEventSource::Update()
 
 }
 
+////////////////////////////////////////////////////////////////////////////////
+std::string InRegionEventSource::GetEventData()
+{
+  string json = "{";
+  json += "\"event\":\"region\",";
+  if(this->isInside)
+  {
+    json += "\"state\":\"inside\",";
+  }
+  else
+  {
+    json += "\"state\":\"outside\",";
+  }
+  json += "\"region\":\"" + this->regionName + "\"";
+  json += "}";
+  return json;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 bool Volume::PointInVolume(const math::Vector3 &_p) const
@@ -200,6 +222,27 @@ ostream& operator << (ostream &out, const Region &_region)
   return out;
 } 
 
+void ScoringPlugin::OnModelInfo(ConstModelPtr &_msg)
+{
+  string modelName = _msg->name();
+  // if the model is not in the set, emit event
+  if(models.insert(modelName).second)
+  {
+    cout << "SPAWNED " << modelName << endl;
+  }
+}
+
+void ScoringPlugin::OnRequest(ConstRequestPtr &_msg)
+{
+  if (_msg->request() == "entity_delete")
+  {
+    string modelName = _msg->data();
+    if(models.erase(modelName) == 1)
+    {
+      cout << "DELETED " << modelName << endl;
+    } 
+  }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 void ScoringPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
@@ -214,8 +257,13 @@ void ScoringPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
   node->Init(_parent->GetName());
 
   // Create a publisher on the ~/MOOCEvent topic
-  transport::PublisherPtr pub =
-  node->Advertise<SimpleMOOC_msgs::msgs::MOOCEvent>("~/MOOCEvent");
+  pub = node->Advertise<SimpleMOOC_msgs::msgs::MOOCEvent>("~/MOOCEvent");
+
+  // Subscribe to model spawning
+  spawnSub = node->Subscribe("~/model/info", &ScoringPlugin::OnModelInfo, this );
+
+  // detect model deletion
+  requestSub = node->Subscribe("~/request", &ScoringPlugin::OnRequest, this);
 
   cout << this->sdf->GetName() << endl;
 
@@ -234,7 +282,10 @@ void ScoringPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
   child = this->sdf->GetElement("event");
   while (child)
   {
+    string eventName = child->GetElement("name")->Get<string>();
     string eventType = child->GetElement("type")->Get<string>();
+    cout << "Event " << eventName << " [" << eventType << "]" << endl;
+
     EventSourcePtr event;
     if (eventType == "simState")
     {
@@ -266,7 +317,7 @@ void ScoringPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
     child = child->GetNextElement("event");
   }
 
-std::cerr << " done while loop " << std::endl;
+  std::cerr << "Scoring events loaded" << std::endl;
   // Listen to the update event. This event is broadcast every
   // simulation iteration.
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
@@ -277,22 +328,11 @@ std::cerr << " done while loop " << std::endl;
 ////////////////////////////////////////////////////////////////////////////////
 void ScoringPlugin::Init()
 {
-  cout << "Init!!!" << endl;
-  cout << " ScoringPlugin::Load" << endl;
-
-
-  for (unsigned int i = 0; i < events.size(); ++i)
+  cout << "ScoringPlugin::Init" << endl;
+  cout << "Initialization of scoring events!" << endl;
+  for (unsigned int i = 0; i < events.size(); ++i){
     events[i]->Init();
-
- // Create the message
-  // msgs::Factory msg;
-  // Pose to initialize the model to
-  // msgs::Set(msg.mutable_pose(),
-  // math::Pose(math::Vector3(1, -2, 0), math::Quaternion(0, 0, 0)));
-
-  // Send the message
-  // pub->Publish(msg);
- 
+  }
 
 }
 
@@ -303,9 +343,17 @@ void ScoringPlugin::Update()
   {
     if (events[i]->Update())
     {
-//      std::string eventData = events[i]->GetEventString();
-      std::cout << "event fired " << events[i]->name << std::endl;
-      // publish to rest server;
+      cout << "UPDATE " << events[i]->name << endl;
+      if(events[i]->IsActive())
+      {
+        std::string eventData = events[i]->GetEventData();
+        std::cout << "event fired " << events[i]->name << " " << eventData << "" << std::endl;
+        // publish to MOOC topic
+        SimpleMOOC_msgs::msgs::MOOCEvent msg;
+        msg.set_route("/events/new");
+        msg.set_json(eventData.c_str() );
+        pub->Publish(msg);
+      }
     }
   }
 }

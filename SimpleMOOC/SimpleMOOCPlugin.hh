@@ -53,7 +53,7 @@ namespace gazebo
     private: void RunRequestQ();
 
     /// \brief Process a RestRequest message from the requestThread
-    private: void ProcessRequest(ConstRestRequestPtr _msg);
+    private: void ProcessLoginRequest(ConstRestRequestPtr _msg);
 
     /// \brief Process a MOOCEvent messsage from the requestThread
     private: void ProcessMOOCEvent(ConstMOOCEventPtr _msg);

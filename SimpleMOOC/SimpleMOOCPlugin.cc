@@ -64,8 +64,25 @@ void SimpleMOOCPlugin::Load(int /*_argc*/, char ** /*_argv*/)
 void SimpleMOOCPlugin::OnMoocEvent(ConstMOOCEventPtr &_msg )
 {
   cout << "SimpleMOOCPlugin::OnMOOCEvent ";
-//   cout << "[" << _msg.route() << ", " << _msg.jsonData() << "]"  << endl; 
+  cout << "[" << _msg->route() << ", " << _msg->json() << "]"  << endl; 
   cout << endl;
+
+  try
+  {
+    restApi.PostLearningEvent(_msg->route().c_str(), _msg->json().c_str());
+  }
+  catch(MOOCException &x)
+  {
+    SimpleMOOC_msgs::msgs::RestResponse msg;
+    std::string errorMsg ("There was a problem trying to login the MOOC: ");
+    errorMsg += x.what();
+    msg.set_type("Error");
+    msg.set_msg(errorMsg);
+    // alert the user via the gui plugin
+    cerr << "ERROR in request... publising to MOOCUI: " << errorMsg << endl;
+    this->pub->Publish(msg);
+  }
+
 }
 
 void SimpleMOOCPlugin::OnRestRequest(ConstRestRequestPtr &_msg )
@@ -81,7 +98,7 @@ void SimpleMOOCPlugin::OnRestRequest(ConstRestRequestPtr &_msg )
 
 }
 
-void SimpleMOOCPlugin::ProcessRequest(ConstRestRequestPtr _msg)
+void SimpleMOOCPlugin::ProcessLoginRequest(ConstRestRequestPtr _msg)
 {
   try
   {
@@ -147,7 +164,7 @@ void SimpleMOOCPlugin::RunRequestQ()
 
       if(req)
       {
-        this->ProcessRequest(req);
+        this->ProcessLoginRequest(req);
       }
       if(event)
       {
