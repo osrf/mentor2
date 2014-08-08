@@ -32,10 +32,8 @@ MotorPlugin::~MotorPlugin()
 }
 
 /////////////////////////////////////////////////
-void MotorPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
+void MotorPlugin::LoadImpl(sdf::ElementPtr _sdf)
 {
-  // This loads all the ports and properties.
-  SimpleModelPlugin::Load(_sdf);
 }
 
 /////////////////////////////////////////////////

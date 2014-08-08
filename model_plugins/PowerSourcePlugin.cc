@@ -32,10 +32,8 @@ PowerSourcePlugin::~PowerSourcePlugin()
 }
 
 /////////////////////////////////////////////////
-void PowerSourcePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
+void PowerSourcePlugin::LoadImpl(sdf::ElementPtr _sdf)
 {
-  // This loads all the ports and properties.
-  SimpleModelPlugin::Load(_sdf);
 }
 
 /////////////////////////////////////////////////

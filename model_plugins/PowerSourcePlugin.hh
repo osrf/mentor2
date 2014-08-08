@@ -31,9 +31,8 @@ namespace gazebo
     public: ~PowerSourcePlugin();
 
     /// \brief Load the model plugin.
-    /// param[in] _model Parent model the plugin is attached to.
-    /// param[in] _sdf The sdf parameters for this plugin.
-    public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
+    /// param[in] _sdf The SDF of this plugin.
+    public: virtual void LoadImpl(sdf::ElementPtr _sdf);
 
     /// \brief Initialize the plugin.
     public: virtual void Init();

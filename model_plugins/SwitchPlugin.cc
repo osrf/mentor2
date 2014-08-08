@@ -32,10 +32,8 @@ SwitchPlugin::~SwitchPlugin()
 }
 
 /////////////////////////////////////////////////
-void SwitchPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
+void SwitchPlugin::LoadImpl(sdf::ElementPtr _sdf)
 {
-  // This loads all the ports and properties.
-  SimpleModelPlugin::Load(_sdf);
 }
 
 /////////////////////////////////////////////////

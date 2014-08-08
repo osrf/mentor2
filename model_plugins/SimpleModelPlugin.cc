@@ -16,8 +16,9 @@
 */
 
 
-#include "SimpleModelPlugin.hh"
+#include <gazebo/physics/physics.hh>
 
+#include "SimpleModelPlugin.hh"
 
 using namespace gazebo;
 
@@ -36,6 +37,8 @@ SimpleModelPlugin::~SimpleModelPlugin()
 /////////////////////////////////////////////////
 void SimpleModelPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 {
+  this->parent = _model;
+  GZ_ASSERT(this->parent, "Parent model is NULL");
 }
 
 /////////////////////////////////////////////////
@@ -64,6 +67,8 @@ void SimpleModelPlugin::Load(sdf::ElementPtr _sdf)
     }
   }
 
+  this->LoadImpl(_sdf);
+
   // DEBUG
   /*for (unsigned int i = 0 ; i < this->ports.size(); ++i)
     std::cerr << " got port " << this->ports[i] << std::endl;
@@ -73,6 +78,12 @@ void SimpleModelPlugin::Load(sdf::ElementPtr _sdf)
     std::cerr << " got property " << it->first << ": " <<
         it->second << std::endl;
   */
+}
+
+/////////////////////////////////////////////////
+void SimpleModelPlugin::LoadImpl(sdf::ElementPtr _sdf)
+{
+  // This function should be mostly empty
 }
 
 /////////////////////////////////////////////////
@@ -105,21 +116,38 @@ void SimpleModelPlugin::ProcessRequestMsgs()
   for (iter = this->requestMsgs.begin();
        iter != this->requestMsgs.end(); ++iter)
   {
-    bool send = true;
     response.set_id((*iter).id());
     response.set_request((*iter).request());
     response.set_response("success");
 
     if ((*iter).request() == "entity_info")
     {
-
-    }
-
-    if (send)
-    {
+      SimpleModel_msgs::msgs::SimpleModel simpleModelMsg;
+      this->FillMsg(simpleModelMsg);
+      std::string *serializedData = response.mutable_serialized_data();
+      simpleModelMsg.SerializeToString(serializedData);
+      response.set_type(simpleModelMsg.GetTypeName());
       this->responsePub->Publish(response);
     }
   }
 
   this->requestMsgs.clear();
+}
+
+//////////////////////////////////////////////////
+void SimpleModelPlugin::FillMsg(SimpleModel_msgs::msgs::SimpleModel &_msg)
+{
+  _msg.set_name(this->parent->GetScopedName());
+  for (unsigned int i =0; i < this->ports.size(); ++i)
+  {
+    _msg.add_port(this->ports[i]);
+  }
+
+  std::map<std::string, std::string>::iterator it;
+  for (it = this->properties.begin() ; it != this->properties.end(); ++it)
+  {
+    _msg.add_key(it->first);
+    _msg.add_value(it->second);
+  }
+
 }
