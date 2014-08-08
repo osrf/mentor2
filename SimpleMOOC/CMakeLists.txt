@@ -14,5 +14,5 @@ include_directories(
   )
 
 add_library(SimpleMOOCPlugin SHARED ${src} )
-target_link_libraries(SimpleMOOCPlugin ${GAZEBO_libraries} SimpleMOOCMsgs)
+target_link_libraries(SimpleMOOCPlugin ${GAZEBO_libraries} SimpleMsgs)
 

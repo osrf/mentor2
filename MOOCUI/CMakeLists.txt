@@ -23,10 +23,9 @@ include_directories(
 link_directories(${GAZEBO_LIBRARY_DIRS})
 
 add_definitions(${QT_DEFINITIONS})
-    
 
 QT4_WRAP_CPP(headers_MOC ${qt_headers})
 QT4_ADD_RESOURCES(resources_RCC ${resources})
 
 add_library(MOOCUIPlugin SHARED ${sources} ${headers_MOC})
-target_link_libraries(MOOCUIPlugin ${GAZEBO_libraries} SimpleMOOCMsgs)
+target_link_libraries(MOOCUIPlugin ${GAZEBO_libraries} SimpleMsgs)

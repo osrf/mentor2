@@ -13,5 +13,5 @@ include_directories(
   )
 
 add_library(ScoringPlugin SHARED ${src} )
-target_link_libraries(ScoringPlugin ${GAZEBO_libraries} SimpleMOOCMsgs)
+target_link_libraries(ScoringPlugin ${GAZEBO_libraries} SimpleMsgs)
 

@@ -1,13 +1,13 @@
 <?xml version="1.0" ?>
 <sdf version="1.5">
-  <model name="motor">
-    <pose>0 0 0.1 0 0 0</pose>
+  <model name="AA_battery">
+    <pose>0 0 0.07 0 0 0</pose>
     <link name="link">
       <collision name="collision">
         <pose>0 0 0.0 0 0 0</pose>
         <geometry>
           <mesh>
-            <uri>model://motor/meshes/motor.dae</uri>
+            <uri>model://AA_battery/meshes/AA_battery.dae</uri>
             <scale>0.01 0.01 0.01</scale>
           </mesh>
         </geometry>
@@ -16,26 +16,27 @@
         <pose>0 0 0.0 0 0 0</pose>
         <geometry>
           <mesh>
-            <uri>model://motor/meshes/motor.dae</uri>
+            <uri>model://AA_battery/meshes/AA_battery.dae</uri>
             <scale>0.01 0.01 0.01</scale>
           </mesh>
         </geometry>
       </visual>
     </link>
-    <plugin filename="libMotorPlugin.so" name="motor">
+    <plugin filename="libPowerSourcePlugin.so" name="battery">
       <port>
-        <name>shaft</name>
-        <type>mechanical</type>
+        <name>positive</name>
+        <type>electrical</type>
       </port>
       <port>
-        <name>terminal</name>
+        <name>negative</name>
         <type>electrical</type>
       </port>
       <properties>
+        <voltage>1.5</voltage>
+        <capacity>3000</capacity>
         <max_current>10</max_current>
-        <resistance>5</resistance>
+        <discharge_constant>1.2</discharge_constant>
       </properties>
-
     </plugin>
   </model>
 </sdf>

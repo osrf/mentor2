@@ -22,5 +22,18 @@
         </geometry>
       </visual>
     </link>
+    <plugin filename="libSwitchPlugin.so" name="switch">
+      <port>
+        <name>A</name>
+        <type>electrical</type>
+      </port>
+      <port>
+        <name>B</name>
+        <type>electrical</type>
+      </port>
+      <properties>
+        <closed>true</closed>
+      </properties>
+    </plugin>
   </model>
 </sdf>

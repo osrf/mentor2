@@ -64,6 +64,7 @@ add_subdirectory(CMLEditor)
 add_subdirectory(SimpleMOOC)
 add_subdirectory(MOOCUI)
 add_subdirectory(scoring)
+add_subdirectory(model_plugins)
 
 ########### Add uninstall target ###############
 configure_file(

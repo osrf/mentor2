@@ -55,5 +55,6 @@ link_directories(${GAZEBO_LIBRARY_DIRS} ${OGRE_LIBRARY_DIRS})
 add_library(CMLEditorPlugin SHARED ${sources} ${headers_MOC} ${headers} ${resources_RCC})
 target_link_libraries(CMLEditorPlugin
 #    qgvcore
+    SimpleMsgs
     ${GAZEBO_libraries}
     ${OGRE_LIBRARIES})
