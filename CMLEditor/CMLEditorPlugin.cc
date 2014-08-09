@@ -20,7 +20,9 @@
 #include <gazebo/gui/MainWindow.hh>
 #include <gazebo/gui/GuiEvents.hh>
 
+#include "CMLRender.hh"
 #include "CMLEditor.hh"
+#include "CMLManager.hh"
 #include "CMLEditorPlugin.hh"
 
 using namespace gazebo;
@@ -46,11 +48,14 @@ void CMLEditorPlugin::Init()
 /////////////////////////////////////////////////
 void CMLEditorPlugin::OnMainWindowReady()
 {
+  gui::CMLManager::Instance()->Init();
+
   gui::MainWindow *mainWindow = gui::get_main_window();
   gui::CMLEditor *editor = new gui::CMLEditor(mainWindow);
-  std::cerr << " main window ready " << std::endl;
-}
 
+  // handle user interaction with the 3d render window
+  gui::CMLRender *renderProxy = new gui::CMLRender();
+}
 
 // Register this plugin with the simulator
 GZ_REGISTER_SYSTEM_PLUGIN(CMLEditorPlugin)

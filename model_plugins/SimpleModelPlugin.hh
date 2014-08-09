@@ -77,7 +77,7 @@ namespace gazebo
     /// \brief A list of ports associated with this model.
     protected: std::vector<std::string> ports;
 
-    /// \brief A list of ports.
+    /// \brief A list of properties associated with this model.
     protected: std::map<std::string, std::string> properties;
 
     /// \brief Mutex to protect incoming message buffers.

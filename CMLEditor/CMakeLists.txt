@@ -15,7 +15,9 @@ set (sources
   CMLEditorScene.cc
   CMLEditorView.cc
   CMLEditorWidget.cc
+  CMLManager.cc
   CMLNode.cc
+  CMLRender.cc
   GrabberHandle.cc
   RectItem.cc
   RotateHandle.cc
@@ -34,7 +36,9 @@ set (headers
   CMLEdge.hh
   CMLEditorPlugin.hh
   CMLEditorWidget.hh
+  CMLManager.hh
   CMLNode.hh
+  CMLRender.hh
   GrabberHandle.hh
   RotateHandle.hh
 )
@@ -46,9 +50,13 @@ add_definitions(${QT_DEFINITIONS})
 QT4_WRAP_CPP(headers_MOC ${qt_headers})
 QT4_ADD_RESOURCES(resources_RCC ${resources})
 
-include_directories(${GAZEBO_INCLUDE_DIRS} ${OGRE_INCLUDE_DIRS})
-include_directories(${OGRE-Terrain_INCLUDE_DIRS})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/QGVCore)
+include_directories(
+  ${GAZEBO_INCLUDE_DIRS}
+  ${OGRE_INCLUDE_DIRS}
+  ${OGRE-Terrain_INCLUDE_DIRS}
+  ${CMAKE_CURRENT_BINARY_DIR}/../msgs
+)
+#include_directories(${CMAKE_CURRENT_SOURCE_DIR}/QGVCore)
 
 link_directories(${GAZEBO_LIBRARY_DIRS} ${OGRE_LIBRARY_DIRS})
 
