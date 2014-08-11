@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <sdf version="1.5">
-  <model name="motor">
+  <model name="switch">
     <pose>0 0 0.12 0 0 0</pose>
     <link name="link">
       <collision name="collision">

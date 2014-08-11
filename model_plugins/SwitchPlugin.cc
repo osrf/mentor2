@@ -39,5 +39,5 @@ void SwitchPlugin::LoadImpl(sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void SwitchPlugin::Init()
 {
-
+  SimpleModelPlugin::Init();
 }

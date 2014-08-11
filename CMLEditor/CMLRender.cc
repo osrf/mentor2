@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,11 @@
 #include <gazebo/common/common.hh>
 #include <gazebo/rendering/rendering.hh>
 #include <gazebo/gui/gui.hh>
+
+#include "CMLManager.hh"
+#include "SimpleModel.pb.h"
+
+#include "CMLPortInspector.hh"
 
 #include "CMLRender.hh"
 
@@ -76,6 +81,12 @@ bool CMLRender::OnMouseRelease(const common::MouseEvent &_event)
   {
     if (vis)
     {
+      std::string name = vis->GetRootVisual()->GetName();
+      SimpleModel_msgs::msgs::SimpleModel msg;
+      msg = CMLManager::Instance()->GetModelInfo(name);
+
+      std::cerr << " name " << name << " " << msg.name() << std::endl;
+
         // QMenu menu;
         // menu.addAction(this->inspectAct);
         // menu.exec(QCursor::pos());
@@ -83,8 +94,24 @@ bool CMLRender::OnMouseRelease(const common::MouseEvent &_event)
     }
   }
 
-  if (_event.button != common::MouseEvent::LEFT)
+  if (_event.button == common::MouseEvent::LEFT)
+  {
+    if (vis)
+    {
+      std::string name = vis->GetRootVisual()->GetName();
+      SimpleModel_msgs::msgs::SimpleModel msg;
+      msg = CMLManager::Instance()->GetModelInfo(name);
+
+      std::cerr << " name " << name << " " << msg.name() << std::endl;
+
+      CMLPortInspector *inspector =
+          new CMLPortInspector(gui::get_main_window());
+      inspector->Load(&msg);
+      inspector->show();
+    }
+    //connect(inspector, Applied(), this,
     return false;
+  }
 
 
   return false;

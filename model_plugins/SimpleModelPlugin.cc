@@ -39,6 +39,8 @@ void SimpleModelPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 {
   this->parent = _model;
   GZ_ASSERT(this->parent, "Parent model is NULL");
+
+  this->Load(_sdf);
 }
 
 /////////////////////////////////////////////////
@@ -70,14 +72,14 @@ void SimpleModelPlugin::Load(sdf::ElementPtr _sdf)
   this->LoadImpl(_sdf);
 
   // DEBUG
-  /*for (unsigned int i = 0 ; i < this->ports.size(); ++i)
+  for (unsigned int i = 0 ; i < this->ports.size(); ++i)
     std::cerr << " got port " << this->ports[i] << std::endl;
 
   std::map<std::string, std::string>::iterator it;
   for (it = properties.begin() ; it != properties.end(); ++it)
     std::cerr << " got property " << it->first << ": " <<
         it->second << std::endl;
-  */
+
 }
 
 /////////////////////////////////////////////////
@@ -112,8 +114,13 @@ void SimpleModelPlugin::Init()
 //////////////////////////////////////////////////
 void SimpleModelPlugin::OnRequest(ConstRequestPtr &_msg)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
-  this->requestMsgs.push_back(*_msg);
+  {
+    boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
+    this->requestMsgs.push_back(*_msg);
+  }
+
+  // process here as ConnectWorldUpdateBegin doesn't work when world is paused
+  this->ProcessRequestMsgs();
 }
 
 //////////////////////////////////////////////////
