@@ -68,6 +68,9 @@ namespace gazebo
     /// \brief Publisher for request response messages.
     protected: transport::PublisherPtr responsePub;
 
+    /// \brief Publisher for simple model messages.
+    protected: transport::PublisherPtr simpleModelPub;
+
     /// \brief Transportation node.
     protected: transport::NodePtr node;
 

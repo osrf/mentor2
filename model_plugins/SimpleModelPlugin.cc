@@ -92,11 +92,21 @@ void SimpleModelPlugin::Init()
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
 
+  // currently just handles entity_info requests.
   this->requestSub = this->node->Subscribe("~/simple/request",
       &SimpleModelPlugin::OnRequest, this, true);
 
   this->responsePub =
       this->node->Advertise<msgs::Response>("~/simple/response");
+
+  this->simpleModelPub =
+      this->node->Advertise<SimpleModel_msgs::msgs::SimpleModel>(
+      "~/simple/model/info");
+
+  // let subscribers know that a simple model has been spawned.
+  SimpleModel_msgs::msgs::SimpleModel simpleModelMsg;
+  this->FillMsg(simpleModelMsg);
+  this->simpleModelPub->Publish(simpleModelMsg);
 }
 
 //////////////////////////////////////////////////

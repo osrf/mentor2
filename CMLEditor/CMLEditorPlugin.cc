@@ -48,9 +48,13 @@ void CMLEditorPlugin::Init()
 /////////////////////////////////////////////////
 void CMLEditorPlugin::OnMainWindowReady()
 {
+  // keep tracks of simple models in the world
   gui::CMLManager::Instance()->Init();
 
+  // gazebo main window
   gui::MainWindow *mainWindow = gui::get_main_window();
+
+  // CML schematic view
   gui::CMLEditor *editor = new gui::CMLEditor(mainWindow);
 
   // handle user interaction with the 3d render window

@@ -22,6 +22,9 @@
 
 #include "SimpleModel.pb.h"
 
+typedef const boost::shared_ptr<const SimpleModel_msgs::msgs::SimpleModel>
+    ConstSimpleModelPtr;
+
 namespace gazebo
 {
   namespace gui
@@ -44,10 +47,18 @@ namespace gazebo
           GetModelInfo(const std::string &_name);
 
       /// \brief Callback when a response message is received.
+      /// \param[in] Pointer to the response message.
       private: void OnResponse(ConstResponsePtr &_msg);
+
+      /// \brief Callback when a simple model message is received.
+      /// \param[in] Pointer to the simple model message.
+      private: void OnSimpleModel(ConstSimpleModelPtr &_msg);
 
       /// \brief Transport node.
       private: transport::NodePtr node;
+
+      /// \brief Subscriber for simple model messages.
+      private: transport::SubscriberPtr simpleModelSub;
 
       /// \brief Subscriber for response messages.
       private: transport::SubscriberPtr responseSub;

@@ -59,6 +59,9 @@ void CMLManager::Init()
   this->responseSub = this->node->Subscribe("~/simple/response",
       &CMLManager::OnResponse, this);
 
+  this->simpleModelSub = this->node->Subscribe("~/simple/model/info",
+      &CMLManager::OnSimpleModel, this);
+
   this->requestMsg = msgs::CreateRequest("entity_info", "");
   this->requestPub->Publish(*this->requestMsg);
 
@@ -72,6 +75,12 @@ SimpleModel_msgs::msgs::SimpleModel CMLManager::GetModelInfo(
   boost::recursive_mutex::scoped_lock lock(*this->modelInfoMutex);
   if (this->modelInfo.find(_name) != this->modelInfo.end())
     return this->modelInfo[_name];
+  else
+  {
+    // return empty msg for now if nothing is found.
+    SimpleModel_msgs::msgs::SimpleModel empty;
+    return empty;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -85,4 +94,11 @@ void CMLManager::OnResponse(ConstResponsePtr &_msg)
 
   boost::recursive_mutex::scoped_lock lock(*this->modelInfoMutex);
   this->modelInfo[simpleModelMsg.name()] = simpleModelMsg;
+}
+
+/////////////////////////////////////////////////
+void CMLManager::OnSimpleModel(ConstSimpleModelPtr &_msg)
+{
+  boost::recursive_mutex::scoped_lock lock(*this->modelInfoMutex);
+  this->modelInfo[_msg->name()] = *_msg.get();
 }
