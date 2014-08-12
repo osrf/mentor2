@@ -20,6 +20,8 @@
 #include <gazebo/gui/gui.hh>
 
 #include "CMLManager.hh"
+#include "CMLEvents.hh"
+#include "CMLConnectionMaker.hh"
 #include "SimpleModel.pb.h"
 
 #include "CMLPortInspector.hh"
@@ -32,41 +34,49 @@ using namespace gui;
 /////////////////////////////////////////////////
 CMLRender::CMLRender()
 {
-  MouseEventHandler::Instance()->AddDoubleClickFilter("CML_Render",
+/*  MouseEventHandler::Instance()->AddDoubleClickFilter("CML_Render",
     boost::bind(&CMLRender::OnMouseDoubleClick, this, _1));
 
   MouseEventHandler::Instance()->AddPressFilter("CML_Render",
       boost::bind(&CMLRender::OnMousePress, this, _1));
 
+  MouseEventHandler::Instance()->AddMoveFilter("CML_Render",
+      boost::bind(&CMLRender::OnMouseMove, this, _1));*/
+
   // Add an event filter, which allows the CMLRender to capture mouse events.
   MouseEventHandler::Instance()->AddReleaseFilter("CML_Render",
       boost::bind(&CMLRender::OnMouseRelease, this, _1));
 
-  MouseEventHandler::Instance()->AddMoveFilter("CML_Render",
-      boost::bind(&CMLRender::OnMouseMove, this, _1));
+/*  this->connections.push_back(
+      event::Events::ConnectPreRender(
+        boost::bind(&CMLRender::Update, this)));*/
 
   this->connections.push_back(
-      event::Events::ConnectPreRender(
-        boost::bind(&CMLRender::Update, this)));
+      CMLEvents::ConnectCreateConnection(
+        boost::bind(&CMLRender::OnCreateConnection, this, _1)));
+
+  this->connections.push_back(
+      CMLEvents::ConnectConnectionCreated(
+        boost::bind(&CMLRender::OnConnectionCreated, this)));
 }
 
 /////////////////////////////////////////////////
 CMLRender::~CMLRender()
 {
-  MouseEventHandler::Instance()->RemovePressFilter("CML_Render");
+//  MouseEventHandler::Instance()->RemovePressFilter("CML_Render");
   MouseEventHandler::Instance()->RemoveReleaseFilter("CML_Render");
-  MouseEventHandler::Instance()->RemoveMoveFilter("CML_Render");
-  MouseEventHandler::Instance()->RemoveDoubleClickFilter("CML_Render");
+//  MouseEventHandler::Instance()->RemoveMoveFilter("CML_Render");
+//  MouseEventHandler::Instance()->RemoveDoubleClickFilter("CML_Render");
 }
 
-/////////////////////////////////////////////////
+/*/////////////////////////////////////////////////
 bool CMLRender::OnMousePress(const common::MouseEvent &_event)
 {
   if (_event.button != common::MouseEvent::LEFT)
     return false;
 
   return false;
-}
+}*/
 
 /////////////////////////////////////////////////
 bool CMLRender::OnMouseRelease(const common::MouseEvent &_event)
@@ -94,7 +104,7 @@ bool CMLRender::OnMouseRelease(const common::MouseEvent &_event)
     }
   }
 
-  if (_event.button == common::MouseEvent::LEFT)
+  /*if (_event.button == common::MouseEvent::LEFT)
   {
     if (vis)
     {
@@ -111,12 +121,12 @@ bool CMLRender::OnMouseRelease(const common::MouseEvent &_event)
     }
     //connect(inspector, Applied(), this,
     return false;
-  }
+  }*/
 
 
   return false;
 }
-
+/*
 /////////////////////////////////////////////////
 bool CMLRender::OnMouseMove(const common::MouseEvent &_event)
 {
@@ -149,4 +159,20 @@ bool CMLRender::OnMouseDoubleClick(const common::MouseEvent &_event)
 void CMLRender::Update()
 {
 
+}*/
+
+/////////////////////////////////////////////////
+void CMLRender::OnCreateConnection(const std::string &_type)
+{
+  CMLConnectionMaker::Instance()->Reset();
+  CMLConnectionMaker::Instance()->AddConnection(_type);
+
+  std::cerr << " create connection! " << std::endl;
+}
+
+/////////////////////////////////////////////////
+void CMLRender::OnConnectionCreated()
+{
+  std::cerr << " connection created " << std::endl;
+  //CMLConnectionMaker::Instance()->Start();
 }

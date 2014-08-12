@@ -49,6 +49,9 @@ namespace gazebo
       /// \brief Qt callback when the back button is pushed.
       private slots: void OnBack();
 
+      /// \brief Qt callback when an electrical connection is to be created.
+      private slots: void OnElectricalConnection();
+
       /// \brief Widget that display components.
       private: QTreeWidget *componentTreeWidget;
 

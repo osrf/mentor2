@@ -7,6 +7,7 @@ link_directories(
 )
 
 set (sources
+  CMLConnectionMaker.cc
   CMLEdge.cc
   CMLEditor.cc
   CMLEditorItem.cc
@@ -15,6 +16,7 @@ set (sources
   CMLEditorScene.cc
   CMLEditorView.cc
   CMLEditorWidget.cc
+  CMLEvents.cc
   CMLManager.cc
   CMLNode.cc
   CMLPortInspector.cc
@@ -35,9 +37,11 @@ set (qt_headers
 )
 
 set (headers
+  CMLConnectionMaker.hh
   CMLEdge.hh
   CMLEditorPlugin.hh
   CMLEditorWidget.hh
+  CMLEvents.hh
   CMLManager.hh
   CMLNode.hh
   CMLRender.hh

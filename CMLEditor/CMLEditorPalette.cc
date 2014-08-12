@@ -15,6 +15,7 @@
  *
 */
 
+#include "CMLEvents.hh"
 #include "CMLEditorPalette.hh"
 
 using namespace gazebo;
@@ -40,32 +41,64 @@ CMLEditorPalette::CMLEditorPalette(QWidget *_parent)
       SIGNAL(itemClicked(QTreeWidgetItem *, int)),
       this, SLOT(OnItemSelection(QTreeWidgetItem *, int)));
 
-  // components item
-  QTreeWidgetItem *componentsItem =
+  // -----
+  // simple shapes item
+  QTreeWidgetItem *shapesItem =
     new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
-        QStringList(QString("Components")));
-  this->componentTreeWidget->addTopLevelItem(componentsItem);
+        QStringList(QString("Simple Shapes")));
+  this->componentTreeWidget->addTopLevelItem(shapesItem);
 
-  QTreeWidgetItem *componentsChildItem =
+  QTreeWidgetItem *shapesChildItem =
     new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
-  componentsItem->addChild(componentsChildItem);
+  shapesItem->addChild(shapesChildItem);
 
   // Shapes buttons
-  QWidget *componentWidget = new QWidget(this);
-  QGridLayout *componentsLayout = new QGridLayout;
+  QWidget *shapesWidget = new QWidget(this);
+  QGridLayout *shapesLayout = new QGridLayout;
 
-  // cylinder button
-  QPushButton *componentButton = new QPushButton(tr("ComponentA"), this);
-  componentButton->setCheckable(true);
-  componentButton->setChecked(false);
+  // box button
+  QPushButton *boxButton = new QPushButton(tr("Box"), this);
+  boxButton->setCheckable(false);
+  boxButton->setChecked(false);
   //connect(componentButton, SIGNAL(clicked()), this, SLOT(OnCylinder()));
 
-  componentsLayout->addWidget(componentButton, 0, 0);
-  componentWidget->setLayout(componentsLayout);
+  shapesLayout->addWidget(boxButton, 0, 0);
+  shapesWidget->setLayout(shapesLayout);
 
   this->componentTreeWidget->setItemWidget(
-      componentsChildItem, 0, componentWidget);
-  componentsItem->setExpanded(true);
+      shapesChildItem, 0, shapesWidget);
+  shapesItem->setExpanded(true);
+
+  // -----
+
+  // electical item
+  QTreeWidgetItem *electricalItem =
+    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
+        QStringList(QString("Electrical")));
+  this->componentTreeWidget->addTopLevelItem(electricalItem);
+
+  QTreeWidgetItem *electricalChildItem =
+    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
+  electricalItem->addChild(electricalChildItem);
+
+  // Shapes buttons
+  QWidget *electricalWidget = new QWidget(this);
+  QGridLayout *electricalLayout = new QGridLayout;
+
+  // wiring button
+  QPushButton *wiringButton = new QPushButton(tr("Wiring && Connecting"), this);
+  wiringButton->setCheckable(false);
+  wiringButton->setChecked(false);
+  connect(wiringButton, SIGNAL(clicked()), this,
+      SLOT(OnElectricalConnection()));
+
+  electricalLayout->addWidget(wiringButton, 0, 0);
+  electricalWidget->setLayout(electricalLayout);
+
+  this->componentTreeWidget->setItemWidget(
+      electricalChildItem, 0, electricalWidget);
+  electricalItem->setExpanded(true);
+
 
   /*// save buttons
   QPushButton *discardButton = new QPushButton(tr("Discard"));
@@ -90,6 +123,16 @@ CMLEditorPalette::CMLEditorPalette(QWidget *_parent)
   frameLayout->setContentsMargins(0, 0, 0, 0);
   frame->setLayout(frameLayout);*/
 
+
+
+
+  this->pageStackWidget = new QStackedWidget(this);
+  this->pageStackWidget->addWidget(this->componentTreeWidget);
+
+  mainLayout->addWidget(this->pageStackWidget);
+
+
+  /*
   this->backButton = new QPushButton(tr("Back"));
   connect(this->backButton, SIGNAL(clicked()), this, SLOT(OnBack()));
   this->backButton->setEnabled(false);
@@ -101,12 +144,7 @@ CMLEditorPalette::CMLEditorPalette(QWidget *_parent)
   navigationLayout->addWidget(this->backButton);
   //navigationLayout->addWidget(homeButton);
   navigationLayout->setAlignment(Qt::AlignCenter);
-
-  this->pageStackWidget = new QStackedWidget(this);
-  this->pageStackWidget->addWidget(this->componentTreeWidget);
-
-  mainLayout->addWidget(this->pageStackWidget);
-  mainLayout->addLayout(navigationLayout);
+  mainLayout->addLayout(navigationLayout);*/
 
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0, 0, 0, 0);
@@ -138,4 +176,10 @@ void CMLEditorPalette::OnItemSelection(QTreeWidgetItem *_item, int /*_column*/)
 {
   if (_item && _item->childCount() > 0)
     _item->setExpanded(!_item->isExpanded());
+}
+
+/////////////////////////////////////////////////
+void CMLEditorPalette::OnElectricalConnection()
+{
+  emit CMLEvents::createConnection("electrical");
 }

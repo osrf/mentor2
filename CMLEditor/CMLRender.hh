@@ -57,6 +57,13 @@ namespace gazebo
       /// \return True if the event was handled
       private: bool OnMouseDoubleClick(const common::MouseEvent &_event);
 
+      /// \brief Event callback when a connection is to be created.
+      /// \param[in] _type Type of connection.
+      private: void OnCreateConnection(const std::string &_type);
+
+      /// \brief Event callback when a connection has been created.
+      private: void OnConnectionCreated();
+
       /// \brief All the event connections.
       private: std::vector<event::ConnectionPtr> connections;
     };
