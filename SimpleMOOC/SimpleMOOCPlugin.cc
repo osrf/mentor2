@@ -63,7 +63,7 @@ void SimpleMOOCPlugin::Load(int /*_argc*/, char ** /*_argv*/)
 
 void SimpleMOOCPlugin::OnMoocEvent(ConstMOOCEventPtr &_msg )
 {
-  cout << "SimpleMOOCPlugin::OnMOOCEvent ";
+  cout << "SimpleMOOCPlugin::OnMoocEvent ";
   cout << "[" << _msg->route() << ", " << _msg->json() << "]"  << endl; 
   cout << endl;
 
@@ -74,7 +74,7 @@ void SimpleMOOCPlugin::OnMoocEvent(ConstMOOCEventPtr &_msg )
   catch(MOOCException &x)
   {
     SimpleMOOC_msgs::msgs::RestResponse msg;
-    std::string errorMsg ("There was a problem trying to login the MOOC: ");
+    std::string errorMsg ("There was a problem trying send data to the MOOC: ");
     errorMsg += x.what();
     msg.set_type("Error");
     msg.set_msg(errorMsg);
@@ -103,7 +103,7 @@ void SimpleMOOCPlugin::ProcessLoginRequest(ConstRestRequestPtr _msg)
   try
   {
     std::string resp;
-    resp = restApi.Login(_msg->url().c_str(), _msg->username().c_str(), _msg->password().c_str());
+    resp = restApi.Login(_msg->url().c_str(), "/login", _msg->username().c_str(), _msg->password().c_str());
   }
   catch(MOOCException &x)
   {

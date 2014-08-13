@@ -5,9 +5,13 @@ using namespace std;
 using namespace sdf;
 using namespace physics;
 
+event::EventT<void (std::string, bool)> ScoringEvents::spawnModel;
 
 ////////////////////////////////////////////////////////////////////////////////
-EventSource::EventSource(physics::WorldPtr _world)
+EventSource::EventSource( transport::PublisherPtr _pub,
+                          const char* _type,
+                          physics::WorldPtr _world)
+  :type(_type), pub(_pub)
 {
   this->name = "";
   this->world = _world;
@@ -25,13 +29,37 @@ void EventSource::Load(const sdf::ElementPtr &_sdf)
   this->name = _sdf->GetElement("name")->Get<string>();
 }
 
+void EventSource::Emit(const char* data )
+{
+  if(this->IsActive())
+  {
+    std::cout << "event fired " << this->name << " " << data << "" << std::endl;
+    // publish to MOOC topic
+    SimpleMOOC_msgs::msgs::MOOCEvent msg;
+    msg.set_route("/events/new");
+    string json("{");
+    json += "\"type\": \"";
+    json += this->type;
+    json += "\", ";
+    json += "\"name\": \"";
+    json += this->name + "\", ";
+    json += " \"data\": "; 
+    json += data;
+    json += "}";
+    msg.set_json(json.c_str() );
+    std::cout << "JSON " << json << endl;
+    pub->Publish(msg);
+  }
 
+}
+
+/*
 /////////////////////////////////////////////////////////////////////////////////
 std::string EventSource::GetEventData()
 {
-  return "";
+  return "{}";
 }
-
+*/
 ///////////////////////////////////////////////////////////////////////////////
 bool EventSource::IsActive()
 {
@@ -40,8 +68,9 @@ bool EventSource::IsActive()
 
 
 ////////////////////////////////////////////////////////////////////////////////
-MotionEventSource::MotionEventSource(physics::WorldPtr _world) 
-  : EventSource(_world)
+MotionEventSource::MotionEventSource(transport::PublisherPtr _pub, 
+                                      physics::WorldPtr _world) 
+  :EventSource(_pub, "motion", _world)
 {
 }
 
@@ -57,33 +86,98 @@ bool MotionEventSource::Update()
   return false;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-SimStateEventSource::SimStateEventSource(physics::WorldPtr _world) 
-  : EventSource(_world)
+/////////////////////////////////////////////////////////////////////////////////
+std::string MotionEventSource::GetEventData()
 {
-  this->isPaused = false;
+  return "{\"MotionEventSource\": \"GetEventData\" }";
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+SimStateEventSource::SimStateEventSource( transport::PublisherPtr _pub,
+                                          physics::WorldPtr _world) 
+  :EventSource(_pub, "simstate", _world), hasPaused(false)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void SimStateEventSource::Load(const sdf::ElementPtr &_sdf)
 {
   EventSource::Load(_sdf); 
+  // Listen to the pause event. This event is broadcast every
+  // simulation iteration.
+  this->pauseConnection = event::Events::ConnectPause(
+      boost::bind(&SimStateEventSource::OnPause, this, _1));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool SimStateEventSource::Update()
+void SimStateEventSource::OnPause(bool pause)
 {
-  bool oldState = this->isPaused;
-  this->isPaused = this->world->IsPaused();
-  this->active = !this->isPaused;
-
-  return oldState != this->isPaused;  
+  cout << "PAUSE! " << pause << endl;
+  string json;
+  if(pause)
+  {
+    json = "{\"state\": \"paused\" }";
+  }
+  else
+  {
+    json = "{\"state\": \"running\" }";
+  }
+  this->Emit(json.c_str());  
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InRegionEventSource::InRegionEventSource(physics::WorldPtr _world, 
-    const std::map<std::string, RegionPtr> &_regions) 
-  : EventSource(_world), isInside(false), regions(_regions)
+ExistenceEventSource::ExistenceEventSource( transport::PublisherPtr _pub,
+                                            physics::WorldPtr _world)
+  :EventSource(_pub, "existence", _world)
+{
+
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+void ExistenceEventSource::Load(const sdf::ElementPtr &_sdf)
+{
+  EventSource::Load(_sdf);
+  if(_sdf->HasElement("model"))
+  {
+    this->model = _sdf->GetElement("model")->Get<std::string>();
+    
+  }
+
+  this->existenceConnection = ScoringEvents::ConnectSpawnModel(
+      boost::bind(&ExistenceEventSource::OnExistence, this, _1, _2));
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void ExistenceEventSource::OnExistence(std::string _model, bool _alive)
+{
+  if(_model.find(this->model) == 0)
+  {
+
+    string json = "{";
+    json += "\"event\":\"existence\",";
+    if(_alive)
+    {
+      json += "\"state\":\"creation\",";
+    }
+    else
+    {
+      json += "\"state\":\"deletion\",";
+    }
+    json += "\"model\":\"" + this->name + "\"";
+    json += "}";
+    
+    this->Emit(json.c_str()); 
+  }
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+InRegionEventSource::InRegionEventSource( transport::PublisherPtr _pub,
+                                          physics::WorldPtr _world, 
+                              const std::map<std::string, RegionPtr> &_regions) 
+  :EventSource(_pub, "region", _world), isInside(false), regions(_regions)
 {
 }
 
@@ -101,6 +195,10 @@ void InRegionEventSource::Load(const sdf::ElementPtr &_sdf)
   else
     gzerr << this->name << " is missing a reigon element" << std::endl;
 
+  // Listen to the update event. This event is broadcast every
+  // simulation iteration.
+  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+      boost::bind(&InRegionEventSource::Update, this));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -125,52 +223,58 @@ void InRegionEventSource::Init()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool InRegionEventSource::Update()
+void InRegionEventSource::Update()
 {
   if (!this->model)
-    return false;
+    return;
 
   math::Vector3 point = this->model->GetWorldPose().pos;
+  //  cout << "POINT " << point << endl;
   bool oldState = this->isInside;
   this->isInside = this->region->PointInRegion(point);
-  return oldState != this->isInside;
-
-}
-
-////////////////////////////////////////////////////////////////////////////////
-std::string InRegionEventSource::GetEventData()
-{
-  string json = "{";
-  json += "\"event\":\"region\",";
-  if(this->isInside)
+  if( oldState != this->isInside)
   {
-    json += "\"state\":\"inside\",";
+    string json = "{";
+    if(this->isInside)
+    {
+      json += "\"state\":\"inside\",";
+    }
+    else
+    {
+      json += "\"state\":\"outside\",";
+    }
+    json += "\"region\":\"" + this->regionName + "\"";
+    json += "}";
+    this->Emit(json.c_str());
   }
-  else
-  {
-    json += "\"state\":\"outside\",";
-  }
-  json += "\"region\":\"" + this->regionName + "\"";
-  json += "}";
-  return json;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 bool Volume::PointInVolume(const math::Vector3 &_p) const
 {
+
   if(_p.x >= min.x && _p.x <= max.x)
+  {
     if(_p.y >= min.y && _p.y <= max.y)
+    {
       if(_p.z >= min.z && _p.z <= max.z)
+      {
         return true;
+      }
+    }
+  }
+  return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 bool Region::PointInRegion(const math::Vector3 &_p) const
 {
-  for (unsigned int i=0; i<= volumes.size(); ++i)
+  for (unsigned int i=0; i< volumes.size(); ++i)
   {
     if (volumes[i]->PointInVolume(_p))
+    {
       return true;
+    }
   }
   return false;
 }
@@ -207,8 +311,6 @@ void Region::Load(const sdf::ElementPtr &_sdf)
 ////////////////////////////////////////////////////////////////////////////////
 ostream& operator << (ostream &out, const Region &_region)
 {
-
-
   cout << _region.name << " [";
   for(vector<VolumePtr>::const_iterator i= _region.volumes.begin(); i != _region.volumes.end(); i++)
   {
@@ -229,6 +331,7 @@ void ScoringPlugin::OnModelInfo(ConstModelPtr &_msg)
   if(models.insert(modelName).second)
   {
     cout << "SPAWNED " << modelName << endl;
+    ScoringEvents::spawnModel(modelName, true);
   }
 }
 
@@ -240,6 +343,7 @@ void ScoringPlugin::OnRequest(ConstRequestPtr &_msg)
     if(models.erase(modelName) == 1)
     {
       cout << "DELETED " << modelName << endl;
+      ScoringEvents::spawnModel(modelName, false);
     } 
   }
 }
@@ -279,6 +383,8 @@ void ScoringPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
     child = child->GetNextElement("region");
   }
 
+
+  cout << "\nReading scoring events" << endl;
   child = this->sdf->GetElement("event");
   while (child)
   {
@@ -287,21 +393,21 @@ void ScoringPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
     cout << "Event " << eventName << " [" << eventType << "]" << endl;
 
     EventSourcePtr event;
-    if (eventType == "simState")
+    if (eventType == "sim_state")
     {
-      event.reset(new SimStateEventSource(this->world));
+      event.reset(new SimStateEventSource(this->pub, this->world));
     }
     else if (eventType == "motion")
     {
-      event.reset(new MotionEventSource(this->world));
+      event.reset(new MotionEventSource(this->pub, this->world));
     }
     else if (eventType == "inclusion")
     {
-      event.reset(new InRegionEventSource(this->world, this->regions));
+      event.reset(new InRegionEventSource(this->pub, this->world, this->regions));
     }
-    else if (eventType == "contact")
+    else if (eventType == "existence" )
     {
-      // event.reset(new MotionEventSource(this->world));
+      event.reset(new ExistenceEventSource(this->pub, this->world) ); 
     }
     else
     {
@@ -316,19 +422,14 @@ void ScoringPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
     }
     child = child->GetNextElement("event");
   }
-
   std::cerr << "Scoring events loaded" << std::endl;
-  // Listen to the update event. This event is broadcast every
-  // simulation iteration.
-  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&ScoringPlugin::Update, this));
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////
 void ScoringPlugin::Init()
 {
-  cout << "ScoringPlugin::Init" << endl;
+  cout << "ScoringPlugin::Init " << this << endl;
   cout << "Initialization of scoring events!" << endl;
   for (unsigned int i = 0; i < events.size(); ++i){
     events[i]->Init();
@@ -336,27 +437,6 @@ void ScoringPlugin::Init()
 
 }
 
-////////////////////////////////////////////////////////////////////////////////
-void ScoringPlugin::Update()
-{
-  for (unsigned int i = 0; i < events.size(); ++i)
-  {
-    if (events[i]->Update())
-    {
-      cout << "UPDATE " << events[i]->name << endl;
-      if(events[i]->IsActive())
-      {
-        std::string eventData = events[i]->GetEventData();
-        std::cout << "event fired " << events[i]->name << " " << eventData << "" << std::endl;
-        // publish to MOOC topic
-        SimpleMOOC_msgs::msgs::MOOCEvent msg;
-        msg.set_route("/events/new");
-        msg.set_json(eventData.c_str() );
-        pub->Publish(msg);
-      }
-    }
-  }
-}
 
 
 // Register this plugin with the simulator

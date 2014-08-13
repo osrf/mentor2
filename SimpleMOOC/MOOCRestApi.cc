@@ -92,7 +92,8 @@ int my_trace(CURL *handle, curl_infotype type,
 
   switch (type) {
   case CURLINFO_TEXT:
-    fprintf(stderr, "== Info: %s", data);
+    if(trace_requests)
+      fprintf(stderr, "== Info: %s", data);
   default: // in case a new one is introduced to shock us
     return 0;
 
@@ -117,7 +118,9 @@ int my_trace(CURL *handle, curl_infotype type,
   }
 
   if(trace_requests)
+  {
     dump(text, stderr, (unsigned char *)data, size, config->trace_ascii);
+  }
   return 0;
 }
 
@@ -169,20 +172,19 @@ void MOOCRestApi::PostLearningEvent(const char* _route, const char *_json)
   post.route = _route;
   post.json = _json;
   this->posts.push_back(post);
-// resp = this->Request(_route, _json);
   SendUnpostedPosts();
 }
 
-std::string MOOCRestApi::Login(const char* urlStr, const char* userStr, const char* passStr)
+std::string MOOCRestApi::Login(const char* urlStr, const char *route, const char* userStr, const char* passStr)
 {
   this->isLoggedIn = false;
   this->url = urlStr;
   this->user = userStr;
   this->pass = passStr;
 
-  string path = "/";  
+  this->loginRoute = route;
   string resp;
-  resp = this->Request(path.c_str());
+  resp = this->Request(loginRoute.c_str());
 
   this->isLoggedIn = true;
   this->SendUnpostedPosts();
@@ -193,9 +195,12 @@ void MOOCRestApi::SendUnpostedPosts()
 {
   if(this->isLoggedIn)
   {
+    cout << posts.size() << " posts to send" <<endl;
     while(!this->posts.empty())
     {
       Post post = this->posts.front();
+//      cout << "curl --verbose --connect-timeout 5 -X POST -H \"Content-Type: application/json \" -k --user"
+      cout << "POST " << post.route.c_str() << " " << post.json.c_str() << endl;
       this->Request(post.route.c_str(), post.json.c_str());
       this->posts.pop_front();
     }
@@ -215,8 +220,8 @@ std::string MOOCRestApi::Request(const char* _reqUrl, const char* _postJsonStr)
   curl_easy_setopt(curl, CURLOPT_URL, path.c_str() );
  
   // in case things go wrong 
-  bool debug = true;
-  if(debug)
+  bool trace_requestsdebug = true;
+  if(trace_requests)
   {
     cout << "MOOCRestApi::Request" << endl;
     cout << "  path: " << path << endl;
