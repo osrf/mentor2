@@ -35,7 +35,6 @@ namespace gazebo
     public: ScoreException(const char*m) :std::runtime_error(m){}
   };
   
-  
   class Volume
   {
     public: virtual bool PointInVolume(const math::Vector3 &p) const;

@@ -29,6 +29,37 @@ void EventSource::Load(const sdf::ElementPtr &_sdf)
   this->name = _sdf->GetElement("name")->Get<string>();
 }
 
+/////////////////////////////////////////////////
+//  adapted from TimePanel
+std::string FormatTime(common::Time &_t)
+{
+  std::ostringstream stream;
+  unsigned int day, hour, min, sec, msec;
+
+  stream.str("");
+
+  sec = _t.sec;
+
+  day = sec / 86400;
+  sec -= day * 86400;
+
+  hour = sec / 3600;
+  sec -= hour * 3600;
+
+  min = sec / 60;
+  sec -= min * 60;
+
+  msec = rint(_t.nsec * 1e-6);
+
+  stream << std::setw(2) << std::setfill('0') << day << " ";
+  stream << std::setw(2) << std::setfill('0') << hour << ":";
+  stream << std::setw(2) << std::setfill('0') << min << ":";
+  stream << std::setw(2) << std::setfill('0') << sec << ".";
+  stream << std::setw(3) << std::setfill('0') << msec;
+
+  return stream.str();
+}
+
 void EventSource::Emit(const char* data )
 {
   if(this->IsActive())
@@ -43,6 +74,32 @@ void EventSource::Emit(const char* data )
     json += "\", ";
     json += "\"name\": \"";
     json += this->name + "\", ";
+
+    common::Time t;
+
+    json += "\"clock_time\": ";
+    json += "\"";
+    json += common::Time::GetWallTimeAsISOString();
+    json += "\", ";    
+
+    json += "\"real_time\": ";
+    json += "\"";
+    t = this->world->GetRealTime();
+    json += FormatTime(t);
+    json += "\", ";
+
+    json += "\"sim_time\": ";
+    json += "\"";
+    t = this->world->GetSimTime();
+    json += FormatTime(t);
+    json += "\", ";
+
+    json += "\"pause_time\": ";
+    json += "\"";
+    t = this->world->GetPauseTime();
+    json += FormatTime(t);
+    json += "\", ";
+
     json += " \"data\": "; 
     json += data;
     json += "}";
