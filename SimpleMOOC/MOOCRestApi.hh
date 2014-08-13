@@ -36,7 +36,7 @@ namespace gazebo
 
     /// \brief Connects to the MOOC. 
     /// \returns MOOC version information
-    public: std::string Login(const char* url, const char* user, const char* pass);
+    public: std::string Login(const char* url, const char* route, const char* user, const char* pass);
 
     /// \brief Notify the MOOC of a learning event
     public: void PostLearningEvent(const char* route, const char *json);
@@ -53,6 +53,9 @@ namespace gazebo
 
     /// \brief Login information: MOOC password
     private: std::string pass;
+
+    /// \brief Login information: login route
+    private: std::string loginRoute;
 
     /// \brief True when a previous Login attempt was successful
     private: bool isLoggedIn;

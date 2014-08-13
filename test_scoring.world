@@ -30,10 +30,23 @@
       </volume>
     </region>
 
+
+    <event>
+      <name>NewSphere</name>
+      <type>existence</type>
+      <model>unit_sphere</model>
+    </event>
+
+    <event>
+      <name>God</name>
+      <type>existence</type>
+      <!-- no model  is specified -->
+    </event>
+
     <!-- when the simulation state changes (pause/play) -->
     <event>
       <name>Sim</name>
-      <type>simState</type>
+      <type>sim_state</type>
     </event>
     
     <!-- bounding box intersection event-->
