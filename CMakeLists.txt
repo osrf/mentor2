@@ -1,26 +1,26 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 enable_testing()
 
-project (gdk)
+project (simplegdk)
 include(ExternalProject)
 
-set (GDK_MAJOR_VERSION 0)
-set (GDK_MINOR_VERSION 1)
-set (GDK_PATCH_VERSION 0)
-set (GDK_VERSION ${GDK_MAJOR_VERSION}.${GDK_MINOR_VERSION})
-set (GDK_VERSION_FULL ${GDK_MAJOR_VERSION}.${GDK_MINOR_VERSION}.${GDK_PATCH_VERSION})
-message (STATUS "${PROJECT_NAME} version ${GDK_VERSION_FULL}")
+set (SIMPLEGDK_MAJOR_VERSION 0)
+set (SIMPLEGDK_MINOR_VERSION 1)
+set (SIMPLEGDK_PATCH_VERSION 0)
+set (SIMPLEGDK_VERSION ${SIMPLEGDK_MAJOR_VERSION}.${SIMPLEGDK_MINOR_VERSION})
+set (SIMPLEGDK_VERSION_FULL ${SIMPLEGDK_MAJOR_VERSION}.${SIMPLEGDK_MINOR_VERSION}.${SIMPLEGDK_PATCH_VERSION})
+message (STATUS "${PROJECT_NAME} version ${SIMPLEGDK_VERSION_FULL}")
 
-set (gdk_cmake_dir ${PROJECT_SOURCE_DIR}/cmake CACHE PATH "Location of CMake scripts")
+set (simplegdk_cmake_dir ${PROJECT_SOURCE_DIR}/cmake CACHE PATH "Location of CMake scripts")
 
 # Packaging configuration
-set (CPACK_PACKAGE_VERSION "${GDK_VERSION_FULL}")
-set (CPACK_PACKAGE_VERSION_MAJOR "${GDK_MAJOR_VERSION}")
-set (CPACK_PACKAGE_VERSION_MINOR "${GDK_MINOR_VERSION}")
-set (CPACK_PACKAGE_VERSION_PATCH "${GDK_PATCH_VERSION}")
+set (CPACK_PACKAGE_VERSION "${SIMPLEGDK_VERSION_FULL}")
+set (CPACK_PACKAGE_VERSION_MAJOR "${SIMPLEGDK_MAJOR_VERSION}")
+set (CPACK_PACKAGE_VERSION_MINOR "${SIMPLEGDK_MINOR_VERSION}")
+set (CPACK_PACKAGE_VERSION_PATCH "${SIMPLEGDK_PATCH_VERSION}")
 list (APPEND CPACK_SOURCE_GENERATOR "TBZ2")
 list (APPEND CPACK_SOURCE_IGNORE_FILES ";TODO;/.hg/;.hgignore;.swp$;/build/")
-set (CPACK_SOURCE_PACKAGE_FILE_NAME "@PROJECT_NAME@-@GDK_VERSION_FULL@")
+set (CPACK_SOURCE_PACKAGE_FILE_NAME "@PROJECT_NAME@-@SIMPLEGDK_VERSION_FULL@")
 include (CPack)
 
 # Extending the Module path with the local module path of desuto
@@ -58,6 +58,19 @@ endif()
 #  MESSAGE("Graphviz not found")
 #endif()
 
+if(NOT DEFINED CMAKE_INSTALL_LIBDIR)
+  set(CMAKE_INSTALL_LIBDIR lib)
+endif(NOT DEFINED CMAKE_INSTALL_LIBDIR)
+set(SIMPLEGDK_PLUGIN_INSTALL_DIR
+  ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/simplegdk-${SIMPLEGDK_VERSION}/plugins/
+)
+
+# Generate the setup.sh file
+configure_file(${CMAKE_SOURCE_DIR}/cmake/setup.sh.in ${PROJECT_BINARY_DIR}/setup.sh @ONLY)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${CMAKE_INSTALL_PREFIX}/share/simplegdk-${SIMPLEGDK_VERSION}/)
+# Also install the setup.sh in an unversioned location
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${CMAKE_INSTALL_PREFIX}/share/simplegdk/)
+
 
 add_subdirectory(msgs)
 add_subdirectory(CMLEditor)
@@ -65,6 +78,7 @@ add_subdirectory(SimpleMOOC)
 add_subdirectory(MOOCUI)
 add_subdirectory(scoring)
 add_subdirectory(model_plugins)
+add_subdirectory(models)
 
 ########### Add uninstall target ###############
 configure_file(

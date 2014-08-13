@@ -15,4 +15,4 @@ include_directories(
 
 add_library(SimpleMOOCPlugin SHARED ${src} )
 target_link_libraries(SimpleMOOCPlugin ${GAZEBO_libraries} SimpleMsgs)
-
+install (TARGETS SimpleMOOCPlugin DESTINATION ${SIMPLEGDK_PLUGIN_INSTALL_DIR})
