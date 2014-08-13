@@ -29,3 +29,4 @@ QT4_ADD_RESOURCES(resources_RCC ${resources})
 
 add_library(MOOCUIPlugin SHARED ${sources} ${headers_MOC})
 target_link_libraries(MOOCUIPlugin ${GAZEBO_libraries} SimpleMsgs)
+install (TARGETS MOOCUIPlugin DESTINATION ${SIMPLEGDK_PLUGIN_INSTALL_DIR})

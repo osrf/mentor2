@@ -72,3 +72,4 @@ target_link_libraries(CMLEditorPlugin
     SimpleMsgs
     ${GAZEBO_libraries}
     ${OGRE_LIBRARIES})
+install (TARGETS CMLEditorPlugin DESTINATION ${SIMPLEGDK_PLUGIN_INSTALL_DIR})
