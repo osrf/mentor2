@@ -58,11 +58,13 @@ endif()
 #  MESSAGE("Graphviz not found")
 #endif()
 
+include(GNUInstallDirs)
+
 if(NOT DEFINED CMAKE_INSTALL_LIBDIR)
   set(CMAKE_INSTALL_LIBDIR lib)
 endif(NOT DEFINED CMAKE_INSTALL_LIBDIR)
 set(SIMPLEGDK_PLUGIN_INSTALL_DIR
-  ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/simplegdk-${SIMPLEGDK_VERSION}/plugins/
+  ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/simplegdk-${SIMPLEGDK_VERSION}/plugins
 )
 
 # Generate the setup.sh file
