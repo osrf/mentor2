@@ -67,6 +67,10 @@ namespace gazebo
       /// \brief Process all received messages.
       private: void PreRender();
 
+      /// \brief Response callback
+      /// \param[in] _msg The message data.
+      private: void OnResponse(ConstResponsePtr &_msg);
+
       /// \brief Qt Graphics Scene where graphics items are drawn in
 //      private: QGVScene *scene;
 //      private: QGraphicsScene *scene;
@@ -106,6 +110,15 @@ namespace gazebo
 
       /// \brief Communication Node
       private: transport::NodePtr node;
+
+      /// \brief Subscribe to reponses.
+      private: transport::SubscriberPtr responseSub;
+
+      /// \brief Publish requests
+      private: transport::PublisherPtr requestPub;
+
+      /// \brief Keep around our request message.
+      private: msgs::Request *requestMsg;
 
       //private: std::vector<QGVNode *> graphNodes;
     };

@@ -15,6 +15,8 @@
  *
 */
 
+#include <iostream>
+
  #include "CMLEdge.hh"
  #include "CMLNode.hh"
 
@@ -40,9 +42,31 @@ CMLEditorScene::~CMLEditorScene()
 /////////////////////////////////////////////////
 CMLNode *CMLEditorScene::AddNode(const std::string &_name)
 {
+  if (this->nodes.find(_name) != this->nodes.end())
+  {
+    std::cerr << "A node with the name: '" << _name <<  "' already exists"
+        << std::endl;
+    return NULL;
+  }
+
   CMLNode *node = new CMLNode(_name, this);
+  this->nodes[_name] = node;
+
   this->addItem(node);
   return node;
+}
+
+/////////////////////////////////////////////////
+void CMLEditorScene::RemoveNode(const std::string &_name)
+{
+  if (this->nodes.find(_name) != this->nodes.end())
+    this->removeItem(this->nodes[_name]);
+}
+
+/////////////////////////////////////////////////
+bool CMLEditorScene::HasNode(const std::string &_name)
+{
+  return (this->nodes.find(_name) != this->nodes.end());
 }
 
 /////////////////////////////////////////////////
@@ -68,13 +92,14 @@ void CMLEditorScene::drawBackground(QPainter * _painter, const QRectF & _rect)
     //_painter->drawRect(sceneRect());
 }
 
-
+/////////////////////////////////////////////////
 void CMLEditorScene::itemMoved()
 {
    if (!timerId)
        timerId = startTimer(1000 / 25);
 }
 
+/////////////////////////////////////////////////
 void CMLEditorScene::timerEvent(QTimerEvent *event)
 {
    Q_UNUSED(event);

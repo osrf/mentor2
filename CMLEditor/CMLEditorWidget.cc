@@ -84,15 +84,25 @@ CMLEditorWidget::CMLEditorWidget(QWidget *_parent)
   this->sceneSub = this->node->Subscribe("~/scene",
       &CMLEditorWidget::OnSceneMsg, this);
 
+  // request response for getting the scene msg
+  this->requestPub = this->node->Advertise<msgs::Request>("~/request");
+  this->responseSub = this->node->Subscribe("~/response",
+      &CMLEditorWidget::OnResponse, this, true);
 
   this->receiveMutex = new boost::mutex();
   this->connections.push_back(event::Events::ConnectPreRender(
       boost::bind(&CMLEditorWidget::PreRender, this)));
+
+  this->requestPub->WaitForConnection();
+  this->requestMsg = msgs::CreateRequest("scene_info");
+  this->requestPub->Publish(*this->requestMsg);
 }
 
 /////////////////////////////////////////////////
 CMLEditorWidget::~CMLEditorWidget()
 {
+  delete this->requestMsg;
+  this->requestMsg = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -122,6 +132,19 @@ void CMLEditorWidget::OnModelMsg(ConstModelPtr &_msg)
 }
 
 /////////////////////////////////////////////////
+void CMLEditorWidget::OnResponse(ConstResponsePtr &_msg)
+{
+  if (!this->requestMsg || _msg->id() != this->requestMsg->id())
+    return;
+
+  msgs::Scene sceneMsg;
+  sceneMsg.ParseFromString(_msg->serialized_data());
+  boost::shared_ptr<msgs::Scene> sm(new msgs::Scene(sceneMsg));
+  this->sceneMsgs.push_back(sm);
+  this->requestMsg = NULL;
+}
+
+/////////////////////////////////////////////////
 bool CMLEditorWidget::ProcessSceneMsg(ConstScenePtr &_msg)
 {
   for (int i = 0; i < _msg->model_size(); ++i)
@@ -134,7 +157,9 @@ bool CMLEditorWidget::ProcessSceneMsg(ConstScenePtr &_msg)
 bool CMLEditorWidget::ProcessModelMsg(const msgs::Model &_msg)
 {
   //QGVNode *node = this->scene->addNode(tr(_msg.name().c_str()));
-  CMLNode *node = this->scene->AddNode(_msg.name());
+
+  if (!this->scene->HasNode(_msg.name()))
+    this->scene->AddNode(_msg.name());
   //this->graphNodes.push_back(node);
 
   //this->scene->clearLayout();

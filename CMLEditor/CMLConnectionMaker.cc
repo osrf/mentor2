@@ -378,7 +378,9 @@ bool CMLConnectionMaker::OnMouseMove(const common::MouseEvent &_event)
       this->hoverVis = rootVis;
       if (!rootVis->IsPlane() && (!this->selectedVis ||
            (this->selectedVis && this->hoverVis != this->selectedVis)))
+      {
         this->hoverVis->SetEmissive(common::Color(0.5, 0.5, 0.5));
+      }
     }
   }
 
