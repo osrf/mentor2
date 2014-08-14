@@ -51,41 +51,56 @@
     
     <!-- bounding box intersection event-->
     <event>
-      <name>boxiInStart</name>
+      <name>batiInStart</name>
       <type>inclusion</type>
-      <model>unit_box_1</model>
+      <model>AA_battery</model>
       <region>start</region>
     </event>
 
     <!-- bounding box inclusion event -->
     <event>
-      <name>boxInEnd</name>
+      <name>batInEnd</name>
       <type>inclusion</type>
-      <model>unit_box_1</model>
+      <model>AA_battery</model>
       <region>end</region>
     </event>
-
-    <!-- contact between models -->
-<!--    <event>
-      <name>box_to_box></name>
-      <type>contact</type>
-      <model>unit_box_1</model>
-      <model>unit_box_2</model>
-    </event>    -->
 
     <!-- detect sudden movement (fall)  -->
     <event>
       <type>motion</type>
       <name>fall</name>
-      <model>unit_box_1</model>
-      <accel>9</accel>
+      <model>motor</model>
+      <accel>7</accel>
       <vel>5</vel>
     </event>
     </plugin>
+    
 
-    <!-- first box of two -->
+    <include>
+      <pose>0 0 0 0 0 0</pose>
+      <uri>model://AA_battery</uri>
+    </include>
+
+    <include>
+      <pose>1 0 0 0 0 0</pose>
+      <uri>model://power_switch</uri>
+    </include>
+
+    <include>
+      <pose>2 0 0 0 0 0</pose>
+      <uri>model://battery_holder</uri>
+    </include>
+
+    <include>
+      <pose>3 0 0 0 0 0</pose>
+      <uri>model://motor</uri>
+    </include>
+
+
+
+<!-- first box of two 
     <model name='unit_box_1'>
-      <pose>1 -1 0.5 0 -0 0</pose>
+      <pose>-2 -2 0.5 0 -0 0</pose>
       <link name='link'>
         <inertial>
           <mass>1</mass>
@@ -138,8 +153,9 @@
       </link>
       <static>0</static>
     </model>
+-->
 
-   <!-- second box of two -->
+<!-- second box of two 
     <model name='unit_box_2'>
       <pose>0 -5 0.5 0 -0 0</pose>
       <link name='link'>
@@ -194,7 +210,7 @@
       </link>
       <static>0</static>
     </model>
-
+-->
 
 
 

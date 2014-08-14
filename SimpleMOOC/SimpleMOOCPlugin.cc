@@ -47,7 +47,7 @@ SimpleMOOCPlugin::~SimpleMOOCPlugin()
 
 void SimpleMOOCPlugin::Init()
 {
-  std::cerr << "SimpleMOOCPlugin setting up pubs/sub node" <<  std::endl;
+  std::cerr << "SimpleMOOCPlugin::Init() setting up pubs/sub node" <<  std::endl;
   // setup our node for communication
   node->Init();
   subRequest = node->Subscribe("~/MOOCRequest", &SimpleMOOCPlugin::OnRestRequest, this);
@@ -74,7 +74,7 @@ void SimpleMOOCPlugin::OnMoocEvent(ConstMOOCEventPtr &_msg )
   catch(MOOCException &x)
   {
     SimpleMOOC_msgs::msgs::RestResponse msg;
-    std::string errorMsg ("There was a problem trying send data to the MOOC: ");
+    std::string errorMsg ("There was a problem trying to send data to the MOOC: ");
     errorMsg += x.what();
     msg.set_type("Error");
     msg.set_msg(errorMsg);

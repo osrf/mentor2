@@ -155,8 +155,9 @@ WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
 
 
 MOOCRestApi::MOOCRestApi()
+  :isLoggedIn(false)
 {
-
+  cout << "REST ready!!!!!!!" <<endl;
 }
 
 MOOCRestApi::~MOOCRestApi()
@@ -193,9 +194,10 @@ std::string MOOCRestApi::Login(const char* urlStr, const char *route, const char
 
 void MOOCRestApi::SendUnpostedPosts()
 {
+  cout << "MOOCRestApi::SendUnpostedPosts() isLoggedIn " << this->isLoggedIn << endl;
   if(this->isLoggedIn)
   {
-    cout << posts.size() << " posts to send" <<endl;
+    cout << posts.size() << " post(s) to send" <<endl;
     while(!this->posts.empty())
     {
       Post post = this->posts.front();
@@ -264,7 +266,7 @@ std::string MOOCRestApi::Request(const char* _reqUrl, const char* _postJsonStr)
   string userpass = this->user + ":" + this->pass;
   curl_easy_setopt(curl, CURLOPT_USERPWD, userpass.c_str());
 
-  // 5 sec connection timeout
+  // connection timeout
   curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 10);
   // 10 sec total timeout
   // curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10);

@@ -222,12 +222,11 @@ void ExistenceEventSource::OnExistence(std::string _model, bool _alive)
     {
       json += "\"state\":\"deletion\",";
     }
-    json += "\"model\":\"" + this->name + "\"";
+    json += "\"model\":\"" + _model + "\"";
     json += "}";
     
     this->Emit(json.c_str()); 
   }
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -300,7 +299,8 @@ void InRegionEventSource::Update()
     {
       json += "\"state\":\"outside\",";
     }
-    json += "\"region\":\"" + this->regionName + "\"";
+    json += "\"region\":\"" + this->regionName + "\", ";
+    json += "\"model\":\"" + this->modelName + "\"";
     json += "}";
     this->Emit(json.c_str());
   }
@@ -491,7 +491,12 @@ void ScoringPlugin::Init()
   for (unsigned int i = 0; i < events.size(); ++i){
     events[i]->Init();
   }
-
+  // seed the map with the initial models
+  for (int i=0; i < world->GetModelCount(); ++i)
+  {
+    string name = world->GetModel(i)->GetName();
+    models.insert(name);
+  }
 }
 
 
