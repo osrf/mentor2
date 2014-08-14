@@ -47,6 +47,14 @@ namespace gazebo
       /// \return the Node created.
       public: CMLNode *AddNode(const std::string &_name);
 
+      /// \brief Remove a node from the scene.
+      /// \param[in] _name Name of the node.
+      public: void RemoveNode(const std::string &_name);
+
+      /// \brief Check if a node exists in the scene.
+      /// \return True if the node exists.
+      public: bool HasNode(const std::string &_name);
+
       public: void itemMoved();
 
       protected: void timerEvent(QTimerEvent *event);
@@ -57,6 +65,9 @@ namespace gazebo
       private: void drawBackground(QPainter * _painter, const QRectF & _rect);
 
       private: int timerId;
+
+      /// \brief A map of node names to corresponding graphics items.
+      private: std::map<std::string, QGraphicsItem *> nodes;
     };
   }
 }
