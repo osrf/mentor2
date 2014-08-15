@@ -69,7 +69,7 @@ void CMLManager::Init()
 }
 
 /////////////////////////////////////////////////
-SimpleModel_msgs::msgs::SimpleModel CMLManager::GetModelInfo(
+Simple_msgs::msgs::SimpleModel CMLManager::GetModelInfo(
     const std::string &_name)
 {
   boost::recursive_mutex::scoped_lock lock(*this->modelInfoMutex);
@@ -78,7 +78,7 @@ SimpleModel_msgs::msgs::SimpleModel CMLManager::GetModelInfo(
   else
   {
     // return empty msg for now if nothing is found.
-    SimpleModel_msgs::msgs::SimpleModel empty;
+    Simple_msgs::msgs::SimpleModel empty;
     return empty;
   }
 }
@@ -89,7 +89,7 @@ void CMLManager::OnResponse(ConstResponsePtr &_msg)
   if (!this->requestMsg || _msg->id() != this->requestMsg->id())
     return;
 
-  SimpleModel_msgs::msgs::SimpleModel simpleModelMsg;
+  Simple_msgs::msgs::SimpleModel simpleModelMsg;
   simpleModelMsg.ParseFromString(_msg->serialized_data());
 
   boost::recursive_mutex::scoped_lock lock(*this->modelInfoMutex);

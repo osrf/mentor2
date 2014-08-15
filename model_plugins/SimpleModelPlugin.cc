@@ -102,11 +102,11 @@ void SimpleModelPlugin::Init()
       this->node->Advertise<msgs::Response>("~/simple/response");
 
   this->simpleModelPub =
-      this->node->Advertise<SimpleModel_msgs::msgs::SimpleModel>(
+      this->node->Advertise<Simple_msgs::msgs::SimpleModel>(
       "~/simple/model/info");
 
   // let subscribers know that a simple model has been spawned.
-  SimpleModel_msgs::msgs::SimpleModel simpleModelMsg;
+  Simple_msgs::msgs::SimpleModel simpleModelMsg;
   this->FillMsg(simpleModelMsg);
   this->simpleModelPub->Publish(simpleModelMsg);
 }
@@ -139,7 +139,7 @@ void SimpleModelPlugin::ProcessRequestMsgs()
 
     if ((*iter).request() == "entity_info")
     {
-      SimpleModel_msgs::msgs::SimpleModel simpleModelMsg;
+      Simple_msgs::msgs::SimpleModel simpleModelMsg;
       this->FillMsg(simpleModelMsg);
       std::string *serializedData = response.mutable_serialized_data();
       simpleModelMsg.SerializeToString(serializedData);
@@ -152,7 +152,7 @@ void SimpleModelPlugin::ProcessRequestMsgs()
 }
 
 //////////////////////////////////////////////////
-void SimpleModelPlugin::FillMsg(SimpleModel_msgs::msgs::SimpleModel &_msg)
+void SimpleModelPlugin::FillMsg(Simple_msgs::msgs::SimpleModel &_msg)
 {
   _msg.set_name(this->parent->GetScopedName());
   for (unsigned int i =0; i < this->ports.size(); ++i)

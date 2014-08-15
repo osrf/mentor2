@@ -238,7 +238,10 @@ bool CMLConnectionMaker::OnMouseRelease(const common::MouseEvent &_event)
         this->newConnectionCreated = true;
 
         // signal the end of a connect action.
-        emit CMLEvents::connectionCreated();
+    //    emit CMLEvents::connectionCreated();
+        emit CMLEvents::connectionCreated(
+            this->mouseConnection->parent->GetName(),
+            this->mouseConnection->child->GetName());
 
       }
     }
@@ -502,6 +505,7 @@ void CMLConnectionMaker::Update()
   if (this->newConnectionCreated)
   {
     this->CreateHotSpot(this->mouseConnection);
+
     this->mouseConnection = NULL;
     this->newConnectionCreated = false;
   }

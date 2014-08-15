@@ -59,12 +59,10 @@ void CMLEditor::OnEdit(bool _checked)
 {
   if (_checked)
   {
-    this->mainWindow->Pause();
     this->mainWindow->ShowLeftColumnWidget("CMLEditorTab");
   }
   else
   {
     this->mainWindow->ShowLeftColumnWidget();
-    this->mainWindow->Play();
   }
 }

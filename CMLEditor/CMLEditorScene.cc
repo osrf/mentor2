@@ -70,6 +70,32 @@ bool CMLEditorScene::HasNode(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
+CMLEdge *CMLEditorScene::AddEdge(const std::string &_node1,
+    const std::string &_node2)
+{
+  if (this->nodes.find(_node1) == this->nodes.end())
+  {
+    std::cerr << "Unable to find node: '" << _node1 <<
+        "' when creating an edge" << std::endl;
+    return NULL;
+  }
+
+  if (this->nodes.find(_node2) == this->nodes.end())
+  {
+    std::cerr << "Unable to find node: '" << _node2 <<
+        "' when creating an edge" << std::endl;
+    return NULL;
+  }
+
+  CMLNode *node1 = this->nodes[_node1];
+  CMLNode *node2 = this->nodes[_node2];
+  CMLEdge *edge = new CMLEdge(node1, node2);
+  this->addItem(edge);
+
+  return edge;
+}
+
+/////////////////////////////////////////////////
 void CMLEditorScene::drawBackground(QPainter * _painter, const QRectF & _rect)
 {
     const int gridSize = 25;

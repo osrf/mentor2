@@ -79,8 +79,12 @@ CMLEditorWidget::CMLEditorWidget(QWidget *_parent)
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
 
+  this->simpleConnectionSub = this->node->Subscribe("~/simple/connection",
+      &CMLEditorWidget::OnSimpleConnection, this);
+
   this->modelInfoSub = this->node->Subscribe("~/model/info",
       &CMLEditorWidget::OnModelMsg, this);
+
   this->sceneSub = this->node->Subscribe("~/scene",
       &CMLEditorWidget::OnSceneMsg, this);
 
@@ -127,8 +131,16 @@ void CMLEditorWidget::OnSceneMsg(ConstScenePtr &_msg)
 /////////////////////////////////////////////////
 void CMLEditorWidget::OnModelMsg(ConstModelPtr &_msg)
 {
+  std::cerr << " got model msg " << std::endl;
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   this->modelMsgs.push_back(_msg);
+}
+
+//////////////////////////////////////////////////
+void CMLEditorWidget::OnSimpleConnection(ConstSimpleConnectionPtr &_msg)
+{
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  this->simpleConnectionMsgs.push_back(_msg);
 }
 
 /////////////////////////////////////////////////
@@ -157,7 +169,6 @@ bool CMLEditorWidget::ProcessSceneMsg(ConstScenePtr &_msg)
 bool CMLEditorWidget::ProcessModelMsg(const msgs::Model &_msg)
 {
   //QGVNode *node = this->scene->addNode(tr(_msg.name().c_str()));
-
   if (!this->scene->HasNode(_msg.name()))
     this->scene->AddNode(_msg.name());
   //this->graphNodes.push_back(node);
@@ -171,25 +182,39 @@ bool CMLEditorWidget::ProcessModelMsg(const msgs::Model &_msg)
   return true;
 }
 
+/////////////////////////////////////////////////
+bool CMLEditorWidget::ProcessSimpleConnectionMsg(
+    const Simple_msgs::msgs::SimpleConnection &_msg)
+{
+  this->scene->AddEdge(_msg.parent(), _msg.child());
+}
+
 //////////////////////////////////////////////////
 void CMLEditorWidget::PreRender()
 {
   static SceneMsgs_L::iterator sIter;
   static ModelMsgs_L::iterator modelIter;
+  static SimpleConnectionMsgs_L::iterator simpleConnectionIter;
 
   SceneMsgs_L sceneMsgsCopy;
   ModelMsgs_L modelMsgsCopy;
+  SimpleConnectionMsgs_L simpleConnectionMsgsCopy;
 
   {
     boost::mutex::scoped_lock lock(*this->receiveMutex);
 
     std::copy(this->sceneMsgs.begin(), this->sceneMsgs.end(),
-              std::back_inserter(sceneMsgsCopy));
+        std::back_inserter(sceneMsgsCopy));
     this->sceneMsgs.clear();
 
     std::copy(this->modelMsgs.begin(), this->modelMsgs.end(),
-              std::back_inserter(modelMsgsCopy));
+        std::back_inserter(modelMsgsCopy));
     this->modelMsgs.clear();
+
+    std::copy(this->simpleConnectionMsgs.begin(),
+        this->simpleConnectionMsgs.end(),
+        std::back_inserter(simpleConnectionMsgsCopy));
+    this->simpleConnectionMsgs.clear();
   }
 
   // Process the scene messages. DO THIS FIRST
@@ -208,5 +233,15 @@ void CMLEditorWidget::PreRender()
       modelMsgsCopy.erase(modelIter++);
     else
       ++modelIter;
+  }
+
+  // Process the simple connection messages.
+  for (simpleConnectionIter = simpleConnectionMsgsCopy.begin();
+      simpleConnectionIter != simpleConnectionMsgsCopy.end();)
+  {
+    if (this->ProcessSimpleConnectionMsg(**simpleConnectionIter))
+      simpleConnectionMsgsCopy.erase(simpleConnectionIter++);
+    else
+      ++simpleConnectionIter;
   }
 }
