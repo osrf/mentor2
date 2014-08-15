@@ -108,29 +108,6 @@ namespace gazebo
   };
 
 
-  class  ExistenceEventSource: public EventSource
-  {
-    /// \brief Constructor
-    public: ExistenceEventSource(transport::PublisherPtr pub, physics::WorldPtr _world);
-
-    /// \brief Reads the model filter and event name
-    public: virtual void Load(const sdf::ElementPtr &_sdf);
-
-    /// \brief callback for gazebo event 
-    public: void OnExistence(std::string _model, bool _alive);
-
-    /// \brief A filter to raise the event only for models
-    /// with a name that starts with a specific prefix
-    /// when empy, the existence event is raised for each
-    /// model creation and destruction
-    private: std::string model;    
-
-    /// \brief Allows us to get called when a new model is spawned
-    /// or deleted
-    private: event::ConnectionPtr existenceConnection;  
-
-  };
-
   /// \brief Gazebo events 
   class  ScoringEvents
   {

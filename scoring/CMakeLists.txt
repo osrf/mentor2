@@ -7,6 +7,7 @@ set (src
   ScoringPlugin.cc
   EventSource.cc
   InRegionEventSource.cc
+  ExistenceEventSource.cc
   )
 
 include_directories(

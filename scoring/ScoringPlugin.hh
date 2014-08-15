@@ -20,11 +20,10 @@
 #include "ScoreException.hh"
 #include "EventSource.hh"
 #include "InRegionEventSource.hh"
+#include "ExistenceEventSource.hh"
 
-//#include "gazebo/physics/physics.hh"
-#include "gazebo/common/common.hh"
-//#include "gazebo/gazebo.hh"
-#include "gazebo/common/Event.hh"
+//#include "gazebo/common/common.hh"
+//#include "gazebo/common/Event.hh"
 
 #include <iostream>
 
