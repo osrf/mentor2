@@ -86,27 +86,6 @@ namespace gazebo
   
   };
 
-  
-  class SimStateEventSource: public EventSource
-  {
-    /// \brief Constructor
-    /// \param[in] _world Pointer to the world.
-    public: SimStateEventSource(transport::PublisherPtr pub, physics::WorldPtr _world);
-   
-    /// Documentation Inherited
-    public: virtual void Load(const sdf::ElementPtr &_sdf);
-
-    /// \brief Callback for the pause event
-    public: void OnPause(bool p);
-
-    /// brief True if the simulation is paused.
-    private: bool hasPaused;
-
-    /// \brief Pointer to the Gazebo pause event connection
-    private: event::ConnectionPtr pauseConnection;
-    
-  };
-
 
   /// \brief Gazebo events 
   class  ScoringEvents

@@ -21,9 +21,7 @@
 #include "EventSource.hh"
 #include "InRegionEventSource.hh"
 #include "ExistenceEventSource.hh"
-
-//#include "gazebo/common/common.hh"
-//#include "gazebo/common/Event.hh"
+#include "SimStateEventSource.hh"
 
 #include <iostream>
 

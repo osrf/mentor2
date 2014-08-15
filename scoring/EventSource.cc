@@ -45,7 +45,7 @@ void EventSource::Load(const sdf::ElementPtr &_sdf)
   this->name = _sdf->GetElement("name")->Get<string>();
 }
 
-/////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 //  adapted from TimePanel
 std::string FormatTime(common::Time &_t)
 {
@@ -76,6 +76,7 @@ std::string FormatTime(common::Time &_t)
   return stream.str();
 }
 
+////////////////////////////////////////////////////////////////////////////////
 void EventSource::Emit(const char* data )
 {
   if(this->IsActive())
@@ -150,45 +151,5 @@ void MotionEventSource::Load(const sdf::ElementPtr &_sdf)
 bool MotionEventSource::Update()
 {
   return false;
-}
-
-/////////////////////////////////////////////////////////////////////////////////
-std::string MotionEventSource::GetEventData()
-{
-  return "{\"MotionEventSource\": \"GetEventData\" }";
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-SimStateEventSource::SimStateEventSource( transport::PublisherPtr _pub,
-                                          physics::WorldPtr _world) 
-  :EventSource(_pub, "simstate", _world), hasPaused(false)
-{
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void SimStateEventSource::Load(const sdf::ElementPtr &_sdf)
-{
-  EventSource::Load(_sdf); 
-  // Listen to the pause event. This event is broadcast every
-  // simulation iteration.
-  this->pauseConnection = event::Events::ConnectPause(
-      boost::bind(&SimStateEventSource::OnPause, this, _1));
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void SimStateEventSource::OnPause(bool pause)
-{
-  cout << "PAUSE! " << pause << endl;
-  string json;
-  if(pause)
-  {
-    json = "{\"state\": \"paused\" }";
-  }
-  else
-  {
-    json = "{\"state\": \"running\" }";
-  }
-  this->Emit(json.c_str());  
 }
 

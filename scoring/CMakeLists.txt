@@ -8,6 +8,7 @@ set (src
   EventSource.cc
   InRegionEventSource.cc
   ExistenceEventSource.cc
+  SimStateEventSource.cc
   )
 
 include_directories(
