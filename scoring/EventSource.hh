@@ -131,68 +131,6 @@ namespace gazebo
 
   };
 
-  class Volume
-  {
-    public: virtual bool PointInVolume(const math::Vector3 &p) const;
-    public: math::Vector3 min, max;
-  
-  };
-  
-  typedef boost::shared_ptr<Volume> VolumePtr;
-  
-  class Region
-  {
-    public: void Load(const sdf::ElementPtr &_sdf);
-    public: std::string name;
-    public: std::vector<VolumePtr> volumes;
-    public: bool PointInRegion(const math::Vector3 &p) const; 
-  };
-  
-  typedef boost::shared_ptr<Region> RegionPtr;
- 
-  std::ostream& operator << (std::ostream &out, const Region &_region);
-  
-  class  InRegionEventSource: public EventSource
-  {
-    /// \brief Constructor
-    /// \param[in] _world Pointer to the world.
-    public: InRegionEventSource(transport::PublisherPtr pub, 
-                                physics::WorldPtr _world, 
-                                const std::map<std::string, RegionPtr> &_regions);
-
-    /// \brief Initialize the event
-    public: virtual void Init();
-   
-    /// \brief Called every simulation step
-    public: void Update();
-
-    /// Documentation Inherited
-    public: virtual void Load(const sdf::ElementPtr &_sdf);
-
-    /// \brief Pointer to the update event connection
-    private: event::ConnectionPtr updateConnection;
-
-    /// \brief The model used for the in region check.
-    private: std::string modelName;
-
-    /// \brief a Pointer to the model
-    private: physics::ModelPtr model;
-
-    /// \brief The region used for the in region check.
-    private: std::string regionName;
-
-    /// \brief A map of region names to region pointers.
-    private: const std::map<std::string, RegionPtr> &regions;
- 
-    /// \brief A region to test the point inclusion.
-    private: RegionPtr region;
-
-    /// \brief the current state
-    private: bool isInside;
-    
-  };
-
-
   /// \brief Gazebo events 
   class  ScoringEvents
   {

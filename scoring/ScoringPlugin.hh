@@ -19,6 +19,7 @@
 
 #include "ScoreException.hh"
 #include "EventSource.hh"
+#include "InRegionEventSource.hh"
 
 //#include "gazebo/physics/physics.hh"
 #include "gazebo/common/common.hh"

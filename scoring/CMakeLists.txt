@@ -6,6 +6,7 @@ link_directories(
 set (src
   ScoringPlugin.cc
   EventSource.cc
+  InRegionEventSource.cc
   )
 
 include_directories(
