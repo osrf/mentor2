@@ -21,7 +21,7 @@
 #include <gazebo/gui/qt.h>
 
 
-namespace SimpleModel_msgs
+namespace Simple_msgs
 {
   namespace msgs
   {
@@ -48,7 +48,7 @@ namespace gazebo
 
       /// \brief Load the inspector with a simple model message
       /// \param[in] _msg A simple model message that contains port information.
-      public: void Load(const SimpleModel_msgs::msgs::SimpleModel *_msg);
+      public: void Load(const Simple_msgs::msgs::SimpleModel *_msg);
 
       /// \brief Qt signal emitted to indicate that changes should be applied.
       Q_SIGNALS: void Applied();

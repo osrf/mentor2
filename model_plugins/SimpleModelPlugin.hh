@@ -52,7 +52,7 @@ namespace gazebo
     /// \brief Fill a message with the ports and properties of this model.
     /// \param[out] _msg A message to be filled with ports and properties of
     /// this model.
-    protected: void FillMsg(SimpleModel_msgs::msgs::SimpleModel &_msg);
+    protected: void FillMsg(Simple_msgs::msgs::SimpleModel &_msg);
 
     /// \brief Called when a request message is received.
     /// \param[in] _msg The request message.

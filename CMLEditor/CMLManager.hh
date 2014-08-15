@@ -22,7 +22,7 @@
 
 #include "SimpleModel.pb.h"
 
-typedef const boost::shared_ptr<const SimpleModel_msgs::msgs::SimpleModel>
+typedef const boost::shared_ptr<const Simple_msgs::msgs::SimpleModel>
     ConstSimpleModelPtr;
 
 namespace gazebo
@@ -43,7 +43,7 @@ namespace gazebo
       public: void Init();
 
       /// \brief Initialize the manager
-      public: SimpleModel_msgs::msgs::SimpleModel
+      public: Simple_msgs::msgs::SimpleModel
           GetModelInfo(const std::string &_name);
 
       /// \brief Callback when a response message is received.
@@ -70,7 +70,7 @@ namespace gazebo
       private: msgs::Request *requestMsg;
 
       /// \brief A map of model name to a message with its properties.
-      private: std::map<std::string, SimpleModel_msgs::msgs::SimpleModel>
+      private: std::map<std::string, Simple_msgs::msgs::SimpleModel>
           modelInfo;
 
       /// \brief Mutex to protect the model info map.

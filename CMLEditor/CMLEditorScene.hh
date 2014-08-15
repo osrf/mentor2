@@ -28,6 +28,7 @@ namespace gazebo
   namespace gui
   {
     class CMLNode;
+    class CMLEdge;
 
     /// \class CMLEditorScene CMLEditorScene.hh
     /// \brief Control the editor view and manage contents in the editor scene.
@@ -55,6 +56,17 @@ namespace gazebo
       /// \return True if the node exists.
       public: bool HasNode(const std::string &_name);
 
+      /// \brief Add an edge to connect two nodes.
+      /// \param[in] _node1 Name of the first node.
+      /// \param[in] _node2 Name of the second node.
+      /// \return the Edge created.
+      public: CMLEdge *AddEdge(const std::string &_node1,
+          const std::string &_node2);
+
+      /// \brief Remove an edge between two nodes.
+      /// \param[in] _name Name of the node.
+      // public: void RemoveEdge(const std::string &_name);
+
       public: void itemMoved();
 
       protected: void timerEvent(QTimerEvent *event);
@@ -67,7 +79,7 @@ namespace gazebo
       private: int timerId;
 
       /// \brief A map of node names to corresponding graphics items.
-      private: std::map<std::string, QGraphicsItem *> nodes;
+      private: std::map<std::string, CMLNode *> nodes;
     };
   }
 }

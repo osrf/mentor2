@@ -22,6 +22,8 @@
 #include "CMLManager.hh"
 #include "CMLEvents.hh"
 #include "CMLConnectionMaker.hh"
+
+#include "SimpleConnection.pb.h"
 #include "SimpleModel.pb.h"
 
 #include "CMLPortInspector.hh"
@@ -57,7 +59,14 @@ CMLRender::CMLRender()
 
   this->connections.push_back(
       CMLEvents::ConnectConnectionCreated(
-        boost::bind(&CMLRender::OnConnectionCreated, this)));
+        boost::bind(&CMLRender::OnConnectionCreated, this, _1, _2)));
+
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init();
+
+  this->connectionPub =
+      this->node->Advertise<Simple_msgs::msgs::SimpleConnection>(
+      "~/simple/connection");
 }
 
 /////////////////////////////////////////////////
@@ -81,7 +90,6 @@ bool CMLRender::OnMousePress(const common::MouseEvent &_event)
 /////////////////////////////////////////////////
 bool CMLRender::OnMouseRelease(const common::MouseEvent &_event)
 {
-  std::cerr << " intercepting mouse release events " << std::endl;
   // Get the active camera and scene.
   rendering::UserCameraPtr camera = gui::get_active_camera();
   rendering::ScenePtr scene = camera->GetScene();
@@ -92,7 +100,7 @@ bool CMLRender::OnMouseRelease(const common::MouseEvent &_event)
     if (vis)
     {
       std::string name = vis->GetRootVisual()->GetName();
-      SimpleModel_msgs::msgs::SimpleModel msg;
+      Simple_msgs::msgs::SimpleModel msg;
       msg = CMLManager::Instance()->GetModelInfo(name);
 
       std::cerr << " name " << name << " " << msg.name() << std::endl;
@@ -109,7 +117,7 @@ bool CMLRender::OnMouseRelease(const common::MouseEvent &_event)
     if (vis)
     {
       std::string name = vis->GetRootVisual()->GetName();
-      SimpleModel_msgs::msgs::SimpleModel msg;
+      Simple_msgs::msgs::SimpleModel msg;
       msg = CMLManager::Instance()->GetModelInfo(name);
 
       std::cerr << " name " << name << " " << msg.name() << std::endl;
@@ -164,15 +172,20 @@ void CMLRender::Update()
 /////////////////////////////////////////////////
 void CMLRender::OnCreateConnection(const std::string &_type)
 {
-  CMLConnectionMaker::Instance()->Reset();
   CMLConnectionMaker::Instance()->AddConnection(_type);
 
   std::cerr << " create connection! " << std::endl;
 }
 
 /////////////////////////////////////////////////
-void CMLRender::OnConnectionCreated()
+void CMLRender::OnConnectionCreated(const std::string &_parent,
+    const std::string &_child)
 {
-  std::cerr << " connection created " << std::endl;
+  std::cerr << " connection created " << _parent << " " << _child << std::endl;
+
+  Simple_msgs::msgs::SimpleConnection msg;
+  msg.set_parent(_parent);
+  msg.set_child(_child);
+  this->connectionPub->Publish(msg);
   //CMLConnectionMaker::Instance()->Start();
 }

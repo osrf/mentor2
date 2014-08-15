@@ -62,10 +62,19 @@ namespace gazebo
       private: void OnCreateConnection(const std::string &_type);
 
       /// \brief Event callback when a connection has been created.
-      private: void OnConnectionCreated();
+      /// \brief Parent of the connection.
+      /// \brief Child of the connection.
+      private: void OnConnectionCreated(const std::string &_parent,
+          const std::string &_child);
 
       /// \brief All the event connections.
       private: std::vector<event::ConnectionPtr> connections;
+
+      /// \brief Publish requests
+      private: transport::PublisherPtr connectionPub;
+
+      /// \brief Communication Node
+      private: transport::NodePtr node;
     };
   }
 }

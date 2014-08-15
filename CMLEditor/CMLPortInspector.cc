@@ -69,7 +69,7 @@ CMLPortInspector::~CMLPortInspector()
 }
 
 /////////////////////////////////////////////////
-void CMLPortInspector::Load(const SimpleModel_msgs::msgs::SimpleModel *_msg)
+void CMLPortInspector::Load(const Simple_msgs::msgs::SimpleModel *_msg)
 {
   for (int i = 0; i < _msg->port_size(); ++i)
   {

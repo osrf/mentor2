@@ -23,6 +23,11 @@
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/gui/qt.h>
 
+#include "SimpleConnection.pb.h"
+
+
+typedef const boost::shared_ptr<const Simple_msgs::msgs::SimpleConnection>
+    ConstSimpleConnectionPtr;
 
 //class QGVScene;
 //class QGVNode;
@@ -64,12 +69,21 @@ namespace gazebo
       /// \param[in] _msg The message data.
       private: bool ProcessModelMsg(const msgs::Model &_msg);
 
+      /// \brief Process a sipmle connection message.
+      /// \param[in] _msg The message data.
+      private: bool ProcessSimpleConnectionMsg(
+          const Simple_msgs::msgs::SimpleConnection &_msg);
+
       /// \brief Process all received messages.
       private: void PreRender();
 
       /// \brief Response callback
       /// \param[in] _msg The message data.
       private: void OnResponse(ConstResponsePtr &_msg);
+
+      /// \brief Model connection message callback
+      /// \param[in] _msg The message data.
+      private: void OnSimpleConnection(ConstSimpleConnectionPtr &_msg);
 
       /// \brief Qt Graphics Scene where graphics items are drawn in
 //      private: QGVScene *scene;
@@ -102,14 +116,26 @@ namespace gazebo
       /// \brief List of scene message to process.
       private: SceneMsgs_L sceneMsgs;
 
+      /// \def ModelConnectionMsgs_L
+      /// \brief List of simple connection messages.
+      typedef std::list<boost::shared_ptr<
+          Simple_msgs::msgs::SimpleConnection const> >
+          SimpleConnectionMsgs_L;
+
+      /// \brief List of simple connection message to process.
+      private: SimpleConnectionMsgs_L simpleConnectionMsgs;
+
+      /// \brief Communication Node
+      private: transport::NodePtr node;
+
+      /// \brief Subscribe to model info updates
+      private: transport::SubscriberPtr simpleConnectionSub;
+
       /// \brief Subscribe to model info updates
       private: transport::SubscriberPtr modelInfoSub;
 
       /// \brief Subscribe to scene topic
       private: transport::SubscriberPtr sceneSub;
-
-      /// \brief Communication Node
-      private: transport::NodePtr node;
 
       /// \brief Subscribe to reponses.
       private: transport::SubscriberPtr responseSub;
