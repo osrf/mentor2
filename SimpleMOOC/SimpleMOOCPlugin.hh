@@ -41,15 +41,16 @@ namespace gazebo
     /// \brief Plugin Load
     public: virtual void Load(int /*_argc*/, char ** /*_argv*/);
 
-    /// \brief  called everytime a message is received.
-    public: void OnRestRequest(ConstRestRequestPtr &_msg );
+    /// \brief  called everytime a login message is received.
+    public: void OnRestLoginRequest(ConstRestRequestPtr &_msg );
    
-    public: void OnMoocEvent(ConstMOOCEventPtr &_msg);
+    /// \brief called everytime a REST POST event message is received
+    public: void OnEventRestPost(ConstMOOCEventPtr &_msg);
  
     /// \brief Plugin initialization
     private: virtual void Init();
     
-    /// \brief Entry point for the request processing thread
+    /// \brief Entry point for the web requests processing thread
     private: void RunRequestQ();
 
     /// \brief Process a RestRequest message from the requestThread

@@ -64,7 +64,9 @@ void InRegionEventSource::Init()
   std::map<std::string, RegionPtr>::const_iterator it = 
     this->regions.find(this->regionName); 
   if (it != this->regions.end())
+  {
     this->region = it->second;
+  }
   else 
   {
     gzerr << this->name << ": Region '" << this->regionName 
@@ -117,23 +119,15 @@ bool Volume::PointInVolume(const math::Vector3 &_p) const
   return false;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-bool Region::PointInRegion(const math::Vector3 &_p) const
+/*
+ScoreRegion::ScoreRegion()
 {
-  for (unsigned int i=0; i< volumes.size(); ++i)
-  {
-    if (volumes[i]->PointInVolume(_p))
-    {
-      return true;
-    }
-  }
-  return false;
 }
- 
+
 ////////////////////////////////////////////////////////////////////////////////
-void Region::Load(const sdf::ElementPtr &_sdf)
+void ScoreRegion::Load(const sdf::ElementPtr &_sdf)
 {
-  
+ 
   sdf::ElementPtr child = _sdf->GetFirstElement();
   while(child)
   {
@@ -157,10 +151,11 @@ void Region::Load(const sdf::ElementPtr &_sdf)
     }
     child = child->GetNextElement();
   }
+ 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ostream& operator << (ostream &out, const Region &_region)
+ostream& operator << (ostream &out, const ScoreRegion &_region)
 {
   cout << _region.name << " [";
   for(vector<VolumePtr>::const_iterator i= _region.volumes.begin(); i != _region.volumes.end(); i++)
@@ -175,4 +170,51 @@ ostream& operator << (ostream &out, const Region &_region)
   return out;
 } 
 
+
+*/
+
+
+////////////////////////////////////////////////////////////////////////////////
+bool Region::PointInRegion(const math::Vector3 &_p) const
+{
+  for (unsigned int i=0; i< volumes.size(); ++i)
+  {
+    if (volumes[i]->PointInVolume(_p))
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+
+void Region::Load(const sdf::ElementPtr &_sdf)
+{
+  sdf::ElementPtr child = _sdf->GetFirstElement();
+  while(child)
+  {
+    std::string name = child->GetName();
+    if (name == "volume")
+    {
+      VolumePtr volume = VolumePtr(new Volume());
+      volume->min = child->GetElement("min")->Get<math::Vector3>();
+      volume->max = child->GetElement("max")->Get<math::Vector3>();
+      this->volumes.push_back(volume);
+    }   
+    else if (name == "name")
+    {
+      this->name = child->Get<string>(); 
+    }
+    else
+    {
+      string m;
+      m += "Unexpected element \"" + name + "\" in Region element";
+      throw ScoreException(m.c_str()); 
+    }
+    child = child->GetNextElement();
+  }
+ 
+}
+
+ 
 

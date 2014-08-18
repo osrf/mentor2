@@ -72,17 +72,20 @@ void ScoringPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
   cout << this->sdf->GetName() << endl;
 
   sdf::ElementPtr child = this->sdf->GetElement("region");
+
+  cout << "\nReading scoring regions" << endl;
   while(child)
   {
+   
+    Region* r = new Region;
+    r->Load(child);
     RegionPtr region;
-    region.reset(new Region);
-    region->Load(child);
-    this->regions[region->name] = region;
-    cout << "region " << *(region.get()) << endl; 
-      
-    child = child->GetNextElement("region");
-  }
+    region.reset(r);
 
+    this->regions[region->name] = region;
+    child = child->GetNextElement("region");
+
+  }
 
   cout << "\nReading scoring events" << endl;
   child = this->sdf->GetElement("event");
@@ -90,7 +93,7 @@ void ScoringPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
   {
     string eventName = child->GetElement("name")->Get<string>();
     string eventType = child->GetElement("type")->Get<string>();
-    cout << "Event " << eventName << " [" << eventType << "]" << endl;
+    cout << "  Event " << eventName << " [" << eventType << "]" << endl;
 
     EventSourcePtr event;
     if (eventType == "sim_state")

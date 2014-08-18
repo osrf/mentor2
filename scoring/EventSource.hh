@@ -80,9 +80,6 @@ namespace gazebo
   
     /// Documentation Inherited
     public: virtual bool Update();
-
-    /// Documentation inherited
-    public: virtual std::string GetEventData();
   
   };
 

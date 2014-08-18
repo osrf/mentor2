@@ -28,21 +28,22 @@ namespace gazebo
     public: math::Vector3 min, max;
   
   };
-  
+
   typedef boost::shared_ptr<Volume> VolumePtr;
-  
-  class Region
+
+  class Region 
   {
     public: void Load(const sdf::ElementPtr &_sdf);
+    public: bool PointInRegion(const math::Vector3 &p) const;
     public: std::string name;
     public: std::vector<VolumePtr> volumes;
-    public: bool PointInRegion(const math::Vector3 &p) const; 
   };
-  
+
   typedef boost::shared_ptr<Region> RegionPtr;
- 
+
+
   std::ostream& operator << (std::ostream &out, const Region &_region);
-  
+
   class  InRegionEventSource: public EventSource
   {
     /// \brief Constructor
@@ -72,12 +73,12 @@ namespace gazebo
     /// \brief The region used for the in region check.
     private: std::string regionName;
 
+    /// \brief The region pointer
+    private: RegionPtr region;
+
     /// \brief A map of region names to region pointers.
     private: const std::map<std::string, RegionPtr> &regions;
  
-    /// \brief A region to test the point inclusion.
-    private: RegionPtr region;
-
     /// \brief the current state
     private: bool isInside;
     

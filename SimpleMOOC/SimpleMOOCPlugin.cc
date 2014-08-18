@@ -21,6 +21,7 @@
 using namespace gazebo;
 using namespace std;
 
+
 SimpleMOOCPlugin::SimpleMOOCPlugin()
   :node(new gazebo::transport::Node()),
   stopMsgProcessing(false),
@@ -50,8 +51,8 @@ void SimpleMOOCPlugin::Init()
   std::cerr << "SimpleMOOCPlugin::Init() setting up pubs/sub node" <<  std::endl;
   // setup our node for communication
   node->Init();
-  subRequest = node->Subscribe("~/MOOCRequest", &SimpleMOOCPlugin::OnRestRequest, this);
-  subEvent = node->Subscribe("~/MOOCEvent", &SimpleMOOCPlugin::OnMoocEvent, this);
+  subRequest = node->Subscribe("~/event/rest_login", &SimpleMOOCPlugin::OnRestLoginRequest, this);
+  subEvent = node->Subscribe("~/event/rest_post", &SimpleMOOCPlugin::OnEventRestPost, this);
   requestQThread = new boost::thread( boost::bind(&SimpleMOOCPlugin::RunRequestQ, this));
 }
 
@@ -61,9 +62,9 @@ void SimpleMOOCPlugin::Load(int /*_argc*/, char ** /*_argv*/)
   
 }
 
-void SimpleMOOCPlugin::OnMoocEvent(ConstMOOCEventPtr &_msg )
+void SimpleMOOCPlugin::OnEventRestPost(ConstMOOCEventPtr &_msg )
 {
-  cout << "SimpleMOOCPlugin::OnMoocEvent ";
+  cout << "SimpleMOOCPlugin::OnRestPost";
   cout << "[" << _msg->route() << ", " << _msg->json() << "]"  << endl; 
   cout << endl;
 
@@ -85,7 +86,7 @@ void SimpleMOOCPlugin::OnMoocEvent(ConstMOOCEventPtr &_msg )
 
 }
 
-void SimpleMOOCPlugin::OnRestRequest(ConstRestRequestPtr &_msg )
+void SimpleMOOCPlugin::OnRestLoginRequest(ConstRestRequestPtr &_msg )
 {
   cout << "SimpleMOOC queuing Request: [";
   cout << _msg->url() << ", ";

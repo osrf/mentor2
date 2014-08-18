@@ -18,7 +18,6 @@
 #define _SCORING_PLUGIN_HH_
 
 #include "ScoreException.hh"
-#include "EventSource.hh"
 #include "InRegionEventSource.hh"
 #include "ExistenceEventSource.hh"
 #include "SimStateEventSource.hh"
