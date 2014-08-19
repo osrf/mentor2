@@ -201,11 +201,15 @@ void MOOCRestApi::SendUnpostedPosts()
     while(!this->posts.empty())
     {
       Post post = this->posts.front();
-//      cout << "curl --verbose --connect-timeout 5 -X POST -H \"Content-Type: application/json \" -k --user"
+//    cout << "curl --verbose --connect-timeout 5 -X POST -H \"Content-Type: application/json \" -k --user"
       cout << "POST " << post.route.c_str() << " " << post.json.c_str() << endl;
       this->Request(post.route.c_str(), post.json.c_str());
       this->posts.pop_front();
     }
+  }
+  else
+  {
+    cout << posts.size() << " post(s) queued to be sent" <<endl;
   }
 }
 

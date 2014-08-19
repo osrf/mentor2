@@ -18,6 +18,7 @@
 
 #include "ScoringPlugin.hh"
 
+
 using namespace gazebo;
 using namespace std;
 using namespace sdf;
@@ -30,7 +31,6 @@ void ScoringPlugin::OnModelInfo(ConstModelPtr &_msg)
   // if the model is not in the set, emit event
   if(models.insert(modelName).second)
   {
-    cout << "SPAWNED " << modelName << endl;
     ScoringEvents::spawnModel(modelName, true);
   }
 }
@@ -42,7 +42,6 @@ void ScoringPlugin::OnRequest(ConstRequestPtr &_msg)
     string modelName = _msg->data();
     if(models.erase(modelName) == 1)
     {
-      cout << "DELETED " << modelName << endl;
       ScoringEvents::spawnModel(modelName, false);
     } 
   }
@@ -60,8 +59,8 @@ void ScoringPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
   // Initialize the node with the world name
   node->Init(_parent->GetName());
 
-  // Create a publisher on the ~/MOOCEvent topic
-  pub = node->Advertise<SimpleMOOC_msgs::msgs::MOOCEvent>("~/MOOCEvent");
+  // Create a publisher on the Rest plugin topic
+  pub = node->Advertise<Event_msgs::msgs::RestPost>("~/event/rest_post");
 
   // Subscribe to model spawning
   spawnSub = node->Subscribe("~/model/info", &ScoringPlugin::OnModelInfo, this );

@@ -62,7 +62,7 @@ void SimpleMOOCPlugin::Load(int /*_argc*/, char ** /*_argv*/)
   
 }
 
-void SimpleMOOCPlugin::OnEventRestPost(ConstMOOCEventPtr &_msg )
+void SimpleMOOCPlugin::OnEventRestPost(ConstRestPostPtr &_msg)
 {
   cout << "SimpleMOOCPlugin::OnRestPost";
   cout << "[" << _msg->route() << ", " << _msg->json() << "]"  << endl; 
@@ -74,7 +74,7 @@ void SimpleMOOCPlugin::OnEventRestPost(ConstMOOCEventPtr &_msg )
   }
   catch(MOOCException &x)
   {
-    SimpleMOOC_msgs::msgs::RestResponse msg;
+    Event_msgs::msgs::RestError msg;
     std::string errorMsg ("There was a problem trying to send data to the MOOC: ");
     errorMsg += x.what();
     msg.set_type("Error");
@@ -86,7 +86,7 @@ void SimpleMOOCPlugin::OnEventRestPost(ConstMOOCEventPtr &_msg )
 
 }
 
-void SimpleMOOCPlugin::OnRestLoginRequest(ConstRestRequestPtr &_msg )
+void SimpleMOOCPlugin::OnRestLoginRequest(ConstRestLoginPtr &_msg )
 {
   cout << "SimpleMOOC queuing Request: [";
   cout << _msg->url() << ", ";
@@ -94,22 +94,24 @@ void SimpleMOOCPlugin::OnRestLoginRequest(ConstRestRequestPtr &_msg )
   cout << _msg->password() << "]" << endl;
   {
     boost::mutex::scoped_lock lock(this->requestQMutex);
-    msgRequestQ.push_back(_msg);
+    msgLoginQ.push_back(_msg);
   }
 
 }
 
-void SimpleMOOCPlugin::ProcessLoginRequest(ConstRestRequestPtr _msg)
+
+void SimpleMOOCPlugin::ProcessLoginRequest(ConstRestLoginPtr _msg)
 {
-  try
+ // this is executed asynchronously
+ try
   {
     std::string resp;
     resp = restApi.Login(_msg->url().c_str(), "/login", _msg->username().c_str(), _msg->password().c_str());
   }
   catch(MOOCException &x)
   {
-    SimpleMOOC_msgs::msgs::RestResponse msg;
-    std::string errorMsg ("There was a problem trying to login the MOOC: ");
+    Event_msgs::msgs::RestError msg;
+    std::string errorMsg ("There was a problem trying to login the web server: ");
     errorMsg += x.what();
     msg.set_type("Error");
     msg.set_msg(errorMsg);
@@ -119,16 +121,17 @@ void SimpleMOOCPlugin::ProcessLoginRequest(ConstRestRequestPtr _msg)
   } 
 }
 
-void SimpleMOOCPlugin::ProcessMOOCEvent(ConstMOOCEventPtr _msg)
+void SimpleMOOCPlugin::ProcessMOOCEvent(ConstRestPostPtr _msg)
 {
+  // this is executed asynchronously
   try
   {
     restApi.PostLearningEvent(_msg->route().c_str(), _msg->json().c_str());
   }
   catch(MOOCException &x)
   {
-    SimpleMOOC_msgs::msgs::RestResponse msg;
-    std::string errorMsg ("There was a problem trying to post data to the MOOC: ");
+    Event_msgs::msgs::RestError msg;
+    std::string errorMsg ("There was a problem trying to post data to the web server: ");
     errorMsg += x.what();
     msg.set_type("Error");
     msg.set_msg(errorMsg);
@@ -140,36 +143,39 @@ void SimpleMOOCPlugin::ProcessMOOCEvent(ConstMOOCEventPtr _msg)
 
 void SimpleMOOCPlugin::RunRequestQ()
 {
+  
+  // be ready to send errors back to the UI
   cout << "SimpleMOOCPlugin::RunRequestQ THREAD started" << endl;
-  pub = node->Advertise<SimpleMOOC_msgs::msgs::RestResponse>("~/MOOCResponse");
+  pub = node->Advertise<Event_msgs::msgs::RestError>("~/event/rest_error");
 
+  // process any login or post data that ha been received
   while (!stopMsgProcessing) {
     gazebo::common::Time::MSleep(50);
     try{
-      boost::shared_ptr<const SimpleMOOC_msgs::msgs::RestRequest> req;
-      boost::shared_ptr<const SimpleMOOC_msgs::msgs::MOOCEvent> event;
+      boost::shared_ptr<const Event_msgs::msgs::RestLogin> login;
+      boost::shared_ptr<const Event_msgs::msgs::RestPost> post;
       // Grab the mutex and remove first message in each queue
       {
         boost::mutex::scoped_lock lock(this->requestQMutex);
-        if(!msgRequestQ.empty())
+        if(!msgLoginQ.empty())
         {
-          req = msgRequestQ.front();
-          msgRequestQ.pop_front();
+          login = msgLoginQ.front();
+          msgLoginQ.pop_front();
         }
         if(!msgEventQ.empty())
         {
-          event = msgEventQ.front();
+          post = msgEventQ.front();
           msgEventQ.pop_front();
         }
       }
 
-      if(req)
+      if(login)
       {
-        this->ProcessLoginRequest(req);
+        this->ProcessLoginRequest(login);
       }
-      if(event)
+      if(post)
       {
-        this->ProcessMOOCEvent(event);
+        this->ProcessMOOCEvent(post);
       }
     }
     catch(...) {

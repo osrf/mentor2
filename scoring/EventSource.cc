@@ -81,9 +81,9 @@ void EventSource::Emit(const char* data )
 {
   if(this->IsActive())
   {
-    std::cout << "event fired " << this->name << " " << data << "" << std::endl;
+    std::cout << "scoring/EventSource::Emit()  event fired " << this->name << " " << data << "" << std::endl;
     // publish to MOOC topic
-    SimpleMOOC_msgs::msgs::MOOCEvent msg;
+    Event_msgs::msgs::RestPost msg;
     msg.set_route("/events/new");
     string json("{");
     json += "\"type\": \"";

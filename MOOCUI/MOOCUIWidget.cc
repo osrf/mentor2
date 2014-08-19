@@ -32,8 +32,8 @@ MOOCUIWidget::MOOCUIWidget(QWidget *_parent)
   
   cout << "MOOCUIWidget::MOOCUIWidget node setup" << endl;
   node->Init();
-  pub = node->Advertise<SimpleMOOC_msgs::msgs::RestRequest>("~/MOOCRequest");
-  sub = node->Subscribe("~/MOOCResponse", &MOOCUIWidget::OnResponse, this);
+  pub = node->Advertise<Event_msgs::msgs::RestLogin>("~/event/rest_login");
+  sub = node->Subscribe("~/event/rest_error", &MOOCUIWidget::OnResponse, this);
 }
  
 
@@ -47,15 +47,15 @@ void MOOCUIWidget::LoginMOOC()
   std::cout << "MOOCUI login" << std::endl;
 
   if(dialog.exec() == QDialog::Rejected) {
-    cout << "MOOCUIWidget::LoginMOOC CANCELLED" << endl;
+    cout << "MOOCUIWidget::Login CANCELLED" << endl;
   } else {
-    SimpleMOOC_msgs::msgs::RestRequest msg;
+    Event_msgs::msgs::RestLogin msg;
     msg.set_url(dialog.getUrl());
     msg.set_username(dialog.getUsername());
     msg.set_password(dialog.getPassword());
     pub->Publish(msg);
 
-    cout << "Login request sent [";
+    cout << "Login to ~/RestLogin  [";
     cout << dialog.getUrl() << ", ";
     cout << dialog.getUsername() << ", ";
     cout << dialog.getPassword() << "]"; 
@@ -85,9 +85,9 @@ void MOOCUIWidget::PostLearningEvent()
 */
 
 
-void MOOCUIWidget::OnResponse(ConstRestResponsePtr &_msg )
+void MOOCUIWidget::OnResponse(ConstRestErrorPtr &_msg )
 {
-  cout << "MOOCUI Login response received:" << endl;
+  cout << "Error received:" << endl;
   cout << " type: " << _msg->type() << endl;
   cout << " msg:  " << _msg->msg() << endl;
 
@@ -101,7 +101,7 @@ void  MOOCUIWidget::Update()
 {
   // Login problem?
   while(!msgRespQ.empty()) {
-    ConstRestResponsePtr msg = msgRespQ.front();
+    ConstRestErrorPtr msg = msgRespQ.front();
     msgRespQ.pop_front();
     if(msg->type().c_str() == string("Error")) 
       QMessageBox::critical(this, tr("MOOC"),tr(msg->msg().c_str()) );

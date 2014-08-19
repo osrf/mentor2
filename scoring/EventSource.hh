@@ -20,7 +20,7 @@
 
 #include "gazebo/gazebo.hh"
 
-#include "SimpleMOOC.pb.h"
+#include "Event.pb.h"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/common/common.hh"
 #include "gazebo/transport/TransportTypes.hh"
