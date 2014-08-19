@@ -45,6 +45,8 @@ void EventSource::Load(const sdf::ElementPtr &_sdf)
   this->name = _sdf->GetElement("name")->Get<string>();
 }
 
+/*
+
 ////////////////////////////////////////////////////////////////////////////////
 //  adapted from TimePanel
 std::string FormatTime(common::Time &_t)
@@ -76,6 +78,9 @@ std::string FormatTime(common::Time &_t)
   return stream.str();
 }
 
+*/
+
+
 ////////////////////////////////////////////////////////////////////////////////
 void EventSource::Emit(const char* data )
 {
@@ -91,7 +96,7 @@ void EventSource::Emit(const char* data )
     json += "\", ";
     json += "\"name\": \"";
     json += this->name + "\", ";
-
+/*
     common::Time t;
 
     json += "\"clock_time\": ";
@@ -116,7 +121,7 @@ void EventSource::Emit(const char* data )
     t = this->world->GetPauseTime();
     json += FormatTime(t);
     json += "\", ";
-
+*/
     json += " \"data\": "; 
     json += data;
     json += "}";

@@ -17,7 +17,6 @@
 
 #include "SimpleMOOCPlugin.hh"
 
-
 using namespace gazebo;
 using namespace std;
 
@@ -62,6 +61,40 @@ void SimpleMOOCPlugin::Load(int /*_argc*/, char ** /*_argv*/)
   
 }
 
+
+
+////////////////////////////////////////////////////////////////////////////////
+//  adapted from TimePanel
+std::string FormatTime(common::Time &_t)
+{
+  std::ostringstream stream;
+  unsigned int day, hour, min, sec, msec;
+
+  stream.str("");
+
+  sec = _t.sec;
+
+  day = sec / 86400;
+  sec -= day * 86400;
+
+  hour = sec / 3600;
+  sec -= hour * 3600;
+
+  min = sec / 60;
+  sec -= min * 60;
+
+  msec = rint(_t.nsec * 1e-6);
+
+  stream << std::setw(2) << std::setfill('0') << day << " ";
+  stream << std::setw(2) << std::setfill('0') << hour << ":";
+  stream << std::setw(2) << std::setfill('0') << min << ":";
+  stream << std::setw(2) << std::setfill('0') << sec << ".";
+  stream << std::setw(3) << std::setfill('0') << msec;
+
+  return stream.str();
+}
+
+
 void SimpleMOOCPlugin::OnEventRestPost(ConstRestPostPtr &_msg)
 {
   cout << "SimpleMOOCPlugin::OnRestPost";
@@ -70,7 +103,52 @@ void SimpleMOOCPlugin::OnEventRestPost(ConstRestPostPtr &_msg)
 
   try
   {
-    restApi.PostLearningEvent(_msg->route().c_str(), _msg->json().c_str());
+   std::string event = "{";
+    event += "\"event\": " + _msg->json() + ", ";
+    physics::WorldPtr world = physics::get_world();
+    if (!world) {
+      cout << "!!!!! NO WORLD !!!" << endl;
+    }
+    else
+    {
+      event += "\"world\": {";
+      if( world->GetRunning() )
+      {
+        event += "\"is_running\": \"true\", ";
+      }
+      else
+      {
+        event +=  "\"is_running\": \"false\", ";
+      }
+      common::Time t;
+
+      event += "\"clock_time\": ";
+      event += "\"";
+      event += common::Time::GetWallTimeAsISOString();
+      event += "\", ";
+
+      event += "\"real_time\": ";
+      event += "\"";
+      t = world->GetRealTime();
+      event += FormatTime(t);
+      event += "\", ";
+
+      event += "\"sim_time\": ";
+      event += "\"";
+      t = world->GetSimTime();
+      event += FormatTime(t);
+      event += "\", ";
+
+      event += "\"pause_time\": ";
+      event += "\"";
+      t = world->GetPauseTime();
+      event += FormatTime(t);
+      event += "\" ";
+
+      event += "}";
+    }
+    event += "}";
+    restApi.PostLearningEvent(_msg->route().c_str(), event.c_str());
   }
   catch(MOOCException &x)
   {

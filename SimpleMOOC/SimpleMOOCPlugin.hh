@@ -20,6 +20,8 @@
 
 
 #include <gazebo/gazebo.hh>
+#include <gazebo/physics/physics.hh>
+
 #include "Event.pb.h"
 #include "MOOCRestApi.hh"
 
