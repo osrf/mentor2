@@ -73,9 +73,14 @@ namespace gazebo
       private slots: void OnPropertyChanged(QtProperty *_item);*/
 
       /// \brief Qt callback when a component categorty is selected.
+      /// \param[in] _component the category of commponent selected.
       private slots: void OnComponentSelected(QString _component);
 ;
       private slots: void OnWiringComponent();
+
+      /// \brief Callback on a page navigation event.
+      /// \param[in] _page Page to navigate to.
+      private slots: void OnNavigate(int _page);
 
       /// \brief Widget that display components.
       private: QTreeWidget *componentTreeWidget;
@@ -97,14 +102,19 @@ namespace gazebo
 
       //private: QtProperty *selectedProperty;
 
+      /// \brief Bread crumb navigation widget.
       private: BreadCrumbWidget *breadCrumbWidget;
 
       private: boost::mutex *propMutex;
 
+      /// \brief Widget for displaying a list of components or connections.
       private: CMLItemListWidget *itemListWidget;
 
+      /// \brief A widget containing the bread crumb navigation, item list,
+      /// and property widgets.
       private: QFrame *componentInfoFrame;
 
+      /// \brief Qt signal mapper to map component category object to its name.
       private: QSignalMapper *componentSignalMapper;
     };
   }

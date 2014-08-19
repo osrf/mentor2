@@ -168,12 +168,9 @@ CMLEditorPalette::CMLEditorPalette(QWidget *_parent)
   navigationLayout->setAlignment(Qt::AlignCenter);*/
 
 
-
-
-
-
-
   this->breadCrumbWidget = new BreadCrumbWidget;
+  connect(this->breadCrumbWidget, SIGNAL(IndexChanged(int)), this,
+    SLOT(OnNavigate(int)));
 
   // property browser for the simple components
 /*  this->variantManager = new QtVariantPropertyManager();
@@ -308,4 +305,10 @@ void CMLEditorPalette::OnComponentSelected(QString _component)
   this->pageStackWidget->setCurrentWidget(this->componentInfoFrame);
 
   this->breadCrumbWidget->Push(_component.toStdString());
+}
+
+/////////////////////////////////////////////////
+void CMLEditorPalette::OnNavigate(int _page)
+{
+  this->pageStackWidget->setCurrentIndex(_page);
 }

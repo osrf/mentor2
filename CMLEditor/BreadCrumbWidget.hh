@@ -47,6 +47,23 @@ namespace gazebo
       /// \brief Pop a bread crumb
       public: std::string Pop();
 
+      /// \brief Set the current index of the bread  crumb, this will truncate
+      /// the all crumbs after the index.
+      /// \param[in] _index Index to set to.
+      public: void SetCurrentIndex(unsigned int _index);
+
+      /// \brief Truncate the bread crumb
+      /// \param[in] _start Start index of the truncation.
+      /// \param[in] _end End index of the truncation.
+      public: void Truncate(unsigned int _start, unsigned int _end = 0);
+
+      /// \brief Qt signal emitted when the bread crumb index is changed.
+      /// \param[in] _index Index of the bread crumb
+      Q_SIGNALS: void IndexChanged(int _index);
+
+      /// \brief Qt callback when a bread crumb is cliked
+      private slots: void OnClicked();
+
       /// \brief Push a separator at the end of the bread crumbs
       private: void PushSeparator();
 
