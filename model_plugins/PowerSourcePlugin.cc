@@ -39,5 +39,5 @@ void PowerSourcePlugin::LoadImpl(sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void PowerSourcePlugin::Init()
 {
-
+  SimpleModelPlugin::Init();
 }

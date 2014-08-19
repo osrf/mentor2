@@ -270,9 +270,9 @@ bool CMLConnectionMaker::SelectPort()
   std::string name = this->hoverVis->GetName();
   Simple_msgs::msgs::SimpleModel msg;
   msg = CMLManager::Instance()->GetModelInfo(name);
+
   if (msg.port_size() > 0)
   {
-    std::cerr << " name " << name << " " << msg.name() << std::endl;
     CMLPortInspector *inspector =
         new CMLPortInspector(gui::get_main_window());
     inspector->setModal(true);

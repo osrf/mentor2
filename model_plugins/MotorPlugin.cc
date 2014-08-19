@@ -39,5 +39,5 @@ void MotorPlugin::LoadImpl(sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void MotorPlugin::Init()
 {
-
+  SimpleModelPlugin::Init();
 }

@@ -131,7 +131,6 @@ void CMLEditorWidget::OnSceneMsg(ConstScenePtr &_msg)
 /////////////////////////////////////////////////
 void CMLEditorWidget::OnModelMsg(ConstModelPtr &_msg)
 {
-  std::cerr << " got model msg " << std::endl;
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   this->modelMsgs.push_back(_msg);
 }
