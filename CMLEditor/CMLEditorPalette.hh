@@ -29,17 +29,21 @@ namespace boost
   class mutex;
 }
 
+/*
 class QtTreePropertyBrowser;
 class QtVariantPropertyManager;
 class QtProperty;
 class QtTreePropertyItem;
 class QtBrowserItem;
 class QtVariantEditorFactory;
-
+*/
 namespace gazebo
 {
   namespace gui
   {
+    class BreadCrumbWidget;
+    class CMLItemListWidget;
+
     /// \class CMLEditorPalette CMLEditorPalette.hh
     /// \brief A palette of items which can be added to the editor.
     class CMLEditorPalette : public QWidget
@@ -64,14 +68,13 @@ namespace gazebo
       /// \brief Qt callback when an electrical connection is to be created.
       private slots: void OnElectricalConnection();
 
-      private slots: void OnCurrentPropertyChanged(QtBrowserItem *_item);
+/*      private slots: void OnCurrentPropertyChanged(QtBrowserItem *_item);
 
-      private slots: void OnPropertyChanged(QtProperty *_item);
+      private slots: void OnPropertyChanged(QtProperty *_item);*/
 
-      private slots: void OnElecticalComponent();
-
-      private slots: void OnMechanicalComponent();
-
+      /// \brief Qt callback when a component categorty is selected.
+      private slots: void OnComponentSelected(QString _component);
+;
       private slots: void OnWiringComponent();
 
       /// \brief Widget that display components.
@@ -83,22 +86,26 @@ namespace gazebo
       /// \brief Back button for page navigation.
       private: QPushButton *backButton;
 
-      private: QtTreePropertyBrowser *propTreeBrowser;
+/*      private: QtTreePropertyBrowser *propTreeBrowser;
 
       private: QtVariantPropertyManager *variantManager;
 
-      private: QtVariantEditorFactory *variantFactory;
+      private: QtVariantEditorFactory *variantFactory;*/
 
       /// \brief Qt tree widget item for component connection category.
       private: QTreeWidgetItem *wiringConnectingItem;
 
-      private: QtProperty *selectedProperty;
+      //private: QtProperty *selectedProperty;
+
+      private: BreadCrumbWidget *breadCrumbWidget;
 
       private: boost::mutex *propMutex;
 
-      private: QWidget *componentSubLevelWidget;
+      private: CMLItemListWidget *itemListWidget;
 
       private: QFrame *componentInfoFrame;
+
+      private: QSignalMapper *componentSignalMapper;
     };
   }
 }

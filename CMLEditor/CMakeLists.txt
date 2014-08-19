@@ -19,6 +19,7 @@ set (sources
   CMLEditorView.cc
   CMLEditorWidget.cc
   CMLEvents.cc
+  CMLItemListWidget.cc
   CMLManager.cc
   CMLNode.cc
   CMLPortInspector.cc
@@ -35,6 +36,7 @@ set (qt_headers
   CMLEditorPalette.hh
   CMLEditorScene.hh
   CMLEditorView.hh
+  CMLItemListWidget.hh
   CMLPortInspector.hh
   RectItem.hh
 )

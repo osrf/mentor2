@@ -19,6 +19,7 @@
 #include "qtpropertybrowser/qttreepropertybrowser.h"
 #include "qtpropertybrowser/qtvariantproperty.h"
 
+#include "CMLItemListWidget.hh"
 #include "BreadCrumbWidget.hh"
 #include "CMLEvents.hh"
 #include "CMLEditorPalette.hh"
@@ -90,19 +91,28 @@ CMLEditorPalette::CMLEditorPalette(QWidget *_parent)
   QWidget *allModelWidget = new QWidget(this);
   QGridLayout *allModelLayout = new QGridLayout;
 
+  this->componentSignalMapper = new QSignalMapper(this);
+  connect(this->componentSignalMapper, SIGNAL(mapped(QString)),
+      this, SLOT(OnComponentSelected(QString)));
+
   // electrical button
   QPushButton *electricalButton = new QPushButton(tr("Electrical"), this);
   electricalButton->setCheckable(false);
   electricalButton->setChecked(false);
-  connect(electricalButton, SIGNAL(clicked()), this,
-      SLOT(OnElecticalComponent()));
+  this->componentSignalMapper->setMapping(electricalButton,
+      electricalButton->text());
+  connect(electricalButton, SIGNAL(clicked()), this->componentSignalMapper,
+      SLOT(map()));
 
   // mechanical button
   QPushButton *mechanicalButton = new QPushButton(tr("Mechanical"), this);
   mechanicalButton->setCheckable(false);
   mechanicalButton->setChecked(false);
-  connect(mechanicalButton, SIGNAL(clicked()), this,
-      SLOT(OnMechanicalComponent()));
+  this->componentSignalMapper->setMapping(mechanicalButton,
+      mechanicalButton->text());
+  connect(mechanicalButton, SIGNAL(clicked()), this->componentSignalMapper,
+      SLOT(map()));
+
 
   allModelLayout->addWidget(electricalButton, 0, 0);
   allModelLayout->addWidget(mechanicalButton, 1, 0);
@@ -112,12 +122,10 @@ CMLEditorPalette::CMLEditorPalette(QWidget *_parent)
       allModelChildItem, 0, allModelWidget);
   allModelItem->setExpanded(true);
 
-
-
   // Wiring and Connecting item
   this->wiringConnectingItem =
     new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
-        QStringList(QString("Wiring && Connecting")));
+        QStringList(QString("Wiring & Connecting")));
   this->componentTreeWidget->addTopLevelItem(this->wiringConnectingItem);
 
   QTreeWidgetItem *wiringConnectingChildItem =
@@ -165,7 +173,7 @@ CMLEditorPalette::CMLEditorPalette(QWidget *_parent)
 
 
 
-  BreadCrumbWidget *breadCrumbWidget = new BreadCrumbWidget;
+  this->breadCrumbWidget = new BreadCrumbWidget;
 
   // property browser for the simple components
 /*  this->variantManager = new QtVariantPropertyManager();
@@ -182,15 +190,12 @@ CMLEditorPalette::CMLEditorPalette(QWidget *_parent)
           this, SLOT(OnCurrentPropertyChanged(QtBrowserItem *)));*/
 
 
-
-  this->componentSubLevelWidget = new QWidget;
+  this->itemListWidget = new CMLItemListWidget;
   QWidget *propTreeBrowserStub = new QWidget;
 
-
-
   QSplitter *splitter = new QSplitter(Qt::Vertical);
-  splitter->addWidget(breadCrumbWidget);
-  splitter->addWidget(this->componentSubLevelWidget);
+  splitter->addWidget(this->breadCrumbWidget);
+  splitter->addWidget(this->itemListWidget);
   splitter->addWidget(propTreeBrowserStub);
   splitter->setStretchFactor(0, 1);
   splitter->setStretchFactor(1, 2);
@@ -263,7 +268,7 @@ void CMLEditorPalette::OnElectricalConnection()
   emit CMLEvents::createConnection("electrical");
 }
 
-/////////////////////////////////////////////////
+/*/////////////////////////////////////////////////
 void CMLEditorPalette::OnCurrentPropertyChanged(QtBrowserItem *_item)
 {
   if (_item)
@@ -279,30 +284,28 @@ void CMLEditorPalette::OnPropertyChanged(QtProperty *_item)
   if (!lock)
     return;
 
-  if (this->selectedProperty != _item /*|| this->fillingPropertyTree*/)
+  if (this->selectedProperty != _item )
     return;
 
-  /*QTreeWidgetItem *currentItem = this->componentTreeWidget->currentItem();
 
-  if (!currentItem)
-    return;
-
-  if (this->wiringConnectingItem->indexOfChild(currentItem) != -1)
-    this->LightPropertyChanged(_item);
-  else if (currentItem == this->sceneItem)
-    this->ScenePropertyChanged(_item);
-  else if (currentItem == this->physicsItem)
-    this->PhysicsPropertyChanged(_item);*/
-}
+}*/
 
 /////////////////////////////////////////////////
-void CMLEditorPalette::OnElecticalComponent()
+void CMLEditorPalette::OnComponentSelected(QString _component)
 {
-  this->pageStackWidget->setCurrentWidget(this->componentInfoFrame);
-}
+  this->itemListWidget->SetCurrentItemList(_component.toStdString());
+  if (this->itemListWidget->GetItemCount() == 0)
+  {
+    // populate with some test items.
+    std::vector<std::string> items;
+    items.push_back("AA_battery");
+    items.push_back("motor");
+    items.push_back("power_switch");
+    items.push_back("batter_holder");
+    this->itemListWidget->Populate(items);
+  }
 
-/////////////////////////////////////////////////
-void CMLEditorPalette::OnMechanicalComponent()
-{
   this->pageStackWidget->setCurrentWidget(this->componentInfoFrame);
+
+  this->breadCrumbWidget->Push(_component.toStdString());
 }

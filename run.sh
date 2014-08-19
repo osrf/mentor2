@@ -1,7 +1,7 @@
 killall gzserver
 killall gzclient
 
-echo "SOURCE befor you buy ~/local/share/simplegdk/setup.sh"
+echo "SOURCE before you buy ~/local/share/simplegdk/setup.sh"
 
 echo "GAZEBO PLUGIN PATH=$GAZEBO_PLUGIN_PATH"
 echo "MENTOR2 world [$1]"
