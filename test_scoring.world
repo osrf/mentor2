@@ -30,6 +30,13 @@
       </volume>
     </region>
 
+<!--    
+    <event>
+      <name>connect</name>
+      <type>topic</type>
+      <topic_name>~/simple/connection</topic_name>
+    </event>
+-->
 
     <event>
       <name>NewSphere</name>

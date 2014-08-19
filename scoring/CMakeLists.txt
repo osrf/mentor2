@@ -5,6 +5,10 @@ link_directories(
 
 set (src
   ScoringPlugin.cc
+  EventSource.cc
+  InRegionEventSource.cc
+  ExistenceEventSource.cc
+  SimStateEventSource.cc
   )
 
 include_directories(

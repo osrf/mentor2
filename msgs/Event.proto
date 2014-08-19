@@ -1,7 +1,7 @@
 
-package SimpleMOOC_msgs.msgs;
+package Event_msgs.msgs;
 
-message RestRequest
+message RestLogin
 {
   required string url      = 1;
   optional string username = 2;
@@ -9,13 +9,13 @@ message RestRequest
 }
 
 
-message RestResponse
+message RestError
 {
   required string type  = 1;
   optional string msg   = 2;
 }
 
-message MOOCEvent
+message RestPost
 {
   required string route = 1;
   required string json =2;

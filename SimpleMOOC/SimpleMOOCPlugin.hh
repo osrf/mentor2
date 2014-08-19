@@ -20,11 +20,11 @@
 
 
 #include <gazebo/gazebo.hh>
-#include "SimpleMOOC.pb.h"
+#include "Event.pb.h"
 #include "MOOCRestApi.hh"
 
-typedef const boost::shared_ptr<const SimpleMOOC_msgs::msgs::RestRequest> ConstRestRequestPtr;
-typedef const boost::shared_ptr<const SimpleMOOC_msgs::msgs::MOOCEvent> ConstMOOCEventPtr;
+typedef const boost::shared_ptr<const Event_msgs::msgs::RestLogin> ConstRestLoginPtr;
+typedef const boost::shared_ptr<const Event_msgs::msgs::RestPost> ConstRestPostPtr;
 
 
 namespace gazebo
@@ -41,22 +41,23 @@ namespace gazebo
     /// \brief Plugin Load
     public: virtual void Load(int /*_argc*/, char ** /*_argv*/);
 
-    /// \brief  called everytime a message is received.
-    public: void OnRestRequest(ConstRestRequestPtr &_msg );
+    /// \brief  called everytime a login message is received.
+    public: void OnRestLoginRequest(ConstRestLoginPtr &_msg);
    
-    public: void OnMoocEvent(ConstMOOCEventPtr &_msg);
+    /// \brief called everytime a REST POST event message is received
+    public: void OnEventRestPost(ConstRestPostPtr &_msg);
  
     /// \brief Plugin initialization
     private: virtual void Init();
     
-    /// \brief Entry point for the request processing thread
+    /// \brief Entry point for the web requests processing thread
     private: void RunRequestQ();
 
     /// \brief Process a RestRequest message from the requestThread
-    private: void ProcessLoginRequest(ConstRestRequestPtr _msg);
+    private: void ProcessLoginRequest(ConstRestLoginPtr _msg);
 
     /// \brief Process a MOOCEvent messsage from the requestThread
-    private: void ProcessMOOCEvent(ConstMOOCEventPtr _msg);
+    private: void ProcessMOOCEvent(ConstRestPostPtr _msg);
 
     /// \brief Gazebo pub/sub node
     private: gazebo::transport::NodePtr node;
@@ -80,10 +81,10 @@ namespace gazebo
     private: bool stopMsgProcessing;
  
     /// \brief a list to accumulate pending request    
-    private: std::list< boost::shared_ptr<const SimpleMOOC_msgs::msgs::RestRequest> > msgRequestQ;
+    private: std::list< boost::shared_ptr<const Event_msgs::msgs::RestLogin> > msgLoginQ;
 
     /// \brief a list to accumulate pending request    
-    private: std::list< boost::shared_ptr<const SimpleMOOC_msgs::msgs::MOOCEvent> > msgEventQ;
+    private: std::list< boost::shared_ptr<const Event_msgs::msgs::RestPost> > msgEventQ;
  
     /// \brief a thread to process requests without stopping the simulation
     private: boost::thread *requestQThread;

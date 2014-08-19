@@ -4,7 +4,7 @@ find_package(Protobuf REQUIRED)
 set (msgs
   SimpleConnection.proto
   SimpleModel.proto
-  SimpleMOOC.proto
+  Event.proto
 )
 
 PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${msgs})

@@ -19,11 +19,11 @@
 #define _MOOCUI_WIDGET_HH_
 
 #include <gazebo/gazebo.hh>
-#include "SimpleMOOC.pb.h" 
+#include "Event.pb.h" 
 #include "MOOCLoginDialog.hh"
 
 
-typedef const boost::shared_ptr<const SimpleMOOC_msgs::msgs::RestResponse> ConstRestResponsePtr;
+typedef const boost::shared_ptr<const Event_msgs::msgs::RestError> ConstRestErrorPtr;
 
 namespace gazebo
 {
@@ -49,7 +49,7 @@ namespace gazebo
     private: gazebo::transport::SubscriberPtr sub;
 
     /// \brief called everytime a response  message is received.
-    private: void OnResponse(ConstRestResponsePtr &_msg);   
+    private: void OnResponse(ConstRestErrorPtr &_msg);   
 
     /// \brief called before rendering, from the GUI thread
     /// this is called from the plugin's update
@@ -58,7 +58,7 @@ namespace gazebo
     /// \brief login dialog
     private: gui::MOOCLoginDialog dialog;
     
-   private: std::list< boost::shared_ptr<const SimpleMOOC_msgs::msgs::RestResponse> > msgRespQ;
+   private: std::list< boost::shared_ptr<const Event_msgs::msgs::RestError> > msgRespQ;
 
  };
 }
