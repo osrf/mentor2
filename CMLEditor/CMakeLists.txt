@@ -1,4 +1,5 @@
 #add_subdirectory(QGVCore)
+#add_subdirectory(qtpropertybrowser)
 
 include ( ${QT_USE_FILE} )
 
@@ -7,6 +8,7 @@ link_directories(
 )
 
 set (sources
+  BreadCrumbWidget.cc
   CMLConnectionMaker.cc
   CMLEdge.cc
   CMLEditor.cc
@@ -17,6 +19,7 @@ set (sources
   CMLEditorView.cc
   CMLEditorWidget.cc
   CMLEvents.cc
+  CMLItemListWidget.cc
   CMLManager.cc
   CMLNode.cc
   CMLPortInspector.cc
@@ -27,11 +30,13 @@ set (sources
 )
 
 set (qt_headers
+  BreadCrumbWidget.hh
   CMLEditor.hh
   CMLEditorItem.hh
   CMLEditorPalette.hh
   CMLEditorScene.hh
   CMLEditorView.hh
+  CMLItemListWidget.hh
   CMLPortInspector.hh
   RectItem.hh
 )
@@ -69,7 +74,8 @@ link_directories(${GAZEBO_LIBRARY_DIRS} ${OGRE_LIBRARY_DIRS})
 add_library(CMLEditorPlugin SHARED ${sources} ${headers_MOC} ${headers} ${resources_RCC})
 target_link_libraries(CMLEditorPlugin
 #    qgvcore
+#    simpleqtpropertybrowser
     SimpleMsgs
-    ${GAZEBO_libraries}
+    ${GAZEBO_LIBRARIES}
     ${OGRE_LIBRARIES})
 install (TARGETS CMLEditorPlugin DESTINATION ${SIMPLEGDK_PLUGIN_INSTALL_DIR})

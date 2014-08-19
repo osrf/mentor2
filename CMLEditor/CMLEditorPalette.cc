@@ -15,6 +15,12 @@
  *
 */
 
+
+#include "qtpropertybrowser/qttreepropertybrowser.h"
+#include "qtpropertybrowser/qtvariantproperty.h"
+
+#include "CMLItemListWidget.hh"
+#include "BreadCrumbWidget.hh"
 #include "CMLEvents.hh"
 #include "CMLEditorPalette.hh"
 
@@ -26,6 +32,8 @@ CMLEditorPalette::CMLEditorPalette(QWidget *_parent)
     : QWidget(_parent)
 {
   this->setObjectName("CMLEditorPalette");
+
+  this->propMutex = new boost::mutex();
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
 
@@ -43,7 +51,7 @@ CMLEditorPalette::CMLEditorPalette(QWidget *_parent)
 
   // -----
   // simple shapes item
-  QTreeWidgetItem *shapesItem =
+  /*QTreeWidgetItem *shapesItem =
     new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
         QStringList(QString("Simple Shapes")));
   this->componentTreeWidget->addTopLevelItem(shapesItem);
@@ -67,37 +75,80 @@ CMLEditorPalette::CMLEditorPalette(QWidget *_parent)
 
   this->componentTreeWidget->setItemWidget(
       shapesChildItem, 0, shapesWidget);
-  shapesItem->setExpanded(true);
+  shapesItem->setExpanded(true);*/
 
-  // -----
-
-  // electical item
-  QTreeWidgetItem *electricalItem =
+  // components
+  QTreeWidgetItem *allModelItem =
     new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
-        QStringList(QString("Electrical")));
-  this->componentTreeWidget->addTopLevelItem(electricalItem);
+        QStringList(QString("Components")));
+  this->componentTreeWidget->addTopLevelItem(allModelItem);
 
-  QTreeWidgetItem *electricalChildItem =
+  QTreeWidgetItem *allModelChildItem =
     new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
-  electricalItem->addChild(electricalChildItem);
+  allModelItem->addChild(allModelChildItem);
 
-  // Shapes buttons
-  QWidget *electricalWidget = new QWidget(this);
-  QGridLayout *electricalLayout = new QGridLayout;
+  // all model buttons
+  QWidget *allModelWidget = new QWidget(this);
+  QGridLayout *allModelLayout = new QGridLayout;
+
+  this->componentSignalMapper = new QSignalMapper(this);
+  connect(this->componentSignalMapper, SIGNAL(mapped(QString)),
+      this, SLOT(OnComponentSelected(QString)));
+
+  // electrical button
+  QPushButton *electricalButton = new QPushButton(tr("Electrical"), this);
+  electricalButton->setCheckable(false);
+  electricalButton->setChecked(false);
+  this->componentSignalMapper->setMapping(electricalButton,
+      electricalButton->text());
+  connect(electricalButton, SIGNAL(clicked()), this->componentSignalMapper,
+      SLOT(map()));
+
+  // mechanical button
+  QPushButton *mechanicalButton = new QPushButton(tr("Mechanical"), this);
+  mechanicalButton->setCheckable(false);
+  mechanicalButton->setChecked(false);
+  this->componentSignalMapper->setMapping(mechanicalButton,
+      mechanicalButton->text());
+  connect(mechanicalButton, SIGNAL(clicked()), this->componentSignalMapper,
+      SLOT(map()));
+
+
+  allModelLayout->addWidget(electricalButton, 0, 0);
+  allModelLayout->addWidget(mechanicalButton, 1, 0);
+  allModelWidget->setLayout(allModelLayout);
+
+  this->componentTreeWidget->setItemWidget(
+      allModelChildItem, 0, allModelWidget);
+  allModelItem->setExpanded(true);
+
+  // Wiring and Connecting item
+  this->wiringConnectingItem =
+    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
+        QStringList(QString("Wiring & Connecting")));
+  this->componentTreeWidget->addTopLevelItem(this->wiringConnectingItem);
+
+  QTreeWidgetItem *wiringConnectingChildItem =
+    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
+  this->wiringConnectingItem->addChild(wiringConnectingChildItem);
+
+  // electrical component buttons
+  QWidget *wiringConnectingWidget = new QWidget(this);
+  QGridLayout *wiringConnectingLayout = new QGridLayout;
 
   // wiring button
-  QPushButton *wiringButton = new QPushButton(tr("Wiring && Connecting"), this);
+  QPushButton *wiringButton = new QPushButton(tr("Wires"), this);
   wiringButton->setCheckable(false);
   wiringButton->setChecked(false);
   connect(wiringButton, SIGNAL(clicked()), this,
       SLOT(OnElectricalConnection()));
 
-  electricalLayout->addWidget(wiringButton, 0, 0);
-  electricalWidget->setLayout(electricalLayout);
+  wiringConnectingLayout->addWidget(wiringButton, 0, 0);
+  wiringConnectingWidget->setLayout(wiringConnectingLayout);
 
   this->componentTreeWidget->setItemWidget(
-      electricalChildItem, 0, electricalWidget);
-  electricalItem->setExpanded(true);
+      wiringConnectingChildItem, 0, wiringConnectingWidget);
+  this->wiringConnectingItem->setExpanded(true);
 
 
   /*// save buttons
@@ -117,18 +168,51 @@ CMLEditorPalette::CMLEditorPalette(QWidget *_parent)
   navigationLayout->setAlignment(Qt::AlignCenter);*/
 
 
-/*  QFrame *frame = new QFrame;
+
+
+
+
+
+  this->breadCrumbWidget = new BreadCrumbWidget;
+
+  // property browser for the simple components
+/*  this->variantManager = new QtVariantPropertyManager();
+  this->propTreeBrowser = new QtTreePropertyBrowser();
+  this->propTreeBrowser->setObjectName("simplePropTreeBrowser");
+  this->variantFactory = new QtVariantEditorFactory();
+  this->propTreeBrowser->setFactoryForManager(this->variantManager,
+                                              this->variantFactory);
+  connect(this->variantManager,
+          SIGNAL(propertyChanged(QtProperty*)),
+          this, SLOT(OnPropertyChanged(QtProperty *)));
+  connect(this->propTreeBrowser,
+          SIGNAL(currentItemChanged(QtBrowserItem*)),
+          this, SLOT(OnCurrentPropertyChanged(QtBrowserItem *)));*/
+
+
+  this->itemListWidget = new CMLItemListWidget;
+  QWidget *propTreeBrowserStub = new QWidget;
+
+  QSplitter *splitter = new QSplitter(Qt::Vertical);
+  splitter->addWidget(this->breadCrumbWidget);
+  splitter->addWidget(this->itemListWidget);
+  splitter->addWidget(propTreeBrowserStub);
+  splitter->setStretchFactor(0, 1);
+  splitter->setStretchFactor(1, 2);
+  splitter->setStretchFactor(2, 2);
+  splitter->setCollapsible(0, false);
+  splitter->setCollapsible(1, false);
+  splitter->setCollapsible(2, false);
+
+  this->componentInfoFrame = new QFrame;
   QVBoxLayout *frameLayout = new QVBoxLayout;
-  frameLayout->addWidget(this->componentTreeWidget, 0);
+  frameLayout->addWidget(splitter);
   frameLayout->setContentsMargins(0, 0, 0, 0);
-  frame->setLayout(frameLayout);*/
-
-
-
+  this->componentInfoFrame->setLayout(frameLayout);
 
   this->pageStackWidget = new QStackedWidget(this);
   this->pageStackWidget->addWidget(this->componentTreeWidget);
-
+  this->pageStackWidget->addWidget(this->componentInfoFrame);
   mainLayout->addWidget(this->pageStackWidget);
 
 
@@ -182,4 +266,46 @@ void CMLEditorPalette::OnItemSelection(QTreeWidgetItem *_item, int /*_column*/)
 void CMLEditorPalette::OnElectricalConnection()
 {
   emit CMLEvents::createConnection("electrical");
+}
+
+/*/////////////////////////////////////////////////
+void CMLEditorPalette::OnCurrentPropertyChanged(QtBrowserItem *_item)
+{
+  if (_item)
+    this->selectedProperty = _item->property();
+  else
+    this->selectedProperty = NULL;
+}
+
+/////////////////////////////////////////////////
+void CMLEditorPalette::OnPropertyChanged(QtProperty *_item)
+{
+  boost::mutex::scoped_try_lock lock(*this->propMutex);
+  if (!lock)
+    return;
+
+  if (this->selectedProperty != _item )
+    return;
+
+
+}*/
+
+/////////////////////////////////////////////////
+void CMLEditorPalette::OnComponentSelected(QString _component)
+{
+  this->itemListWidget->SetCurrentItemList(_component.toStdString());
+  if (this->itemListWidget->GetItemCount() == 0)
+  {
+    // populate with some test items.
+    std::vector<std::string> items;
+    items.push_back("AA_battery");
+    items.push_back("motor");
+    items.push_back("power_switch");
+    items.push_back("batter_holder");
+    this->itemListWidget->Populate(items);
+  }
+
+  this->pageStackWidget->setCurrentWidget(this->componentInfoFrame);
+
+  this->breadCrumbWidget->Push(_component.toStdString());
 }
