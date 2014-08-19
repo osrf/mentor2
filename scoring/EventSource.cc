@@ -96,37 +96,10 @@ void EventSource::Emit(const char* data )
     json += "\", ";
     json += "\"name\": \"";
     json += this->name + "\", ";
-/*
-    common::Time t;
-
-    json += "\"clock_time\": ";
-    json += "\"";
-    json += common::Time::GetWallTimeAsISOString();
-    json += "\", ";    
-
-    json += "\"real_time\": ";
-    json += "\"";
-    t = this->world->GetRealTime();
-    json += FormatTime(t);
-    json += "\", ";
-
-    json += "\"sim_time\": ";
-    json += "\"";
-    t = this->world->GetSimTime();
-    json += FormatTime(t);
-    json += "\", ";
-
-    json += "\"pause_time\": ";
-    json += "\"";
-    t = this->world->GetPauseTime();
-    json += FormatTime(t);
-    json += "\", ";
-*/
     json += " \"data\": "; 
     json += data;
     json += "}";
     msg.set_json(json.c_str() );
-    std::cout << "JSON " << json << endl;
     pub->Publish(msg);
   }
 

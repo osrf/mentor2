@@ -16,8 +16,8 @@
 */
 
 
-#include "qtpropertybrowser/qttreepropertybrowser.h"
-#include "qtpropertybrowser/qtvariantproperty.h"
+//#include "qtpropertybrowser/qttreepropertybrowser.h"
+//#include "qtpropertybrowser/qtvariantproperty.h"
 
 #include "CMLItemListWidget.hh"
 #include "BreadCrumbWidget.hh"
