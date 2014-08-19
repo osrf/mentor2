@@ -168,10 +168,6 @@ void BreadCrumbWidget::Truncate(unsigned int _start, unsigned int _end)
     count--;
   }
 
-//  QLayoutItem * item = this->breadCrumbLayout->itemAt();
-//    delete this->breadCrumbLayout->takeAt(this->breadCrumbLayout->count()-1);
-//      std::cerr << " c " << this->breadCrumbLayout->count() << std::endl;
-
   if (this->currentIndex >= _end || this->currentIndex >= _start)
     this->currentIndex = _start - 1;
 }

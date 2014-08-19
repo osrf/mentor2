@@ -47,7 +47,7 @@ namespace gazebo
 
       /// \brief Populate the widget with a list of item names.
       /// \param[in] _items A list of items used to populate the widget.
-      public: void Populate(const std::vector<std::string> &_items);
+      public: void Populate(const std::map<std::string, std::string> &_items);
 
       /// \brief Get the number of items in the current item list widget.
       /// \return Number of items.
@@ -55,7 +55,7 @@ namespace gazebo
 
       /// \brief Qt callback when an item is clicked.
       /// \param[in] _item Name of the name that is clicked.
-      private slots: void OnItemSelected(QString _item);
+      private slots: void OnItemSelected(QString _url);
 
       /// \brief A Qt signal mapper to map item clicked signals to its name.
       private: QSignalMapper *itemsSignalMapper;

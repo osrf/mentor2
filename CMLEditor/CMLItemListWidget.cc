@@ -15,7 +15,9 @@
  *
 */
 
-#include <gazebo/gui/qt.h>
+
+#include <gazebo/common/common.hh>
+#include <gazebo/gui/gui.hh>
 
 #include "CMLItemListWidget.hh"
 
@@ -69,18 +71,20 @@ void CMLItemListWidget::SetCurrentItemList(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-void CMLItemListWidget::Populate(const std::vector<std::string> &_items)
+void CMLItemListWidget::Populate(const std::map<std::string, std::string>
+    &_items)
 {
   QWidget *widget = this->stackedWidget->currentWidget();
   if (!widget)
     return;
 
-  for (unsigned int i = 0; i < _items.size(); ++i)
+  std::map<std::string, std::string>::const_iterator it;
+  for (it = _items.begin(); it != _items.end(); ++it)
   {
-    QPushButton *itemButton = new QPushButton(tr(_items[i].c_str()), this);
+    QPushButton *itemButton = new QPushButton(tr(it->first.c_str()), this);
     itemButton->setCheckable(false);
     itemButton->setChecked(false);
-    this->itemsSignalMapper->setMapping(itemButton, itemButton->text());
+    this->itemsSignalMapper->setMapping(itemButton, tr(it->second.c_str()));
     connect(itemButton, SIGNAL(clicked()),
         this->itemsSignalMapper, SLOT(map()));
 
@@ -100,6 +104,9 @@ unsigned int CMLItemListWidget::GetItemCount()
 }
 
 /////////////////////////////////////////////////
-void CMLItemListWidget::OnItemSelected(QString _item)
+void CMLItemListWidget::OnItemSelected(QString _url)
 {
+  std::string path = std::string("model://") + _url.toStdString();
+  std::string filename = common::ModelDatabase::Instance()->GetModelFile(path);
+  gui::Events::createEntity("model", filename);
 }
