@@ -20,15 +20,17 @@
 #include <vector>
 
 #include <gazebo/common/common.hh>
-
 #include <gazebo/rendering/rendering.hh>
+#include <gazebo/gui/gui.hh>
 
-#include <gazebo/gui/GuiIface.hh>
+/*#include <gazebo/gui/GuiIface.hh>
 #include <gazebo/gui/KeyEventHandler.hh>
 #include <gazebo/gui/MouseEventHandler.hh>
-#include <gazebo/gui/GuiEvents.hh>
+#include <gazebo/gui/GuiEvents.hh>*/
 
 #include "CMLEvents.hh"
+#include "CMLManager.hh"
+#include "CMLPortInspector.hh"
 #include "CMLConnectionMaker.hh"
 
 using namespace gazebo;
@@ -212,6 +214,10 @@ bool CMLConnectionMaker::OnMouseRelease(const common::MouseEvent &_event)
         if (this->mouseConnection)
           return false;
 
+        // select port, blocking call.
+        if (!this->SelectPort())
+          return false;
+
         this->hoverVis->SetEmissive(common::Color(0, 0, 0));
         this->selectedVis = this->hoverVis;
         this->hoverVis.reset();
@@ -224,6 +230,10 @@ bool CMLConnectionMaker::OnMouseRelease(const common::MouseEvent &_event)
       // Pressed child part
       else if (this->selectedVis != this->hoverVis)
       {
+        // select port, blocking call.
+        if (!this->SelectPort())
+          return false;
+
         if (this->hoverVis)
           this->hoverVis->SetEmissive(common::Color(0, 0, 0));
         if (this->selectedVis)
@@ -238,7 +248,6 @@ bool CMLConnectionMaker::OnMouseRelease(const common::MouseEvent &_event)
         this->newConnectionCreated = true;
 
         // signal the end of a connect action.
-    //    emit CMLEvents::connectionCreated();
         emit CMLEvents::connectionCreated(
             this->mouseConnection->parent->GetName(),
             this->mouseConnection->child->GetName());
@@ -249,6 +258,30 @@ bool CMLConnectionMaker::OnMouseRelease(const common::MouseEvent &_event)
     return true;
   }
   return false;
+}
+
+/////////////////////////////////////////////////
+bool CMLConnectionMaker::SelectPort()
+{
+  if (!this->hoverVis)
+    return false;
+
+  // show the port inspector if there are ports
+  std::string name = this->hoverVis->GetName();
+  Simple_msgs::msgs::SimpleModel msg;
+  msg = CMLManager::Instance()->GetModelInfo(name);
+  if (msg.port_size() > 0)
+  {
+    std::cerr << " name " << name << " " << msg.name() << std::endl;
+    CMLPortInspector *inspector =
+        new CMLPortInspector(gui::get_main_window());
+    inspector->setModal(true);
+    inspector->Load(&msg);
+    int ret = inspector->exec();
+    if (ret != QDialog::Accepted)
+      return false;
+  }
+  return true;
 }
 
 /////////////////////////////////////////////////

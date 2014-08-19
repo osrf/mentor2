@@ -119,7 +119,12 @@ namespace gazebo
       private: bool OnKeyPress(const common::KeyEvent &_event);
 
       /// \brief Helper method to create hotspot visual for mouse interaction.
+      //// \param[in] _connect Create a hotspot from the connect data.
       private: void CreateHotSpot(ConnectionData *_connect);
+
+      /// \brief Select a port on the model.
+      /// return True if a port is selected, false otherwise.
+      private: bool SelectPort();
 
       /// \brief Qt signal when the connection creation process has ended.
       //Q_SIGNALS: void ConnectionAdded();

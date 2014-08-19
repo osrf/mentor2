@@ -24,6 +24,18 @@
 
 #include <gazebo/gui/qt.h>
 
+namespace boost
+{
+  class mutex;
+}
+
+class QtTreePropertyBrowser;
+class QtVariantPropertyManager;
+class QtProperty;
+class QtTreePropertyItem;
+class QtBrowserItem;
+class QtVariantEditorFactory;
+
 namespace gazebo
 {
   namespace gui
@@ -52,6 +64,16 @@ namespace gazebo
       /// \brief Qt callback when an electrical connection is to be created.
       private slots: void OnElectricalConnection();
 
+      private slots: void OnCurrentPropertyChanged(QtBrowserItem *_item);
+
+      private slots: void OnPropertyChanged(QtProperty *_item);
+
+      private slots: void OnElecticalComponent();
+
+      private slots: void OnMechanicalComponent();
+
+      private slots: void OnWiringComponent();
+
       /// \brief Widget that display components.
       private: QTreeWidget *componentTreeWidget;
 
@@ -60,6 +82,23 @@ namespace gazebo
 
       /// \brief Back button for page navigation.
       private: QPushButton *backButton;
+
+      private: QtTreePropertyBrowser *propTreeBrowser;
+
+      private: QtVariantPropertyManager *variantManager;
+
+      private: QtVariantEditorFactory *variantFactory;
+
+      /// \brief Qt tree widget item for component connection category.
+      private: QTreeWidgetItem *wiringConnectingItem;
+
+      private: QtProperty *selectedProperty;
+
+      private: boost::mutex *propMutex;
+
+      private: QWidget *componentSubLevelWidget;
+
+      private: QFrame *componentInfoFrame;
     };
   }
 }
