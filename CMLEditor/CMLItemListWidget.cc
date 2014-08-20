@@ -28,7 +28,7 @@ using namespace gui;
 CMLItemListWidget::CMLItemListWidget(QWidget *_parent)
     : QWidget(_parent)
 {
-  this->setObjectName("cmlComponentInfo");
+  this->setObjectName("CMLItemListWidget");
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
 

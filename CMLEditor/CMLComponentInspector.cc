@@ -16,6 +16,9 @@
 */
 
 #include <iostream>
+
+#include <gazebo/math/Helpers.hh>
+
 #include "SimpleModel.pb.h"
 #include "CMLComponentInspector.hh"
 
@@ -84,22 +87,37 @@ QWidget *CMLComponentInspector::GetValueWidget(
   switch (_msg->type())
   {
     case  Simple_msgs::msgs::Variant::UINT32:
+    {
       widget = new QSpinBox();
-      qobject_cast<QSpinBox *>(widget)->setValue(_msg->v_uint32());
+      QSpinBox *spinBoxWidget = qobject_cast<QSpinBox *>(widget);
+      spinBoxWidget->setRange(GZ_UINT32_MIN, GZ_UINT32_MAX);
+      spinBoxWidget->setValue(_msg->v_uint32());
       break;
+    }
     case  Simple_msgs::msgs::Variant::INT32:
+    {
       widget = new QSpinBox();
-      qobject_cast<QSpinBox *>(widget)->setValue(_msg->v_int32());
+      QSpinBox *spinBoxWidget = qobject_cast<QSpinBox *>(widget);
+      spinBoxWidget->setRange(-GZ_INT32_MAX, GZ_INT32_MAX);
+      spinBoxWidget->setValue(_msg->v_int32());
       break;
+    }
     case  Simple_msgs::msgs::Variant::DOUBLE:
+    {
       widget = new QDoubleSpinBox();
-      qobject_cast<QDoubleSpinBox *>(widget)->setValue(_msg->v_double());
+      QDoubleSpinBox *spinBoxWidget = qobject_cast<QDoubleSpinBox *>(widget);
+      spinBoxWidget->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
+      spinBoxWidget->setValue(_msg->v_double());
       break;
+    }
     case  Simple_msgs::msgs::Variant::STRING:
+    {
       widget = new QLineEdit();
       qobject_cast<QLineEdit *>(widget)->setText(tr(_msg->v_string().c_str()));
       break;
+    }
     case  Simple_msgs::msgs::Variant::BOOL:
+    {
       widget = new QCheckBox();
       QCheckBox *checkBoxWidget = qobject_cast<QCheckBox *>(widget);
       checkBoxWidget->setTristate(false);
@@ -116,6 +134,7 @@ QWidget *CMLComponentInspector::GetValueWidget(
         checkBoxWidget->setText(tr("False"));
       }
       break;
+    }
   }
   return widget;
 }

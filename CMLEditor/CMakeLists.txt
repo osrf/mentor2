@@ -56,7 +56,7 @@ set (headers
   RotateHandle.hh
 )
 
-set (resources resources.qrc)
+set (resources cmlresources.qrc)
 
 add_definitions(${QT_DEFINITIONS})
 

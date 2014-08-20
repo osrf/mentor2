@@ -35,13 +35,9 @@ BreadCrumbWidget::BreadCrumbWidget(QWidget *_parent)
   this->breadCrumbLayout = new QHBoxLayout;
   this->breadCrumbLayout->setAlignment(Qt::AlignLeft);
 
-  QPushButton *all = new QPushButton(tr("All"));
-  all->setFlat(true);
-  connect(all, SIGNAL(clicked()), this, SLOT(OnClicked()));
-
-  this->breadCrumbLayout->addWidget(all);
-
   this->currentIndex = 0;
+  this->Push("All");
+  this->currentIndex--;
 
   mainLayout->addLayout(this->breadCrumbLayout);
   this->setLayout(mainLayout);
@@ -60,6 +56,10 @@ void BreadCrumbWidget::Push(const std::string &_value)
 
   QPushButton *value = new QPushButton(tr(_value.c_str()));
   value->setFlat(true);
+  value->setCheckable(true);
+  value->setStyleSheet(
+      "QPushButton { background-color : transparent; border: 0}");
+  connect(value, SIGNAL(clicked()), this, SLOT(OnClicked()));
 
   this->breadCrumbLayout->addWidget(value);
 
@@ -83,8 +83,11 @@ std::string BreadCrumbWidget::Pop()
 /////////////////////////////////////////////////
 void BreadCrumbWidget::PushSeparator()
 {
-  QLabel *separator = new QLabel(tr(" > "));
-  this->breadCrumbLayout->addWidget(separator);
+  if (this->breadCrumbLayout->count() > 0)
+  {
+    QLabel *separator = new QLabel(tr(" > "));
+    this->breadCrumbLayout->addWidget(separator);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -124,7 +127,9 @@ void BreadCrumbWidget::OnClicked()
   QPushButton * sender = qobject_cast<QPushButton *>(QObject::sender());
   if (sender)
   {
-     int index = this->breadCrumbLayout->indexOf(sender)/2;
+    int index = this->breadCrumbLayout->indexOf(sender)/2;
+    if (index == this->currentIndex)
+      return;
     this->SetCurrentIndex(index);
   }
 }
