@@ -18,16 +18,24 @@
 #ifndef _CMLRENDER_HH_
 #define _CMLRENDER_HH_
 
-#include <gazebo/common/MouseEvent.hh>
+#include <gazebo/gui/qt.h>
+#include <gazebo/common/common.hh>
+#include <gazebo/transport/transport.hh>
+
+#include "SimpleModel.pb.h"
 
 namespace gazebo
 {
   namespace gui
   {
+    class CMLComponentInspector;
+
     /// \class CMLRender CMLRender.hh
     /// \brief Handle User Interaction with the Gazebo Render Window.
-    class CMLRender
+    class CMLRender : public QObject
     {
+      Q_OBJECT
+
       /// \brief Constructor
       public: CMLRender();
 
@@ -67,6 +75,9 @@ namespace gazebo
       private: void OnConnectionCreated(const std::string &_parent,
           const std::string &_child);
 
+      /// \brief Qt Callback to open component inspector
+      private slots: void OnOpenInspector();
+
       /// \brief All the event connections.
       private: std::vector<event::ConnectionPtr> connections;
 
@@ -75,6 +86,17 @@ namespace gazebo
 
       /// \brief Communication Node
       private: transport::NodePtr node;
+
+      /// \brief Qt action for opening the component inspector.
+      private: QAction *inspectAct;
+
+      /// \brief SimpleModel message associated to the current component being
+      /// inspected.
+      private: Simple_msgs::msgs::SimpleModel inspectMsg;
+
+      /// \brief A map of component name to its inspector.
+      private: std::map<std::string, CMLComponentInspector *>
+          componentInspectors;
     };
   }
 }

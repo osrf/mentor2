@@ -15,7 +15,7 @@
  *
 */
 
-
+#include <boost/lexical_cast.hpp>
 #include <gazebo/physics/physics.hh>
 
 #include "SimpleModelPlugin.hh"
@@ -164,7 +164,35 @@ void SimpleModelPlugin::FillMsg(Simple_msgs::msgs::SimpleModel &_msg)
   for (it = this->properties.begin() ; it != this->properties.end(); ++it)
   {
     _msg.add_key(it->first);
-    _msg.add_value(it->second);
+    Simple_msgs::msgs::Variant *property = _msg.add_value();
+
+    std::string value = it->second;
+    std::transform(value.begin(), value.end(), value.begin(), ::tolower);
+    if (value == "true")
+    {
+      property->set_type(Simple_msgs::msgs::Variant::BOOL);
+      property->set_v_bool(true);
+    }
+    else if (value == "false")
+    {
+      property->set_type(Simple_msgs::msgs::Variant::BOOL);
+      property->set_v_bool(false);
+    }
+    else
+    {
+      try
+      {
+        double value = boost::lexical_cast<double>(it->second);
+        property->set_type(Simple_msgs::msgs::Variant::DOUBLE);
+        property->set_v_double(value);
+      }
+      catch (const boost::bad_lexical_cast &)
+      {
+        property->set_type(Simple_msgs::msgs::Variant::STRING);
+        property->set_v_string(it->second);
+      }
+    }
+    //_msg.add_value(it->second);
   }
 
 }

@@ -9,6 +9,7 @@ link_directories(
 
 set (sources
   BreadCrumbWidget.cc
+  CMLComponentInspector.cc
   CMLConnectionMaker.cc
   CMLEdge.cc
   CMLEditor.cc
@@ -31,6 +32,7 @@ set (sources
 
 set (qt_headers
   BreadCrumbWidget.hh
+  CMLComponentInspector.hh
   CMLEditor.hh
   CMLEditorItem.hh
   CMLEditorPalette.hh
@@ -38,6 +40,7 @@ set (qt_headers
   CMLEditorView.hh
   CMLItemListWidget.hh
   CMLPortInspector.hh
+  CMLRender.hh
   RectItem.hh
 )
 
@@ -49,7 +52,6 @@ set (headers
   CMLEvents.hh
   CMLManager.hh
   CMLNode.hh
-  CMLRender.hh
   GrabberHandle.hh
   RotateHandle.hh
 )

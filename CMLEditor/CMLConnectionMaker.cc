@@ -163,6 +163,9 @@ bool CMLConnectionMaker::OnMousePress(const common::MouseEvent &_event)
 /////////////////////////////////////////////////
 bool CMLConnectionMaker::OnMouseRelease(const common::MouseEvent &_event)
 {
+  if (_event.button != common::MouseEvent::LEFT)
+    return false;
+
   if (this->connectType == CMLConnectionMaker::CONNECT_NONE)
   {
     rendering::UserCameraPtr camera = gui::get_active_camera();

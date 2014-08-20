@@ -18,6 +18,7 @@
 #include <gazebo/common/common.hh>
 #include <gazebo/rendering/rendering.hh>
 #include <gazebo/gui/gui.hh>
+#include <gazebo/gui/qt.h>
 
 #include "CMLManager.hh"
 #include "CMLEvents.hh"
@@ -27,7 +28,7 @@
 #include "SimpleModel.pb.h"
 
 #include "CMLPortInspector.hh"
-
+#include "CMLComponentInspector.hh"
 #include "CMLRender.hh"
 
 using namespace gazebo;
@@ -67,6 +68,11 @@ CMLRender::CMLRender()
   this->connectionPub =
       this->node->Advertise<Simple_msgs::msgs::SimpleConnection>(
       "~/simple/connection");
+
+  this->inspectAct = new QAction(tr("Open Inspector"), this);
+  connect(this->inspectAct, SIGNAL(triggered()), this,
+      SLOT(OnOpenInspector()));
+
 }
 
 /////////////////////////////////////////////////
@@ -99,16 +105,21 @@ bool CMLRender::OnMouseRelease(const common::MouseEvent &_event)
   {
     if (vis)
     {
-      std::string name = vis->GetRootVisual()->GetName();
+      rendering::VisualPtr rootVis = vis->GetRootVisual();
+      std::string name = rootVis->GetName();
       Simple_msgs::msgs::SimpleModel msg;
       msg = CMLManager::Instance()->GetModelInfo(name);
 
-      std::cerr << " name " << name << " " << msg.name() << std::endl;
+      if (!msg.name().empty())
+      {
+        std::cerr << " name " << name << " " << msg.name() << std::endl;
+        this->inspectMsg = msg;
 
-        // QMenu menu;
-        // menu.addAction(this->inspectAct);
-        // menu.exec(QCursor::pos());
-        // return true;
+        QMenu menu;
+        menu.addAction(this->inspectAct);
+        menu.exec(QCursor::pos());
+        return true;
+      }
     }
   }
 
@@ -188,4 +199,26 @@ void CMLRender::OnConnectionCreated(const std::string &_parent,
   msg.set_child(_child);
   this->connectionPub->Publish(msg);
   //CMLConnectionMaker::Instance()->Start();
+}
+
+/////////////////////////////////////////////////
+void CMLRender::OnOpenInspector()
+{
+  CMLComponentInspector *inspector = NULL;
+  if (this->componentInspectors.find(this->inspectMsg.name()) !=
+      this->componentInspectors.end())
+  {
+    inspector = this->componentInspectors[this->inspectMsg.name()];
+    inspector->activateWindow();
+    inspector->setFocus();
+  }
+  else
+  {
+    inspector = new CMLComponentInspector(gui::get_main_window());
+    inspector->Load(&this->inspectMsg);
+    this->componentInspectors[this->inspectMsg.name()] = inspector;
+    /*connect(inspector, SIGNAL(Applied()), this,
+        SLOT(OnComponentProperyChanged()));*/
+  }
+  inspector->show();
 }

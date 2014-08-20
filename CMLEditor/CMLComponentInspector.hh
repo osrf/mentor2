@@ -15,11 +15,12 @@
  *
 */
 
-#ifndef _CML_PORT_INSPECTOR_HH_
-#define _CML_PORT_INSPECTOR_HH_
+#ifndef _CML_COMPONENT_INSPECTOR_HH_
+#define _CML_COMPONENT_INSPECTOR_HH_
 
 #include <gazebo/gui/qt.h>
 
+#include "SimpleModel.pb.h"
 
 namespace Simple_msgs
 {
@@ -33,40 +34,48 @@ namespace gazebo
 {
   namespace gui
   {
-    /// \class CMLPortInspector CMLPortInspector.hh
-    /// \brief Dialog for selecting a ports.
-    class CMLPortInspector : public QDialog
+    /// \class CMLComponentInspector CMLComponentInspector.hh
+    /// \brief Dialog for configuring component properties.
+    class CMLComponentInspector : public QDialog
     {
       Q_OBJECT
 
       /// \brief Constructor
       /// \param[in] _parent Parent QWidget.
-      public: CMLPortInspector(QWidget *_parent = 0);
+      public: CMLComponentInspector(QWidget *_parent = 0);
 
       /// \brief Destructor
-      public: ~CMLPortInspector();
+      public: ~CMLComponentInspector();
 
       /// \brief Load the inspector with a simple model message
-      /// \param[in] _msg A simple model message that contains port information.
+      /// \param[in] _msg A simple model message that contains property
+      /// information.
       public: void Load(const Simple_msgs::msgs::SimpleModel *_msg);
+
+      /// \brief Get the most suitable widget for configuring this property.
+      /// \param[in] _msg Variant message containing property type and value.
+      /// \return a Qt widget for configuring the property.
+      private: QWidget *GetValueWidget(
+          const Simple_msgs::msgs::Variant *_msg);
 
       /// \brief Qt signal emitted to indicate that changes should be applied.
       Q_SIGNALS: void Applied();
 
+      /// \brief Qt callback when the bool property changed.
+      /// \param[in] _state New bool state.
+      private slots: void BoolPropChanged(int _state);
+
       /// \brief Qt callback when the Cancel button is pressed.
       private slots: void OnCancel();
+
+      /// \brief Qt callback when the Apply button is pressed.
+      private slots: void OnApply();
 
       /// \brief Qt callback when the Ok button is pressed.
       private slots: void OnOK();
 
-      /// \brief A group box container for all ports.
-      private: QGroupBox *portsGroupBox;
-
-      /// \brief A group box for hold all ports.
-      private: QButtonGroup *portsButtonGroup;
-
-      /// \brief A layout for the ports.
-      private: QVBoxLayout *portsLayout;
+      /// \brief A layout for the properties.
+      private: QGridLayout *propertyLayout;
     };
   }
 }
