@@ -53,6 +53,7 @@ void CMLManager::Init()
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
+
   this->requestPub =
       this->node->Advertise<msgs::Request>("~/simple/request");
 
@@ -86,6 +87,8 @@ Simple_msgs::msgs::SimpleModel CMLManager::GetModelInfo(
 /////////////////////////////////////////////////
 void CMLManager::OnResponse(ConstResponsePtr &_msg)
 {
+  std::cerr << " on response " << std::endl;
+
   if (!this->requestMsg || _msg->id() != this->requestMsg->id())
     return;
 

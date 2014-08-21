@@ -65,6 +65,10 @@ namespace gazebo
     /// Must only be called from the World::ProcessMessages function.
     private: void ProcessRequestMsgs();
 
+    /// \brief Publish simple model info on a separate thread. Blocks until
+    /// there is at least a subscriber.
+    private: void InitThread();
+
     /// \brief Subscriber to request messages.
     protected: transport::SubscriberPtr requestSub;
 
@@ -91,6 +95,9 @@ namespace gazebo
 
     /// \brief Pointer to the parent model.
     private: physics::ModelPtr parent;
+
+    /// \brief A thread that publishes a simple model info on init.
+    private: boost::thread *initThread;
   };
 }
 

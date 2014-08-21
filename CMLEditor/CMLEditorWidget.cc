@@ -188,7 +188,6 @@ bool CMLEditorWidget::ProcessModelMsg(const msgs::Model &_msg)
         CMLManager::Instance()->GetModelInfo(_msg.name());
     if (!msg.name().empty() && !msg.schematic_type().empty())
       node->SetIcon(this->GetSchematicIcon(msg.schematic_type()));
-    this->scene->advance();
     this->scene->itemMoved();
     this->scene->advance();
   }

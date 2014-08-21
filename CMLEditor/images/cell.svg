@@ -4,7 +4,11 @@
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 width="50px" height="50px" viewBox="0 0 50 50" enable-background="new 0 0 50 50" xml:space="preserve">
 <g>
-	<line fill="none" stroke="#666666" stroke-width="6.0575" x1="7.085" y1="19.511" x2="42.915" y2="19.511"/>
-	<line fill="none" stroke="#666666" stroke-width="6.0575" x1="16.292" y1="30.489" x2="33.708" y2="30.489"/>
+	<line fill="none" stroke="#666666" stroke-width="4" x1="19.037" y1="45.336" x2="19.037" y2="4.664"/>
+	<line fill="none" stroke="#666666" stroke-width="6.0574" x1="30.016" y1="33.708" x2="30.016" y2="16.292"/>
+	<line fill="none" stroke="#666666" stroke-width="4" x1="3.138" y1="25.33" x2="17.172" y2="25.33"/>
+	<line fill="none" stroke="#666666" stroke-width="4" x1="32.828" y1="25.33" x2="46.861" y2="25.33"/>
+	<line fill="none" stroke="#666666" stroke-width="2" x1="8.238" y1="6.946" x2="8.238" y2="13.928"/>
+	<line fill="none" stroke="#666666" stroke-width="2" x1="4.747" y1="10.438" x2="11.729" y2="10.438"/>
 </g>
 </svg>

@@ -15,6 +15,7 @@
  *
 */
 
+#include <boost/thread.hpp>
 #include <boost/lexical_cast.hpp>
 #include <gazebo/physics/physics.hh>
 
@@ -80,9 +81,6 @@ void SimpleModelPlugin::Load(sdf::ElementPtr _sdf)
   for (it = properties.begin() ; it != properties.end(); ++it)
     std::cerr << " got property " << it->first << ": " <<
         it->second << std::endl;
-
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init();
 }
 
 /////////////////////////////////////////////////
@@ -94,6 +92,9 @@ void SimpleModelPlugin::LoadImpl(sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void SimpleModelPlugin::Init()
 {
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init();
+
   // currently just handles entity_info requests.
   this->requestSub = this->node->Subscribe("~/simple/request",
       &SimpleModelPlugin::OnRequest, this, true);
@@ -105,10 +106,21 @@ void SimpleModelPlugin::Init()
       this->node->Advertise<Simple_msgs::msgs::SimpleModel>(
       "~/simple/model/info");
 
+  this->initThread = new boost::thread(
+      boost::bind(&SimpleModelPlugin::InitThread, this));
+}
+
+/////////////////////////////////////////////////
+void SimpleModelPlugin::InitThread()
+{
+  this->simpleModelPub->WaitForConnection();
+
   // let subscribers know that a simple model has been spawned.
   Simple_msgs::msgs::SimpleModel simpleModelMsg;
   this->FillMsg(simpleModelMsg);
   this->simpleModelPub->Publish(simpleModelMsg);
+  std::cerr << " simple model init pub " << std::endl;
+
 }
 
 //////////////////////////////////////////////////
