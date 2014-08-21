@@ -40,6 +40,10 @@ void CMLEditorPlugin::Load(int /*_argc*/, char ** /*_argv*/)
 /////////////////////////////////////////////////
 void CMLEditorPlugin::Init()
 {
+  // keep tracks of simple models in the world
+  gui::CMLManager::Instance()->Init();
+
+
   this->connections.push_back(
       gui::Events::ConnectMainWindowReady(
       boost::bind(&CMLEditorPlugin::OnMainWindowReady, this)));
@@ -48,9 +52,6 @@ void CMLEditorPlugin::Init()
 /////////////////////////////////////////////////
 void CMLEditorPlugin::OnMainWindowReady()
 {
-  // keep tracks of simple models in the world
-  gui::CMLManager::Instance()->Init();
-
   // gazebo main window
   gui::MainWindow *mainWindow = gui::get_main_window();
 
