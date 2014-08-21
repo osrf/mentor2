@@ -112,7 +112,7 @@ void CMLEditorScene::drawBackground(QPainter * _painter, const QRectF & _rect)
 
     _painter->setRenderHint(QPainter::Antialiasing, false);
 
-    _painter->setPen(QColor(Qt::lightGray).lighter(110));
+    _painter->setPen(QColor(Qt::lightGray).lighter(50));
     _painter->drawLines(lines.data(), lines.size());
     _painter->setPen(Qt::black);
     //_painter->drawRect(sceneRect());

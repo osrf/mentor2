@@ -54,6 +54,9 @@ namespace gazebo
     /// this model.
     protected: void FillMsg(Simple_msgs::msgs::SimpleModel &_msg);
 
+    /// \brief Type of model
+    protected: std::string schematicType;
+
     /// \brief Called when a request message is received.
     /// \param[in] _msg The request message.
     private: void OnRequest(ConstRequestPtr &_msg);

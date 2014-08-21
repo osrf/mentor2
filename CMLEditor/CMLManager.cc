@@ -99,7 +99,8 @@ void CMLManager::OnResponse(ConstResponsePtr &_msg)
 /////////////////////////////////////////////////
 void CMLManager::OnSimpleModel(ConstSimpleModelPtr &_msg)
 {
-  std::cerr << " on simple model " << _msg->name() << std::endl;
+  std::cerr << " on simple model " << _msg->name()
+    << " " << _msg->schematic_type() << std::endl;
 
   // TODO ~/simple/model/info doesn't get messages so this doesn't get called.
   boost::recursive_mutex::scoped_lock lock(*this->modelInfoMutex);

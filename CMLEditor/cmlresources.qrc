@@ -1,0 +1,13 @@
+<RCC version="1.0">
+  <qresource>
+    <file>cmlstyle.qss</file>
+    <file>images/cell.png</file>
+    <file>images/motor.png</file>
+    <file>images/switch1.png</file>
+    <file>images/switch2.png</file>
+    <file>images/cell.svg</file>
+    <file>images/motor.svg</file>
+    <file>images/switch1.svg</file>
+    <file>images/switch2.svg</file>    
+  </qresource>
+</RCC>

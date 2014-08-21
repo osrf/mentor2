@@ -21,7 +21,10 @@
 
 //#include "QGVCore/QGVScene.h"
 
+#include "SimpleModel.pb.h"
+
 #include "CMLNode.hh"
+#include "CMLManager.hh"
 #include "CMLEditorScene.hh"
 #include "CMLEditorView.hh"
 #include "CMLEditorWidget.hh"
@@ -169,7 +172,15 @@ bool CMLEditorWidget::ProcessModelMsg(const msgs::Model &_msg)
 {
   //QGVNode *node = this->scene->addNode(tr(_msg.name().c_str()));
   if (!this->scene->HasNode(_msg.name()))
-    this->scene->AddNode(_msg.name());
+  {
+    CMLNode * node = this->scene->AddNode(_msg.name());
+    Simple_msgs::msgs::SimpleModel msg =
+        CMLManager::Instance()->GetModelInfo(_msg.name());
+    if (!msg.name().empty() && !msg.schematic_type().empty())
+      node->SetIcon(this->GetSchematicIcon(msg.schematic_type()));
+  }
+
+
   //this->graphNodes.push_back(node);
 
   //this->scene->clearLayout();
@@ -243,4 +254,15 @@ void CMLEditorWidget::PreRender()
     else
       ++simpleConnectionIter;
   }
+}
+
+//////////////////////////////////////////////////
+std::string CMLEditorWidget::GetSchematicIcon(const std::string &_schematicType)
+{
+  if (_schematicType == "power")
+    return ":/images/cell.png";
+  else if (_schematicType == "switch")
+    return ":/images/switch1.png";
+  else if (_schematicType == "motor")
+    return ":/images/motor.png";
 }

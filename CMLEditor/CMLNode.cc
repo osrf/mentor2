@@ -1,7 +1,21 @@
-#include <QGraphicsScene>
- #include <QGraphicsSceneMouseEvent>
- #include <QPainter>
- #include <QStyleOption>
+/*
+ * Copyright (C) 2014 Open Source Robotics Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
+
+#include <iostream>
 
  #include "CMLEdge.hh"
  #include "CMLNode.hh"
@@ -19,7 +33,7 @@ CMLNode::CMLNode(const std::string &_name, CMLEditorScene *_scene)
   this->setCacheMode(DeviceCoordinateCache);
   this->setZValue(-1);
   this->name = _name;
-  this->setPlainText(tr(this->name.c_str()));
+  //this->setPlainText(tr(this->name.c_str()));
 }
 
 /////////////////////////////////////////////////
@@ -97,14 +111,21 @@ bool CMLNode::advance()
   setPos(newPos);
   return true;
 }
-/*
+
 /////////////////////////////////////////////////
 QRectF CMLNode::boundingRect() const
 {
-  qreal adjust = 2;
+  /*qreal adjust = 2;
   return QRectF( -10 - adjust, -10 - adjust,
-               23 + adjust, 23 + adjust);
-}*/
+               23 + adjust, 23 + adjust);*/
+
+  QRectF rect = QGraphicsPixmapItem::boundingRect();
+
+  if (this->textBoundingRect.width() > 0)
+    return rect.united(this->textBoundingRect);
+  else return rect;
+//  return rect;
+}
 
 /////////////////////////////////////////////////
 QPainterPath CMLNode::shape() const
@@ -118,15 +139,17 @@ QPainterPath CMLNode::shape() const
 void CMLNode::paint(QPainter *_painter, const QStyleOptionGraphicsItem *_option,
     QWidget *_widget)
 {
+
+  QRectF pixRect = QGraphicsPixmapItem::boundingRect();
   _painter->save();
   _painter->setPen(Qt::NoPen);
   _painter->setBrush(Qt::darkGray);
-  _painter->drawRect(this->boundingRect());
+  _painter->drawRect(pixRect);
 
   QRadialGradient gradient(-3, -3, 10);
   if (_option->state & QStyle::State_Sunken)
   {
-    QPointF center = this->boundingRect().center();
+    QPointF center = pixRect.center();
     gradient.setCenter(center.x(), center.y());
     gradient.setFocalPoint(center.x(), center.y());
     gradient.setColorAt(1, QColor(230, 230, 230).light(120));
@@ -139,10 +162,48 @@ void CMLNode::paint(QPainter *_painter, const QStyleOptionGraphicsItem *_option,
   _painter->setBrush(gradient);
 
   _painter->setPen(QPen(Qt::black, 0));
-  _painter->drawRect(this->boundingRect());
+  _painter->drawRect(pixRect);
+
+
+/*  QFont font;
+  font.setPixelSize(20);
+  font.setBold(false);
+  font.setFamily("Calibri");
+
+  QPainterPath path;
+  QPointF center = this->boundingRect().center();
+  path.addText(center.x(), center.y(), font,  "Hello World!!");
+//  _painter->drawPath(path);*/
+
+  int margin = 6;
+  QRectF textRect = pixRect;
+  double halfHeight = pixRect.height()/2;
+  textRect.moveTop(pixRect.height());
+  textRect.setHeight(halfHeight);
+
+  QString nameText(this->name.c_str());
+  QFont font = _painter->font();
+  QFontMetrics fm(font);
+  int w = fm.width(nameText) + margin;
+  int dw = textRect.width() - w;
+  textRect.setWidth(w);
+  textRect.moveLeft(dw/2);
+
+  if (this->pixmap().isNull())
+  {
+    int h = fm.height() + margin;
+    textRect.setHeight(h);
+    _painter->drawRect(textRect);
+  }
+
+  this->textBoundingRect = textRect;
+
+  _painter->drawText(textRect, Qt::AlignCenter, nameText);
+
+
   _painter->restore();
 
-  QGraphicsTextItem::paint(_painter, _option, _widget);
+  QGraphicsPixmapItem::paint(_painter, _option, _widget);
 
   /*_painter->setPen(Qt::NoPen);
   _painter->setBrush(Qt::darkGray);
@@ -187,12 +248,18 @@ QVariant CMLNode::itemChange(GraphicsItemChange change, const QVariant &value)
 void CMLNode::mousePressEvent(QGraphicsSceneMouseEvent *_event)
 {
   update();
-  QGraphicsTextItem::mousePressEvent(_event);
+  QGraphicsPixmapItem::mousePressEvent(_event);
 }
 
 /////////////////////////////////////////////////
 void CMLNode::mouseReleaseEvent(QGraphicsSceneMouseEvent *_event)
 {
   update();
-  QGraphicsTextItem::mouseReleaseEvent(_event);
+  QGraphicsPixmapItem::mouseReleaseEvent(_event);
+}
+
+/////////////////////////////////////////////////
+void CMLNode::SetIcon(const std::string &_url)
+{
+  this->setPixmap(QPixmap(QString(_url.c_str())));
 }

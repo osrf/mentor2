@@ -24,6 +24,7 @@ GZ_REGISTER_MODEL_PLUGIN(PowerSourcePlugin)
 /////////////////////////////////////////////////
 PowerSourcePlugin::PowerSourcePlugin()
 {
+  this->schematicType = "power";
 }
 
 /////////////////////////////////////////////////

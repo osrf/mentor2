@@ -26,6 +26,7 @@ using namespace gazebo;
 SimpleModelPlugin::SimpleModelPlugin()
 {
   this->receiveMutex = new boost::recursive_mutex();
+  this->schematicType = "";
 }
 
 /////////////////////////////////////////////////
@@ -155,6 +156,7 @@ void SimpleModelPlugin::ProcessRequestMsgs()
 void SimpleModelPlugin::FillMsg(Simple_msgs::msgs::SimpleModel &_msg)
 {
   _msg.set_name(this->parent->GetScopedName());
+  _msg.set_schematic_type(this->schematicType);
   for (unsigned int i =0; i < this->ports.size(); ++i)
   {
     _msg.add_port(this->ports[i]);
@@ -194,5 +196,4 @@ void SimpleModelPlugin::FillMsg(Simple_msgs::msgs::SimpleModel &_msg)
     }
     //_msg.add_value(it->second);
   }
-
 }

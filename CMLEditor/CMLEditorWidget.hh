@@ -85,6 +85,11 @@ namespace gazebo
       /// \param[in] _msg The message data.
       private: void OnSimpleConnection(ConstSimpleConnectionPtr &_msg);
 
+      /// \brief Get the schematic representation of a component
+      /// \param[in] _schematicType The schematic type for the component.
+      /// \return Image url
+      private: std::string GetSchematicIcon(const std::string &_schematicType);
+
       /// \brief Qt Graphics Scene where graphics items are drawn in
 //      private: QGVScene *scene;
 //      private: QGraphicsScene *scene;

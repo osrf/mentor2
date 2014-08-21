@@ -1,0 +1,49 @@
+
+
+
+QWidget#componentInfoFrame > QFrame
+{
+  padding: 4px;
+  background-color: #808080;
+}
+
+QWidget#CMLItemListWidget,
+QWidget#breadCrumbWidget
+{
+  background: #808080;
+  background-color: #808080;  
+  color: #d0d0d0;
+}
+
+
+
+
+QTabWidget#CMLEditorTab::pane
+{
+  border-left: 1px solid #101010;
+  border-bottom: 1px solid #101010;
+  border-top: 1px solid #101010;
+
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 10px;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  top: -1px;
+
+  background-color: #808080;
+  padding: 2px;
+
+  margin: 0px;
+  color: #f0f0f0;
+}
+
+QTabWidget::tab
+{
+  border-top: 1px solid #101010;
+  background-color: #808080;
+}
+
+QTabWidget::tab-bar
+{
+  alignment: left;
+}

@@ -169,6 +169,8 @@ namespace gazebo
       private: std::map<CMLConnectionMaker::ConnectType, std::string>
           connectionMaterials;
 
+      private: common::MouseEvent mouseEvent;
+
       /// \brief This is a singleton class.
       private: friend class SingletonT<CMLConnectionMaker>;
     };
@@ -193,9 +195,6 @@ namespace gazebo
 
       /// \brief Visual line used to represent the connection
       public: rendering::DynamicLines *line;
-
-      /// \brief Visual handle used to represent connection parent / child
-      public: Ogre::BillboardSet *handles;
 
       /// \brief Type of connection.
       public: CMLConnectionMaker::ConnectType type;

@@ -32,7 +32,7 @@ namespace gazebo
 
     /// \class CMLNode CMLNode.hh
     /// \brief A node in the CML editor
-    class CMLNode : public QGraphicsTextItem
+    class CMLNode : public QGraphicsPixmapItem
     {
       public: enum { Type = UserType + 1 };
 
@@ -60,9 +60,18 @@ namespace gazebo
       /// \return The node's bounding rectangle
       public: QRectF boundingRect() const;
 */
+
+      /// \brief Get the bounding rect of this node.
+      /// \return the bounding rect.
+      public: QRectF boundingRect() const;
+
       /// \brief Get the shape of this node
       /// \return the shape in described using a QPainterPath object.
       public: QPainterPath shape() const;
+
+      /// \brief Set the icon for this node.
+      /// \param[in] _url Icon url.
+      public: void SetIcon(const std::string &_url);
 
       /// \brief Qt paint function for drawing the node item.
       /// \param[in] _painter Qt painter object.
@@ -91,6 +100,9 @@ namespace gazebo
 
       /// \brief Name of the node.
       private: std::string name;
+
+      /// \brief Bounding rect for the name label.
+      private: QRectF textBoundingRect;
     };
   }
 }

@@ -100,7 +100,6 @@ void CMLConnectionMaker::RemoveConnection(const std::string &_connectionName)
   {
     ConnectionData *connect = this->connects[_connectionName];
     rendering::ScenePtr scene = connect->hotspot->GetScene();
-    scene->GetManager()->destroyBillboardSet(connect->handles);
     scene->RemoveVisual(connect->hotspot);
     scene->RemoveVisual(connect->visual);
     connect->hotspot.reset();
@@ -138,6 +137,8 @@ void CMLConnectionMaker::RemoveConnectionsByEntity(
 /////////////////////////////////////////////////
 bool CMLConnectionMaker::OnMousePress(const common::MouseEvent &_event)
 {
+  this->mouseEvent = _event;
+
   if (_event.button != common::MouseEvent::LEFT)
     return false;
 
@@ -163,6 +164,8 @@ bool CMLConnectionMaker::OnMousePress(const common::MouseEvent &_event)
 /////////////////////////////////////////////////
 bool CMLConnectionMaker::OnMouseRelease(const common::MouseEvent &_event)
 {
+  this->mouseEvent = _event;
+
   if (_event.button != common::MouseEvent::LEFT)
     return false;
 
@@ -278,6 +281,12 @@ bool CMLConnectionMaker::SelectPort()
   {
     CMLPortInspector *inspector =
         new CMLPortInspector(gui::get_main_window());
+
+    inspector->move(
+        gui::get_main_window()->pos().x() +
+        this->mouseEvent.pos.x,
+        gui::get_main_window()->pos().y() +
+        this->mouseEvent.pos.y);
     inspector->setModal(true);
     inspector->Load(&msg);
     int ret = inspector->exec();
@@ -393,6 +402,8 @@ void CMLConnectionMaker::Stop()
 /////////////////////////////////////////////////
 bool CMLConnectionMaker::OnMouseMove(const common::MouseEvent &_event)
 {
+  this->mouseEvent = _event;
+
   if (_event.dragging)
     return false;
 
@@ -481,7 +492,8 @@ void CMLConnectionMaker::CreateHotSpot(ConnectionData *_connect)
 
   std::string hotSpotName = _connect->visual->GetName() + "_HOTSPOT_";
   rendering::VisualPtr hotspotVisual(
-      new rendering::Visual(hotSpotName, _connect->visual, false));
+      new rendering::Visual(hotSpotName, camera->GetScene()->GetWorldVisual(),
+      false));
 
   _connect->hotspot = hotspotVisual;
 
@@ -494,31 +506,6 @@ void CMLConnectionMaker::CreateHotSpot(ConnectionData *_connect)
   hotspotVisual->GetSceneNode()->attachObject(hotspotObj);
   hotspotVisual->SetMaterial(this->connectionMaterials[_connect->type]);
   hotspotVisual->SetTransparency(0.5);
-
-  // create two handles at the ends of the line
-  Ogre::BillboardSet *handleSet =
-      camera->GetScene()->GetManager()->createBillboardSet(3);
-  handleSet->setAutoUpdate(true);
-//  handleSet->setMaterialName("Gazebo/PointHandle");
-  Ogre::MaterialPtr mat =
-      Ogre::MaterialManager::getSingleton().getByName(
-      this->connectionMaterials[_connect->type]);
-  Ogre::ColourValue color = mat->getTechnique(0)->getPass(0)->getDiffuse();
-  color.a = 0.5;
-  double dimension = 0.1;
-  handleSet->setDefaultDimensions(dimension, dimension);
-  Ogre::Billboard *parentHandle = handleSet->createBillboard(0, 0, 0);
-  parentHandle->setColour(color);
-  Ogre::Billboard *childHandle = handleSet->createBillboard(0, 0, 0);
-  childHandle->setColour(color);
-  Ogre::Billboard *childCenterHandle = handleSet->createBillboard(0, 0, 0);
-  childCenterHandle->setDimensions(dimension*0.5, dimension*0.5);
-  Ogre::SceneNode *handleNode =
-      hotspotVisual->GetSceneNode()->createChildSceneNode();
-  handleNode->attachObject(handleSet);
-  handleNode->setInheritScale(false);
-  handleNode->setInheritOrientation(false);
-  _connect->handles = handleSet;
 
   hotspotVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI |
       GZ_VISIBILITY_SELECTABLE);
@@ -576,17 +563,6 @@ void CMLConnectionMaker::Update()
         math::Quaternion q;
         q.SetFromAxis(w, angle);
         connect->hotspot->SetWorldRotation(q);
-
-        // set pos of connect handles
-        connect->handles->getBillboard(0)->setPosition(
-            rendering::Conversions::Convert(parentCentroid -
-            connect->hotspot->GetWorldPose().pos));
-        connect->handles->getBillboard(1)->setPosition(
-            rendering::Conversions::Convert(childCentroid -
-            connect->hotspot->GetWorldPose().pos));
-        connect->handles->getBillboard(2)->setPosition(
-            connect->handles->getBillboard(1)->getPosition());
-        connect->handles->_updateBounds();
       }
     }
   }

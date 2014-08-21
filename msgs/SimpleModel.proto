@@ -18,7 +18,8 @@ message Variant
 message SimpleModel
 {
   required string name      = 1;
-  repeated string port = 2;
-  repeated string key = 3;
-  repeated Variant value = 4;
+  optional string schematic_type = 2;
+  repeated string port = 3;
+  repeated string key = 4;
+  repeated Variant value = 5;
 }
