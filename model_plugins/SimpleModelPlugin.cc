@@ -81,6 +81,8 @@ void SimpleModelPlugin::Load(sdf::ElementPtr _sdf)
     std::cerr << " got property " << it->first << ": " <<
         it->second << std::endl;
 
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init();
 }
 
 /////////////////////////////////////////////////
@@ -92,9 +94,6 @@ void SimpleModelPlugin::LoadImpl(sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void SimpleModelPlugin::Init()
 {
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init();
-
   // currently just handles entity_info requests.
   this->requestSub = this->node->Subscribe("~/simple/request",
       &SimpleModelPlugin::OnRequest, this, true);

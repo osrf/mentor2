@@ -24,6 +24,7 @@
 #include "CMLEvents.hh"
 #include "CMLConnectionMaker.hh"
 
+#include "Event.pb.h"
 #include "SimpleConnection.pb.h"
 #include "SimpleModel.pb.h"
 
@@ -68,6 +69,10 @@ CMLRender::CMLRender()
   this->connectionPub =
       this->node->Advertise<Simple_msgs::msgs::SimpleConnection>(
       "~/simple/connection");
+
+  this->restPub =
+      this->node->Advertise<Event_msgs::msgs::RestPost>(
+      "~/event/rest_post");
 
   this->inspectAct = new QAction(tr("Open Inspector"), this);
   connect(this->inspectAct, SIGNAL(triggered()), this,
@@ -198,6 +203,23 @@ void CMLRender::OnConnectionCreated(const std::string &_parent,
   msg.set_parent(_parent);
   msg.set_child(_child);
   this->connectionPub->Publish(msg);
+
+
+  Event_msgs::msgs::RestPost restMsg;
+  restMsg.set_route("/events/new");
+
+  std::string postStr;
+  postStr = "{";
+  postStr += "\"type\": \"connection\",";
+  postStr += "\"name\": \"simple_connection\",";
+  postStr += "\"data\": {";
+  postStr += "\"parent\": \"" + _parent +"\",";
+  postStr += "\"child\": \"" + _child +"\"";
+  postStr += "}";
+  postStr += "}";
+  restMsg.set_json(postStr);
+  this->restPub->Publish(restMsg);
+
   //CMLConnectionMaker::Instance()->Start();
 }
 

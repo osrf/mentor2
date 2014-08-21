@@ -18,8 +18,9 @@
  #ifndef CML_NODE_HH
  #define CML_NODE_HH
 
- #include <QGraphicsItem>
- #include <QList>
+#include <QGraphicsItem>
+#include <QList>
+#include <QFont>
 
 class QGraphicsSceneMouseEvent;
 
@@ -69,6 +70,10 @@ namespace gazebo
       /// \return the shape in described using a QPainterPath object.
       public: QPainterPath shape() const;
 
+      /// \brief Return Type enum for this custrom graphics item.
+      /// \return Type enum.
+      public: int type() const;
+
       /// \brief Set the icon for this node.
       /// \param[in] _url Icon url.
       public: void SetIcon(const std::string &_url);
@@ -91,6 +96,9 @@ namespace gazebo
       /// \param[in] _event Qt mouse event.
       protected: void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
+      /// \brief Update the name label bounding box.
+      private: void UpdateTextBoundingRect();
+
       /// \brief List of edges connected to this node.
       private: QList<CMLEdge *> edgeList;
 
@@ -103,6 +111,9 @@ namespace gazebo
 
       /// \brief Bounding rect for the name label.
       private: QRectF textBoundingRect;
+
+      /// \brief Font for the name label.
+      private: QFont textFont;
     };
   }
 }

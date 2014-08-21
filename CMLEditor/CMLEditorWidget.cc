@@ -85,6 +85,9 @@ CMLEditorWidget::CMLEditorWidget(QWidget *_parent)
   this->simpleConnectionSub = this->node->Subscribe("~/simple/connection",
       &CMLEditorWidget::OnSimpleConnection, this);
 
+  this->simpleModelSub = this->node->Subscribe("~/simple/model/info",
+      &CMLEditorWidget::OnSimpleModel, this);
+
   this->modelInfoSub = this->node->Subscribe("~/model/info",
       &CMLEditorWidget::OnModelMsg, this);
 
@@ -139,6 +142,13 @@ void CMLEditorWidget::OnModelMsg(ConstModelPtr &_msg)
 }
 
 //////////////////////////////////////////////////
+void CMLEditorWidget::OnSimpleModel(ConstSimpleModelPtr &_msg)
+{
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  this->simpleModelMsgs.push_back(_msg);
+}
+
+//////////////////////////////////////////////////
 void CMLEditorWidget::OnSimpleConnection(ConstSimpleConnectionPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
@@ -178,6 +188,9 @@ bool CMLEditorWidget::ProcessModelMsg(const msgs::Model &_msg)
         CMLManager::Instance()->GetModelInfo(_msg.name());
     if (!msg.name().empty() && !msg.schematic_type().empty())
       node->SetIcon(this->GetSchematicIcon(msg.schematic_type()));
+    this->scene->advance();
+    this->scene->itemMoved();
+    this->scene->advance();
   }
 
 
@@ -193,10 +206,25 @@ bool CMLEditorWidget::ProcessModelMsg(const msgs::Model &_msg)
 }
 
 /////////////////////////////////////////////////
+bool CMLEditorWidget::ProcessSimpleModelMsg(
+    const Simple_msgs::msgs::SimpleModel &_msg)
+{
+  CMLNode *node = this->scene->GetNode(_msg.name());
+  if (node && node->pixmap().isNull())
+  {
+    Simple_msgs::msgs::SimpleModel msg =
+        CMLManager::Instance()->GetModelInfo(_msg.name());
+    if (!msg.name().empty() && !msg.schematic_type().empty())
+      node->SetIcon(this->GetSchematicIcon(msg.schematic_type()));
+  }
+}
+
+/////////////////////////////////////////////////
 bool CMLEditorWidget::ProcessSimpleConnectionMsg(
     const Simple_msgs::msgs::SimpleConnection &_msg)
 {
   this->scene->AddEdge(_msg.parent(), _msg.child());
+  return true;
 }
 
 //////////////////////////////////////////////////
@@ -205,10 +233,12 @@ void CMLEditorWidget::PreRender()
   static SceneMsgs_L::iterator sIter;
   static ModelMsgs_L::iterator modelIter;
   static SimpleConnectionMsgs_L::iterator simpleConnectionIter;
+  static SimpleModelMsgs_L::iterator simpleModelIter;
 
   SceneMsgs_L sceneMsgsCopy;
   ModelMsgs_L modelMsgsCopy;
   SimpleConnectionMsgs_L simpleConnectionMsgsCopy;
+  SimpleModelMsgs_L simpleModelMsgsCopy;
 
   {
     boost::mutex::scoped_lock lock(*this->receiveMutex);
@@ -225,6 +255,11 @@ void CMLEditorWidget::PreRender()
         this->simpleConnectionMsgs.end(),
         std::back_inserter(simpleConnectionMsgsCopy));
     this->simpleConnectionMsgs.clear();
+
+    std::copy(this->simpleModelMsgs.begin(),
+        this->simpleModelMsgs.end(),
+        std::back_inserter(simpleModelMsgsCopy));
+    this->simpleModelMsgs.clear();
   }
 
   // Process the scene messages. DO THIS FIRST
@@ -253,6 +288,16 @@ void CMLEditorWidget::PreRender()
       simpleConnectionMsgsCopy.erase(simpleConnectionIter++);
     else
       ++simpleConnectionIter;
+  }
+
+  // Process the simple model messages.
+  for (simpleModelIter = simpleModelMsgsCopy.begin();
+      simpleModelIter != simpleModelMsgsCopy.end();)
+  {
+    if (this->ProcessSimpleModelMsg(**simpleModelIter))
+      simpleModelMsgsCopy.erase(simpleModelIter++);
+    else
+      ++simpleModelIter;
   }
 }
 

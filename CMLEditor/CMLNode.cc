@@ -33,6 +33,10 @@ CMLNode::CMLNode(const std::string &_name, CMLEditorScene *_scene)
   this->setCacheMode(DeviceCoordinateCache);
   this->setZValue(-1);
   this->name = _name;
+  this->textFont.setPointSize(12);;
+
+  this->UpdateTextBoundingRect();
+
   //this->setPlainText(tr(this->name.c_str()));
 }
 
@@ -73,13 +77,13 @@ void CMLNode::calculateForces()
     double l = 2.0 * (dx * dx + dy * dy);
     if (l > 0)
     {
-      xvel += (dx * 150.0) / l;
-      yvel += (dy * 150.0) / l;
+      xvel += (dx * 450.0) / l;
+      yvel += (dy * 450.0) / l;
     }
   }
 
   // Now subtract all forces pulling items together
-  double weight = (edgeList.size() + 1) * 10;
+  /*double weight = (edgeList.size() + 1) * 10;
   foreach (CMLEdge *edge, edgeList)
   {
      QPointF vec;
@@ -89,9 +93,11 @@ void CMLNode::calculateForces()
          vec = mapToItem(edge->GetSourceNode(), 0, 0);
      xvel -= vec.x() / weight;
      yvel -= vec.y() / weight;
-  }
+  }*/
 
-  if (qAbs(xvel) < 0.1 && qAbs(yvel) < 0.1)
+  std::cerr << "vel " << xvel << " " << yvel << std::endl;
+
+  if (qAbs(xvel) < 6.0 && qAbs(yvel) < 6.0)
      xvel = yvel = 0;
 
   QRectF sceneRect = scene()->sceneRect();
@@ -110,6 +116,13 @@ bool CMLNode::advance()
 
   setPos(newPos);
   return true;
+}
+
+/////////////////////////////////////////////////
+int CMLNode::type() const
+{
+  // Enable the use of qgraphicsitem_cast with this item.
+  return Type;
 }
 
 /////////////////////////////////////////////////
@@ -164,67 +177,17 @@ void CMLNode::paint(QPainter *_painter, const QStyleOptionGraphicsItem *_option,
   _painter->setPen(QPen(Qt::black, 0));
   _painter->drawRect(pixRect);
 
-
-/*  QFont font;
-  font.setPixelSize(20);
-  font.setBold(false);
-  font.setFamily("Calibri");
-
-  QPainterPath path;
-  QPointF center = this->boundingRect().center();
-  path.addText(center.x(), center.y(), font,  "Hello World!!");
-//  _painter->drawPath(path);*/
-
-  int margin = 6;
-  QRectF textRect = pixRect;
-  double halfHeight = pixRect.height()/2;
-  textRect.moveTop(pixRect.height());
-  textRect.setHeight(halfHeight);
-
   QString nameText(this->name.c_str());
-  QFont font = _painter->font();
-  QFontMetrics fm(font);
-  int w = fm.width(nameText) + margin;
-  int dw = textRect.width() - w;
-  textRect.setWidth(w);
-  textRect.moveLeft(dw/2);
 
   if (this->pixmap().isNull())
-  {
-    int h = fm.height() + margin;
-    textRect.setHeight(h);
-    _painter->drawRect(textRect);
-  }
+    _painter->drawRect(this->textBoundingRect);
 
-  this->textBoundingRect = textRect;
-
-  _painter->drawText(textRect, Qt::AlignCenter, nameText);
+  _painter->drawText(this->textBoundingRect, Qt::AlignCenter, nameText);
 
 
   _painter->restore();
 
   QGraphicsPixmapItem::paint(_painter, _option, _widget);
-
-  /*_painter->setPen(Qt::NoPen);
-  _painter->setBrush(Qt::darkGray);
-  _painter->drawEllipse(-7, -7, 20, 20);
-
-  QRadialGradient gradient(-3, -3, 10);
-  if (_option->state & QStyle::State_Sunken)
-  {
-    gradient.setCenter(3, 3);
-    gradient.setFocalPoint(3, 3);
-    gradient.setColorAt(1, QColor(Qt::yellow).light(120));
-    gradient.setColorAt(0, QColor(Qt::darkYellow).light(120));
-  } else
-  {
-    gradient.setColorAt(0, Qt::yellow);
-    gradient.setColorAt(1, Qt::darkYellow);
-  }
-  _painter->setBrush(gradient);
-
-  _painter->setPen(QPen(Qt::black, 0));
-  _painter->drawEllipse(-10, -10, 20, 20);*/
 }
 
 /////////////////////////////////////////////////
@@ -259,7 +222,35 @@ void CMLNode::mouseReleaseEvent(QGraphicsSceneMouseEvent *_event)
 }
 
 /////////////////////////////////////////////////
+void CMLNode::UpdateTextBoundingRect()
+{
+  QRectF pixRect = QGraphicsPixmapItem::boundingRect();
+  int margin = 6;
+  QRectF textRect = pixRect;
+  double halfHeight = pixRect.height()/2;
+  textRect.moveTop(pixRect.height());
+  textRect.setHeight(halfHeight);
+
+  QString nameText(this->name.c_str());
+  QFont font = this->textFont;
+  QFontMetrics fm(font);
+  int w = fm.width(nameText) + margin;
+  int dw = textRect.width() - w;
+  textRect.setWidth(w);
+  textRect.moveLeft(dw/2);
+
+  if (this->pixmap().isNull())
+  {
+    int h = fm.height() + margin;
+    textRect.setHeight(h);
+  }
+  this->textBoundingRect = textRect;
+}
+
+/////////////////////////////////////////////////
 void CMLNode::SetIcon(const std::string &_url)
 {
   this->setPixmap(QPixmap(QString(_url.c_str())));
+  this->UpdateTextBoundingRect();
+//  this->update(this->boundingRect());
 }

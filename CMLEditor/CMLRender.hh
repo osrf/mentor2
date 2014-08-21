@@ -84,6 +84,9 @@ namespace gazebo
       /// \brief Publish requests
       private: transport::PublisherPtr connectionPub;
 
+      /// \brief Publish rest posts
+      private: transport::PublisherPtr restPub;
+
       /// \brief Communication Node
       private: transport::NodePtr node;
 

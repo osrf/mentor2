@@ -49,12 +49,19 @@ namespace gazebo
       public: CMLNode *AddNode(const std::string &_name);
 
       /// \brief Remove a node from the scene.
+      /// \param[in] _name Name of the name.
       /// \param[in] _name Name of the node.
       public: void RemoveNode(const std::string &_name);
 
       /// \brief Check if a node exists in the scene.
+      /// \param[in] _name Name of the name.
       /// \return True if the node exists.
       public: bool HasNode(const std::string &_name);
+
+      /// \brief Get a node from the scene.
+      /// \param[in] _name Name of the name.
+      /// \return Pointer to the node, NULL if it does not exist.
+      public: CMLNode *GetNode(const std::string &_name);
 
       /// \brief Add an edge to connect two nodes.
       /// \param[in] _node1 Name of the first node.

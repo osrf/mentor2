@@ -53,6 +53,7 @@ CMLNode *CMLEditorScene::AddNode(const std::string &_name)
   this->nodes[_name] = node;
 
   this->addItem(node);
+
   return node;
 }
 
@@ -67,6 +68,15 @@ void CMLEditorScene::RemoveNode(const std::string &_name)
 bool CMLEditorScene::HasNode(const std::string &_name)
 {
   return (this->nodes.find(_name) != this->nodes.end());
+}
+
+/////////////////////////////////////////////////
+CMLNode *CMLEditorScene::GetNode(const std::string &_name)
+{
+  if (this->nodes.find(_name) != this->nodes.end())
+    return this->nodes[_name];
+  else
+    return NULL;
 }
 
 /////////////////////////////////////////////////
@@ -132,8 +142,8 @@ void CMLEditorScene::timerEvent(QTimerEvent *event)
 
    QList<CMLNode *> nodes;
    foreach (QGraphicsItem *item, this->items()) {
-       if (CMLNode *node = qgraphicsitem_cast<CMLNode *>(item))
-           nodes << node;
+     if (CMLNode *node = qgraphicsitem_cast<CMLNode *>(item))
+       nodes << node;
    }
 
    foreach (CMLNode *node, nodes)

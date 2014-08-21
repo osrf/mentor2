@@ -24,10 +24,13 @@
 #include <gazebo/gui/qt.h>
 
 #include "SimpleConnection.pb.h"
-
+#include "SimpleModel.pb.h"
 
 typedef const boost::shared_ptr<const Simple_msgs::msgs::SimpleConnection>
     ConstSimpleConnectionPtr;
+
+typedef const boost::shared_ptr<const Simple_msgs::msgs::SimpleModel>
+    ConstSimpleModelPtr;
 
 //class QGVScene;
 //class QGVNode;
@@ -69,10 +72,15 @@ namespace gazebo
       /// \param[in] _msg The message data.
       private: bool ProcessModelMsg(const msgs::Model &_msg);
 
-      /// \brief Process a sipmle connection message.
+      /// \brief Process a simple connection message.
       /// \param[in] _msg The message data.
       private: bool ProcessSimpleConnectionMsg(
           const Simple_msgs::msgs::SimpleConnection &_msg);
+
+      /// \brief Process a simple model message.
+      /// \param[in] _msg The message data.
+      private: bool ProcessSimpleModelMsg(
+          const Simple_msgs::msgs::SimpleModel &_msg);
 
       /// \brief Process all received messages.
       private: void PreRender();
@@ -81,9 +89,13 @@ namespace gazebo
       /// \param[in] _msg The message data.
       private: void OnResponse(ConstResponsePtr &_msg);
 
-      /// \brief Model connection message callback
+      /// \brief Simple connection message callback
       /// \param[in] _msg The message data.
       private: void OnSimpleConnection(ConstSimpleConnectionPtr &_msg);
+
+      /// \brief Simple model message callback
+      /// \param[in] _msg The message data.
+      private: void OnSimpleModel(ConstSimpleModelPtr &_msg);
 
       /// \brief Get the schematic representation of a component
       /// \param[in] _schematicType The schematic type for the component.
@@ -121,20 +133,30 @@ namespace gazebo
       /// \brief List of scene message to process.
       private: SceneMsgs_L sceneMsgs;
 
-      /// \def ModelConnectionMsgs_L
+      /// \def SimpleConnectionMsgs_L
       /// \brief List of simple connection messages.
       typedef std::list<boost::shared_ptr<
-          Simple_msgs::msgs::SimpleConnection const> >
-          SimpleConnectionMsgs_L;
+          Simple_msgs::msgs::SimpleConnection const> > SimpleConnectionMsgs_L;
 
       /// \brief List of simple connection message to process.
       private: SimpleConnectionMsgs_L simpleConnectionMsgs;
+
+      /// \def SimpleModelMsgs_L
+      /// \brief List of simple model messages.
+      typedef std::list<boost::shared_ptr<
+          Simple_msgs::msgs::SimpleModel const> > SimpleModelMsgs_L;
+
+      /// \brief List of simple model message to process.
+      private: SimpleModelMsgs_L simpleModelMsgs;
 
       /// \brief Communication Node
       private: transport::NodePtr node;
 
       /// \brief Subscribe to model info updates
       private: transport::SubscriberPtr simpleConnectionSub;
+
+      /// \brief Subscribe to model info updates
+      private: transport::SubscriberPtr simpleModelSub;
 
       /// \brief Subscribe to model info updates
       private: transport::SubscriberPtr modelInfoSub;
