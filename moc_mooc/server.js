@@ -81,7 +81,7 @@ app.get('/',
       
     res.write('<html>');
     // refresh the page every sec
-    res.write("<meta http-equiv=\"refresh\" content=\"1\" >");
+    res.write("<meta http-equiv=\"refresh\" content=\"2\" >");
     res.write('<script>\n');
     res.write('events = ' + JSON.stringify(all_events) + ';\n' );
     res.write('</script>\n');

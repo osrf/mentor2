@@ -112,7 +112,7 @@ void SimpleMOOCPlugin::OnEventRestPost(ConstRestPostPtr &_msg)
     else
     {
       event += "\"world\": {";
-      if( world->GetRunning() )
+      if(!world->IsPaused() )
       {
         event += "\"is_running\": \"true\", ";
       }
