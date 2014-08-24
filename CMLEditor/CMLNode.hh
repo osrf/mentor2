@@ -74,6 +74,9 @@ namespace gazebo
       /// \return The node's bounding rectangle
       public: QRectF boundingRect() const;
 */
+      /// \brief Get the bounding rect of this pixmap.
+      /// \return the pixmap's bounding rect.
+      public: QRectF GetPixmapBoundingRect();
 
       /// \brief Get the bounding rect of this node.
       /// \return the bounding rect.

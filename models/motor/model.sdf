@@ -34,9 +34,14 @@
         <type>mechanical</type>
       </port>
       <port>
-        <name>terminal</name>
+        <name>positive</name>
         <type>electrical</type>
       </port>
+      <port>
+        <name>negative</name>
+        <type>electrical</type>
+      </port>
+
       <properties>
         <max_current>10</max_current>
         <resistance>5</resistance>

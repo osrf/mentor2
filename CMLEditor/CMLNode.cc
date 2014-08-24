@@ -269,6 +269,12 @@ void CMLNode::UpdateTextBoundingRect()
 }
 
 /////////////////////////////////////////////////
+QRectF CMLNode::GetPixmapBoundingRect()
+{
+  return QGraphicsPixmapItem::boundingRect();
+}
+
+/////////////////////////////////////////////////
 void CMLNode::SetIcon(const std::string &_url)
 {
   this->setPixmap(QPixmap(QString(_url.c_str())));

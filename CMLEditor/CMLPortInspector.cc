@@ -71,7 +71,10 @@ void CMLPortInspector::Load(const Simple_msgs::msgs::SimpleModel *_msg)
 {
   for (int i = 0; i < _msg->port_size(); ++i)
   {
+    QHBoxLayout *radioLayout = new QHBoxLayout;
     QRadioButton *button = new QRadioButton(tr(_msg->port(i).c_str()));
+    button->setStyleSheet("QRadioButton { color: #d0d0d0 }");
+
     this->portsButtonGroup->addButton(button);
     this->portsLayout->addWidget(button);
   }
@@ -86,7 +89,7 @@ void CMLPortInspector::Load(const Simple_msgs::msgs::SimpleModel *_msg)
 /////////////////////////////////////////////////
 void CMLPortInspector::OnCancel()
 {
-  this->close();
+  this->reject();
 }
 
 /////////////////////////////////////////////////

@@ -222,7 +222,10 @@ bool CMLConnectionMaker::OnMouseRelease(const common::MouseEvent &_event)
 
         // select port, blocking call.
         if (!this->SelectPort())
+        {
+          this->Stop();
           return false;
+        }
 
         this->hoverVis->SetEmissive(common::Color(0, 0, 0));
         this->selectedVis = this->hoverVis;
@@ -238,7 +241,9 @@ bool CMLConnectionMaker::OnMouseRelease(const common::MouseEvent &_event)
       {
         // select port, blocking call.
         if (!this->SelectPort())
+        {
           return false;
+        }
 
         if (this->hoverVis)
           this->hoverVis->SetEmissive(common::Color(0, 0, 0));
@@ -277,8 +282,11 @@ bool CMLConnectionMaker::SelectPort()
   Simple_msgs::msgs::SimpleModel msg;
   msg = CMLManager::Instance()->GetModelInfo(name);
 
+  bool accept = true;
   if (msg.port_size() > 0)
   {
+    QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+
     CMLPortInspector *inspector =
         new CMLPortInspector(gui::get_main_window());
 
@@ -291,9 +299,11 @@ bool CMLConnectionMaker::SelectPort()
     inspector->Load(&msg);
     int ret = inspector->exec();
     if (ret != QDialog::Accepted)
-      return false;
+      accept = false;
+
+    QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
   }
-  return true;
+  return accept;
 }
 
 /////////////////////////////////////////////////
@@ -353,6 +363,8 @@ void CMLConnectionMaker::AddConnection(CMLConnectionMaker::ConnectType _type)
     // mouse events.
     MouseEventHandler::Instance()->AddMoveFilter("cml_connection",
         boost::bind(&CMLConnectionMaker::OnMouseMove, this, _1));
+
+    QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
   }
   else
   {
@@ -396,6 +408,8 @@ void CMLConnectionMaker::Stop()
 
     // Remove the event filters.
     MouseEventHandler::Instance()->RemoveMoveFilter("cml_connection");
+
+    QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
   }
 }
 
@@ -417,7 +431,9 @@ bool CMLConnectionMaker::OnMouseMove(const common::MouseEvent &_event)
   if (vis)
   {
     if (this->hoverVis && this->hoverVis != this->selectedVis)
+    {
       this->hoverVis->SetEmissive(common::Color(0.0, 0.0, 0.0));
+    }
 
     // only highlight editor entities by making sure it's not an item in the
     // gui tree widget or a connection hotspot.

@@ -51,13 +51,13 @@ CMLEdge::~CMLEdge()
 /////////////////////////////////////////////////
 CMLNode *CMLEdge::GetSourceNode() const
 {
-  return source;
+  return this->source;
 }
 
 /////////////////////////////////////////////////
 CMLNode *CMLEdge::GetDestNode() const
 {
-  return dest;
+  return this->dest;
 }
 
 /////////////////////////////////////////////////
@@ -66,19 +66,24 @@ void CMLEdge::Adjust()
   if (!source || !dest)
     return;
 
-  QLineF line(mapFromItem(source, 0, 0), mapFromItem(dest, 0, 0));
+  QRectF srcRect = this->source->GetPixmapBoundingRect();
+  QRectF destRect = this->dest->GetPixmapBoundingRect();
+
+  QLineF line(mapFromItem(this->source, srcRect.right(), srcRect.center().y()),
+      mapFromItem(this->dest, destRect.left(), srcRect.center().y()));
   qreal length = line.length();
 
   prepareGeometryChange();
 
   if (length > qreal(20.))
   {
-    QPointF edgeOffset((line.dx() * 10) / length, (line.dy() * 10) / length);
-    sourcePoint = line.p1() + edgeOffset;
-    destPoint = line.p2() - edgeOffset;
+//    QPointF edgeOffset((line.dx() * 10) / length, (line.dy() * 10) / length);
+    QPointF edgeOffset;
+    this->sourcePoint = line.p1() + edgeOffset;
+    this->destPoint = line.p2() - edgeOffset;
   } else
   {
-    sourcePoint = destPoint = line.p1();
+    this->sourcePoint = this->destPoint = line.p1();
   }
 }
 
@@ -91,9 +96,9 @@ QRectF CMLEdge::boundingRect() const
   qreal penWidth = 1;
   qreal extra = (penWidth + arrowSize) / 2.0;
 
-  return QRectF(sourcePoint,
-    QSizeF(destPoint.x() - sourcePoint.x(), destPoint.y() - sourcePoint.y()))
-    .normalized()
+  return QRectF(this->sourcePoint,
+    QSizeF(this->destPoint.x() - this->sourcePoint.x(),
+        this->destPoint.y() - this->sourcePoint.y())).normalized()
     .adjusted(-extra, -extra, extra, extra);
 }
 
@@ -104,7 +109,7 @@ void CMLEdge::paint(QPainter *_painter,
   if (!source || !dest)
     return;
 
-  QLineF line(sourcePoint, destPoint);
+  QLineF line(this->sourcePoint, this->destPoint);
   if (qFuzzyCompare(line.length(), qreal(0.)))
      return;
 
