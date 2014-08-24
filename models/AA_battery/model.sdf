@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <sdf version="1.5">
-  <model name="AA_battery">
+  <model name="AA battery">
     <pose>0 0 0.07 0 0 0</pose>
     <link name="link">
       <collision name="collision">
