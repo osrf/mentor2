@@ -16,6 +16,7 @@
 */
 
 #include <gazebo/gui/qt.h>
+#include <gazebo/gui/TimePanel.hh>
 #include <gazebo/gui/MainWindow.hh>
 #include <gazebo/gui/RenderWidget.hh>
 
@@ -37,14 +38,13 @@ CMLEditor::CMLEditor(MainWindow *_mainWindow)
 //  connect(g_editBuildingAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
 //  this->menuBar = NULL;
 
-  this->CMLEditorWidget = new gazebo::gui::CMLEditorWidget(
-      this->mainWindow->GetRenderWidget());
+  RenderWidget *renderWidget = this->mainWindow->GetRenderWidget();
+  this->CMLEditorWidget = new gazebo::gui::CMLEditorWidget(renderWidget);
   this->CMLEditorWidget->setSizePolicy(QSizePolicy::Expanding,
       QSizePolicy::Expanding);
 //  this->CMLEditorWidget->hide();
 
-  this->mainWindow->GetRenderWidget()->InsertWidget(0,
-      this->CMLEditorWidget);
+  renderWidget->InsertWidget(0, this->CMLEditorWidget);
 
   this->OnEdit(true);
 }
@@ -57,6 +57,13 @@ CMLEditor::~CMLEditor()
 /////////////////////////////////////////////////
 void CMLEditor::OnEdit(bool _checked)
 {
+  RenderWidget *renderWidget = this->mainWindow->GetRenderWidget();
+  TimePanel *timePanel = renderWidget->GetTimePanel();
+  timePanel->ShowSimTime(!_checked);
+  timePanel->ShowRealTimeFactor(!_checked);
+  timePanel->ShowStepWidget(!_checked);
+  timePanel->ShowIterations(!_checked);
+
   if (_checked)
   {
     this->mainWindow->ShowLeftColumnWidget("CMLEditorTab");
