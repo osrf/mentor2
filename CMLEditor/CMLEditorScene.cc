@@ -42,6 +42,10 @@ CMLEditorScene::~CMLEditorScene()
 /////////////////////////////////////////////////
 CMLNode *CMLEditorScene::AddNode(const std::string &_name)
 {
+  // Note don't show the ground plane
+  if (_name.find("plane") != std::string::npos)
+    return NULL;
+
   if (this->nodes.find(_name) != this->nodes.end())
   {
     std::cerr << "A node with the name: '" << _name <<  "' already exists"
