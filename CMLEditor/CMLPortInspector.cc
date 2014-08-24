@@ -29,6 +29,8 @@ CMLPortInspector::CMLPortInspector(QWidget *_parent)
 
   this->setWindowTitle(tr("Select a Port"));
 
+  this->setMinimumWidth(150);
+
 /*  QGroupBox *electricalGroupBox = new QGroupBox(tr("Electrical"));
   electricalGroupBox->setLayout(electricalLayout);
 
