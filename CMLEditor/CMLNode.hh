@@ -18,11 +18,7 @@
  #ifndef CML_NODE_HH
  #define CML_NODE_HH
 
-#include <QGraphicsItem>
-#include <QList>
-#include <QFont>
-
-class QGraphicsSceneMouseEvent;
+#include <gazebo/gui/gui.hh>
 
 namespace gazebo
 {
@@ -33,8 +29,10 @@ namespace gazebo
 
     /// \class CMLNode CMLNode.hh
     /// \brief A node in the CML editor
-    class CMLNode : public QGraphicsPixmapItem
+    class CMLNode : public QObject, public QGraphicsPixmapItem
     {
+      Q_OBJECT
+
       public: enum { Type = UserType + 1 };
 
       /// \brief Constructor.
@@ -112,6 +110,14 @@ namespace gazebo
       /// \param[in] _event Qt mouse event.
       protected: void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
+      /// \brief Qt context menu event received on a mouse right click.
+      /// \param[in] Qt context menu event.
+      private: virtual void contextMenuEvent(
+          QGraphicsSceneContextMenuEvent *_event);
+
+      /// \brief Qt Callback to open component inspector
+      private slots: void OnOpenInspector();
+
       /// \brief Update the name label bounding box.
       private: void UpdateTextBoundingRect();
 
@@ -130,6 +136,9 @@ namespace gazebo
 
       /// \brief Font for the name label.
       private: QFont textFont;
+
+      /// \brief Qt action for opening the component inspector.
+      private: QAction *inspectAct;
     };
   }
 }

@@ -290,11 +290,13 @@ bool CMLConnectionMaker::SelectPort()
     CMLPortInspector *inspector =
         new CMLPortInspector(gui::get_main_window());
 
-    inspector->move(
-        gui::get_main_window()->pos().x() +
+
+
+    inspector->move(QCursor::pos());
+/*        gui::get_main_window()->pos().x() +
         this->mouseEvent.pos.x,
         gui::get_main_window()->pos().y() +
-        this->mouseEvent.pos.y);
+        this->mouseEvent.pos.y);*/
     inspector->setModal(true);
     inspector->Load(&msg);
     int ret = inspector->exec();

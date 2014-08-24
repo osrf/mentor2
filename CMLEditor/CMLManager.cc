@@ -15,7 +15,11 @@
  *
 */
 
-#include "gazebo/transport/transport.hh"
+#include <gazebo/transport/transport.hh>
+#include <gazebo/gui/gui.hh>
+
+#include "CMLComponentInspector.hh"
+
 #include "CMLManager.hh"
 
 using namespace gazebo;
@@ -121,4 +125,30 @@ void CMLManager::OnSimpleModel(ConstSimpleModelPtr &_msg)
   // TODO ~/simple/model/info doesn't get messages so this doesn't get called.
   boost::recursive_mutex::scoped_lock lock(*this->modelInfoMutex);
   this->modelInfo[_msg->name()] = *_msg.get();
+}
+
+/////////////////////////////////////////////////
+bool CMLManager::ShowInspector(const std::string &_name)
+{
+  boost::recursive_mutex::scoped_lock lock(*this->modelInfoMutex);
+  if (this->modelInfo.find(_name) == this->modelInfo.end())
+    return false;
+
+  CMLComponentInspector *inspector = NULL;
+  if (this->componentInspectors.find(_name) != this->componentInspectors.end())
+  {
+    inspector = this->componentInspectors[_name];
+    inspector->activateWindow();
+    inspector->setFocus();
+  }
+  else
+  {
+    inspector = new CMLComponentInspector(gui::get_main_window());
+    inspector->Load(&this->modelInfo[_name]);
+    this->componentInspectors[_name] = inspector;
+    /*connect(inspector, SIGNAL(Applied()), this,
+        SLOT(OnComponentProperyChanged()));*/
+  }
+  inspector->show();
+  return true;
 }

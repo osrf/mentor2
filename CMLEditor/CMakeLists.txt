@@ -39,6 +39,7 @@ set (qt_headers
   CMLEditorScene.hh
   CMLEditorView.hh
   CMLItemListWidget.hh
+  CMLNode.hh
   CMLPortInspector.hh
   CMLRender.hh
   RectItem.hh
@@ -51,7 +52,6 @@ set (headers
   CMLEditorWidget.hh
   CMLEvents.hh
   CMLManager.hh
-  CMLNode.hh
   GrabberHandle.hh
   RotateHandle.hh
 )

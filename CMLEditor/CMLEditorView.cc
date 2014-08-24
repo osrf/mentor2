@@ -51,10 +51,19 @@ void CMLEditorView::resizeEvent(QResizeEvent *_event)
 /////////////////////////////////////////////////
 void CMLEditorView::contextMenuEvent(QContextMenuEvent *_event)
 {
-  QMenu menu(this);
+
+  QGraphicsItem *item = this->scene()->itemAt(this->mapToScene(_event->pos()));
+  if (item)
+  {
+    _event->ignore();
+    QGraphicsView::contextMenuEvent(_event);
+    return;
+  }
+
+/*  QMenu menu(this);
   //menu.addAction(this->addLevelAct);
   menu.exec(_event->globalPos());
-  _event->accept();
+  _event->accept();*/
 }
 
 /////////////////////////////////////////////////

@@ -16,10 +16,13 @@
 */
 
 #include <iostream>
+#include <gazebo/gui/gui.hh>
 
- #include "CMLEdge.hh"
- #include "CMLNode.hh"
- #include "CMLEditorScene.hh"
+#include "CMLManager.hh"
+#include "CMLEditorScene.hh"
+#include "CMLEdge.hh"
+#include "CMLNode.hh"
+
 
 using namespace gazebo;
 using namespace gui;
@@ -36,6 +39,10 @@ CMLNode::CMLNode(const std::string &_name, CMLEditorScene *_scene)
   this->textFont.setPointSize(12);;
 
   this->UpdateTextBoundingRect();
+
+  this->inspectAct = new QAction(tr("Open Inspector"), this);
+  connect(this->inspectAct, SIGNAL(triggered()), this,
+      SLOT(OnOpenInspector()));
 
   //this->setPlainText(tr(this->name.c_str()));
 }
@@ -280,4 +287,24 @@ void CMLNode::SetIcon(const std::string &_url)
   this->setPixmap(QPixmap(QString(_url.c_str())));
   this->UpdateTextBoundingRect();
 //  this->update(this->boundingRect());
+}
+
+/////////////////////////////////////////////////
+void CMLNode::contextMenuEvent(QGraphicsSceneContextMenuEvent *_event)
+{
+  ModelRightMenu *contextMenu = gui::get_context_menu();
+  if (contextMenu)
+  {
+    std::vector<QAction *> menuAction;
+    menuAction.push_back(this->inspectAct);
+    contextMenu->Run(this->name, QCursor::pos(), menuAction);
+    _event->accept();
+  }
+  QGraphicsPixmapItem::contextMenuEvent(_event);
+}
+
+/////////////////////////////////////////////////
+void CMLNode::OnOpenInspector()
+{
+  CMLManager::Instance()->ShowInspector(this->name);
 }

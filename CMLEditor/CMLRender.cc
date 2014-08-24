@@ -77,10 +77,10 @@ CMLRender::CMLRender()
   this->requestSub = this->node->Subscribe("~/request",
     &CMLRender::OnRequest, this);
 
+  this->inspectName = "";
   this->inspectAct = new QAction(tr("Open Inspector"), this);
   connect(this->inspectAct, SIGNAL(triggered()), this,
       SLOT(OnOpenInspector()));
-
 }
 
 /////////////////////////////////////////////////
@@ -123,18 +123,26 @@ bool CMLRender::OnMouseRelease(const common::MouseEvent &_event)
     {
       rendering::VisualPtr rootVis = vis->GetRootVisual();
       std::string name = rootVis->GetName();
+
       Simple_msgs::msgs::SimpleModel msg;
       msg = CMLManager::Instance()->GetModelInfo(name);
 
       if (!msg.name().empty())
       {
         std::cerr << " name " << name << " " << msg.name() << std::endl;
-        this->inspectMsg = msg;
+        this->inspectName = msg.name();
+        //this->inspectMsg = msg;
 
-        QMenu menu;
-        menu.addAction(this->inspectAct);
-        menu.exec(QCursor::pos());
-        return true;
+        ModelRightMenu *contextMenu = gui::get_context_menu();
+        if (contextMenu)
+        {
+          std::vector<QAction *> menuAction;
+          menuAction.push_back(this->inspectAct);
+          contextMenu->Run(name, QCursor::pos(), menuAction);
+          return true;
+        }
+        else
+          return false;
       }
     }
   }
@@ -237,21 +245,6 @@ void CMLRender::OnConnectionCreated(const std::string &_parent,
 /////////////////////////////////////////////////
 void CMLRender::OnOpenInspector()
 {
-  CMLComponentInspector *inspector = NULL;
-  if (this->componentInspectors.find(this->inspectMsg.name()) !=
-      this->componentInspectors.end())
-  {
-    inspector = this->componentInspectors[this->inspectMsg.name()];
-    inspector->activateWindow();
-    inspector->setFocus();
-  }
-  else
-  {
-    inspector = new CMLComponentInspector(gui::get_main_window());
-    inspector->Load(&this->inspectMsg);
-    this->componentInspectors[this->inspectMsg.name()] = inspector;
-    /*connect(inspector, SIGNAL(Applied()), this,
-        SLOT(OnComponentProperyChanged()));*/
-  }
-  inspector->show();
+  CMLManager::Instance()->ShowInspector(this->inspectName);
+  this->inspectName = "";
 }

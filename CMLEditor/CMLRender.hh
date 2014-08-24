@@ -102,11 +102,10 @@ namespace gazebo
 
       /// \brief SimpleModel message associated to the current component being
       /// inspected.
-      private: Simple_msgs::msgs::SimpleModel inspectMsg;
+//      private: Simple_msgs::msgs::SimpleModel inspectMsg;
 
-      /// \brief A map of component name to its inspector.
-      private: std::map<std::string, CMLComponentInspector *>
-          componentInspectors;
+      /// \brief Name of component to be inspected.
+      private: std::string inspectName;
     };
   }
 }

@@ -29,6 +29,8 @@ namespace gazebo
 {
   namespace gui
   {
+    class CMLComponentInspector;
+
     /// \class CMLEditor CMLEditor.hh gui/gui.hh
     /// \brief Interface to the CML editor.
     class CMLManager : public SingletonT<CMLManager>
@@ -42,9 +44,15 @@ namespace gazebo
       /// \brief Initialize the manager
       public: void Init();
 
-      /// \brief Initialize the manager
-      public: Simple_msgs::msgs::SimpleModel
-          GetModelInfo(const std::string &_name);
+      /// \brief Get data of a component
+      /// \param[in] _name Node of the component
+      public: Simple_msgs::msgs::SimpleModel GetModelInfo(
+          const std::string &_name);
+
+      /// \brief Show an inspector for configuring component properties.
+      /// \param[in] _Name of component.
+      /// \return True if the component exists.
+      public: bool ShowInspector(const std::string &_name);
 
       /// \brief Callback when a response message is received.
       /// \param[in] Pointer to the response message.
@@ -85,6 +93,10 @@ namespace gazebo
 
       /// \brief A flag to indicate if the manager is initialized or not.
       private: bool initialized;
+
+      /// \brief A map of component name to its inspector.
+      private: std::map<std::string, CMLComponentInspector *>
+          componentInspectors;
 
       /// \brief This is a singleton class.
       private: friend class SingletonT<CMLManager>;
