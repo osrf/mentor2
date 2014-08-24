@@ -73,6 +73,12 @@ void CMLPortInspector::Load(const Simple_msgs::msgs::SimpleModel *_msg)
     this->portsButtonGroup->addButton(button);
     this->portsLayout->addWidget(button);
   }
+  // By default, check the first port
+  QList<QAbstractButton *> buttons = this->portsButtonGroup->buttons();
+  if (buttons.size() > 0)
+  {
+    buttons[0]->setChecked(true);
+  }
 }
 
 /////////////////////////////////////////////////
