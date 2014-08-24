@@ -295,10 +295,15 @@ void CMLEditorPalette::OnComponentSelected(QString _component)
   {
     // populate with some test items.
     std::map<std::string, std::string> items;
-    items["AA Battery"] = "AA_battery";
     items["Motor"] = "motor";
-    items["Power Switch"] = "power_switch";
-    items["Battery Holder"] = "battery_holder";
+    if (_component.toStdString() == "Electrical")
+    {
+      items["AA Battery"] = "AA_battery";
+      items["Power Switch"] = "power_switch";
+    }
+    else
+      items["Battery Holder"] = "battery_holder";
+
     this->itemListWidget->Populate(items);
   }
 
