@@ -18,6 +18,7 @@
 #ifndef _CML_EDITOR_WIDGET_HH_
 #define _CML_EDITOR_WIDGET_HH_
 
+#include <set>
 #include <boost/thread/mutex.hpp>
 
 #include <gazebo/msgs/msgs.hh>
@@ -66,21 +67,30 @@ namespace gazebo
 
       /// \brief Process a scene message.
       /// \param[in] _msg The message data.
+      /// \return True if the message is processed.
       private: bool ProcessSceneMsg(ConstScenePtr &_msg);
 
       /// \brief Process a model message.
       /// \param[in] _msg The message data.
+      /// \return True if the message is processed.
       private: bool ProcessModelMsg(const msgs::Model &_msg);
 
       /// \brief Process a simple connection message.
       /// \param[in] _msg The message data.
+      /// \return True if the message is processed.
       private: bool ProcessSimpleConnectionMsg(
           const Simple_msgs::msgs::SimpleConnection &_msg);
 
       /// \brief Process a simple model message.
       /// \param[in] _msg The message data.
+      /// \return True if the message is processed.
       private: bool ProcessSimpleModelMsg(
           const Simple_msgs::msgs::SimpleModel &_msg);
+
+      /// \brief Process remove entity requests.
+      /// \param[in] _name Name of the entity removed.
+      /// \return True if the remove entity process is successful.
+      private: bool ProcessRemoveEntity(const std::string &_name);
 
       /// \brief Process all received messages.
       private: void PreRender();
@@ -88,6 +98,10 @@ namespace gazebo
       /// \brief Response callback
       /// \param[in] _msg The message data.
       private: void OnResponse(ConstResponsePtr &_msg);
+
+      /// \brief Request callback
+      /// \param[in] _msg Teh message data.
+      private: void OnRequest(ConstRequestPtr &_msg);
 
       /// \brief Simple connection message callback
       /// \param[in] _msg The message data.
@@ -167,11 +181,17 @@ namespace gazebo
       /// \brief Subscribe to reponses.
       private: transport::SubscriberPtr responseSub;
 
+      /// \brief Subscribe to requests.
+      private: transport::SubscriberPtr requestSub;
+
       /// \brief Publish requests
       private: transport::PublisherPtr requestPub;
 
       /// \brief Keep around our request message.
       private: msgs::Request *requestMsg;
+
+      // \brief A list of entities to be removed.
+      private: std::set<std::string> removeEntityList;
 
       //private: std::vector<QGVNode *> graphNodes;
     };

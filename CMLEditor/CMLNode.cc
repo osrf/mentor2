@@ -40,11 +40,32 @@ CMLNode::CMLNode(const std::string &_name, CMLEditorScene *_scene)
   //this->setPlainText(tr(this->name.c_str()));
 }
 
+
+/////////////////////////////////////////////////
+std::string CMLNode::GetName() const
+{
+  return this->name;
+}
+
 /////////////////////////////////////////////////
 void CMLNode::AddEdge(CMLEdge *_edge)
 {
   edgeList << _edge;
   _edge->Adjust();
+}
+
+/////////////////////////////////////////////////
+bool CMLNode::HasEdge(CMLEdge *_edge)
+{
+  return edgeList.indexOf(_edge) >= 0;
+}
+
+/////////////////////////////////////////////////
+void CMLNode::RemoveEdge(CMLEdge *_edge)
+{
+  int index = edgeList.indexOf(_edge);
+  if (index >= 0)
+    edgeList.takeAt(index);
 }
 
 /////////////////////////////////////////////////
@@ -95,7 +116,7 @@ void CMLNode::calculateForces()
      yvel -= vec.y() / weight;
   }*/
 
-  std::cerr << "vel " << xvel << " " << yvel << std::endl;
+  //std::cerr << "vel " << xvel << " " << yvel << std::endl;
 
   if (qAbs(xvel) < 6.0 && qAbs(yvel) < 6.0)
      xvel = yvel = 0;

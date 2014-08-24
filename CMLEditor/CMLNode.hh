@@ -50,6 +50,19 @@ namespace gazebo
       /// \return A list of connected edges.
       public: QList<CMLEdge *> GetEdges() const;
 
+      /// \brief Check if the node has the specified edge.
+      /// \param[in] _edge Edge
+      /// \return True if the node has the edge.
+      public: bool HasEdge(CMLEdge *_edge);
+
+      /// \brief Remove an edge from the node.
+      /// \param[in] _edge Edge to be removed.
+      public: void RemoveEdge(CMLEdge *_edge);
+
+      /// \brief Get the name of this graphics item.
+      /// \return Name of this item.
+      public: std::string GetName() const;
+
       /// \brief Get the type of this graphics item.
       /// \return Type of this item.
       public: int GetType() const { return Type; }

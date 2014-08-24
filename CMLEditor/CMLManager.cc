@@ -66,6 +66,9 @@ void CMLManager::Init()
   this->requestMsg = msgs::CreateRequest("entity_info", "");
   this->requestPub->Publish(*this->requestMsg);
 
+  this->requestSub = this->node->Subscribe("~/request",
+    &CMLManager::OnRequest, this);
+
   this->initialized = true;
 }
 
@@ -81,6 +84,16 @@ Simple_msgs::msgs::SimpleModel CMLManager::GetModelInfo(
     // return empty msg for now if nothing is found.
     Simple_msgs::msgs::SimpleModel empty;
     return empty;
+  }
+}
+
+/////////////////////////////////////////////////
+void CMLManager::OnRequest(ConstRequestPtr &_msg)
+{
+  if (_msg->request() == "entity_delete")
+  {
+    if (this->modelInfo.find(_msg->data()) != this->modelInfo.end())
+        this->modelInfo.erase(_msg->data());
   }
 }
 

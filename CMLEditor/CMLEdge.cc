@@ -41,6 +41,14 @@ CMLEdge::CMLEdge(CMLNode *sourceNode, CMLNode *destNode)
 }
 
 /////////////////////////////////////////////////
+CMLEdge::~CMLEdge()
+{
+//  std::cerr << "edge destructor " << std::endl;
+//  this->source->RemoveEdge(this);
+//  this->dest->RemoveEdge(this);
+}
+
+/////////////////////////////////////////////////
 CMLNode *CMLEdge::GetSourceNode() const
 {
   return source;

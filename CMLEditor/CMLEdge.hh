@@ -35,6 +35,9 @@ namespace gazebo
       /// \param[in] _destNode Destination node of the edge.
       public: CMLEdge(CMLNode *_sourceNode, CMLNode *_destNode);
 
+      /// \brief Destructor;
+      public: ~CMLEdge();
+
       /// \brief Get the source node.
       /// \return Source node.
       public: CMLNode *GetSourceNode() const;

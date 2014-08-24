@@ -50,7 +50,6 @@ namespace gazebo
 
       /// \brief Remove a node from the scene.
       /// \param[in] _name Name of the name.
-      /// \param[in] _name Name of the node.
       public: void RemoveNode(const std::string &_name);
 
       /// \brief Check if a node exists in the scene.

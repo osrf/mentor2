@@ -74,6 +74,9 @@ CMLRender::CMLRender()
       this->node->Advertise<Event_msgs::msgs::RestPost>(
       "~/event/rest_post");
 
+  this->requestSub = this->node->Subscribe("~/request",
+    &CMLRender::OnRequest, this);
+
   this->inspectAct = new QAction(tr("Open Inspector"), this);
   connect(this->inspectAct, SIGNAL(triggered()), this,
       SLOT(OnOpenInspector()));
@@ -97,6 +100,14 @@ bool CMLRender::OnMousePress(const common::MouseEvent &_event)
 
   return false;
 }*/
+
+
+/////////////////////////////////////////////////
+void CMLRender::OnRequest(ConstRequestPtr &_msg)
+{
+  if (_msg->request() == "entity_delete")
+    CMLConnectionMaker::Instance()->RemoveConnectionsByEntity(_msg->data());
+}
 
 /////////////////////////////////////////////////
 bool CMLRender::OnMouseRelease(const common::MouseEvent &_event)

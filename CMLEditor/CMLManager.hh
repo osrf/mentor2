@@ -54,6 +54,10 @@ namespace gazebo
       /// \param[in] Pointer to the simple model message.
       private: void OnSimpleModel(ConstSimpleModelPtr &_msg);
 
+      /// \brief Callback when a request message is received.
+      /// \param[in] _msg The request message.
+      private: void OnRequest(ConstRequestPtr &_msg);
+
       /// \brief Transport node.
       private: transport::NodePtr node;
 
@@ -65,6 +69,9 @@ namespace gazebo
 
       /// \brief Publisher for request messages.
       private: transport::PublisherPtr requestPub;
+
+      /// \brief Subscriber for request messages.
+      private: transport::SubscriberPtr requestSub;
 
       /// \brief A request message to retrieve all simple models.
       private: msgs::Request *requestMsg;

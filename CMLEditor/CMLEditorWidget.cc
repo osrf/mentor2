@@ -106,6 +106,9 @@ CMLEditorWidget::CMLEditorWidget(QWidget *_parent)
   this->requestPub->WaitForConnection();
   this->requestMsg = msgs::CreateRequest("scene_info");
   this->requestPub->Publish(*this->requestMsg);
+
+  this->requestSub = this->node->Subscribe("~/request",
+      &CMLEditorWidget::OnRequest, this);
 }
 
 /////////////////////////////////////////////////
@@ -113,6 +116,16 @@ CMLEditorWidget::~CMLEditorWidget()
 {
   delete this->requestMsg;
   this->requestMsg = NULL;
+}
+
+/////////////////////////////////////////////////
+void CMLEditorWidget::OnRequest(ConstRequestPtr &_msg)
+{
+  if (_msg->request() == "entity_delete")
+  {
+    boost::mutex::scoped_lock lock(*this->receiveMutex);
+    this->removeEntityList.insert(_msg->data());
+  }
 }
 
 /////////////////////////////////////////////////
@@ -226,6 +239,14 @@ bool CMLEditorWidget::ProcessSimpleConnectionMsg(
   return true;
 }
 
+
+//////////////////////////////////////////////////
+bool CMLEditorWidget::ProcessRemoveEntity(const std::string &_name)
+{
+  this->scene->RemoveNode(_name);
+  return true;
+}
+
 //////////////////////////////////////////////////
 void CMLEditorWidget::PreRender()
 {
@@ -238,6 +259,7 @@ void CMLEditorWidget::PreRender()
   ModelMsgs_L modelMsgsCopy;
   SimpleConnectionMsgs_L simpleConnectionMsgsCopy;
   SimpleModelMsgs_L simpleModelMsgsCopy;
+  std::set<std::string> removeEntityCopy;
 
   {
     boost::mutex::scoped_lock lock(*this->receiveMutex);
@@ -259,6 +281,9 @@ void CMLEditorWidget::PreRender()
         this->simpleModelMsgs.end(),
         std::back_inserter(simpleModelMsgsCopy));
     this->simpleModelMsgs.clear();
+
+    removeEntityCopy = this->removeEntityList;
+    this->removeEntityList.clear();
   }
 
   // Process the scene messages. DO THIS FIRST
@@ -298,6 +323,15 @@ void CMLEditorWidget::PreRender()
     else
       ++simpleModelIter;
   }
+
+  // Process the remove entity messages.
+  for (std::set<std::string>::iterator removeEntityIter
+      = removeEntityCopy.begin(); removeEntityIter != removeEntityCopy.end();
+      ++removeEntityIter)
+  {
+    this->ProcessRemoveEntity(*removeEntityIter);
+  }
+  removeEntityCopy.clear();
 }
 
 //////////////////////////////////////////////////

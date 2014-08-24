@@ -75,6 +75,10 @@ namespace gazebo
       private: void OnConnectionCreated(const std::string &_parent,
           const std::string &_child);
 
+      /// \brief Callback when a request message is received.
+      /// \param[in] _msg The request message.
+      private: void OnRequest(ConstRequestPtr &_msg);
+
       /// \brief Qt Callback to open component inspector
       private slots: void OnOpenInspector();
 
@@ -83,6 +87,9 @@ namespace gazebo
 
       /// \brief Publish requests
       private: transport::PublisherPtr connectionPub;
+
+      /// \brief Subscriber for request messages.
+      private: transport::SubscriberPtr requestSub;
 
       /// \brief Publish rest posts
       private: transport::PublisherPtr restPub;

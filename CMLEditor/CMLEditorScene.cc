@@ -61,7 +61,25 @@ CMLNode *CMLEditorScene::AddNode(const std::string &_name)
 void CMLEditorScene::RemoveNode(const std::string &_name)
 {
   if (this->nodes.find(_name) != this->nodes.end())
-    this->removeItem(this->nodes[_name]);
+  {
+    CMLNode *node = this->nodes[_name];
+    QList<CMLEdge *> edges = node->GetEdges();
+    for (int i = 0; i < edges.size(); ++i)
+    {
+      if (edges[i]->GetSourceNode() == node)
+      {
+        edges[i]->GetDestNode()->RemoveEdge(edges[i]);
+      }
+      else
+      {
+        edges[i]->GetSourceNode()->RemoveEdge(edges[i]);
+      }
+
+      this->removeItem(edges[i]);
+    }
+    this->removeItem(node);
+    this->nodes.erase(_name);
+  }
 }
 
 /////////////////////////////////////////////////
