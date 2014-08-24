@@ -113,7 +113,7 @@ void CMLEdge::paint(QPainter *_painter,
       QPen(Qt::black, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
   _painter->drawLine(line);
 
-  // Draw the arrows
+/*  // Draw the arrows
   double angle = ::acos(line.dx() / line.length());
   if (line.dy() >= 0)
      angle = TwoPi - angle;
@@ -135,5 +135,5 @@ void CMLEdge::paint(QPainter *_painter,
   _painter->drawPolygon(
       QPolygonF() << line.p1() << sourceArrowP1 << sourceArrowP2);
   _painter->drawPolygon(
-      QPolygonF() << line.p2() << destArrowP1 << destArrowP2);
+      QPolygonF() << line.p2() << destArrowP1 << destArrowP2);*/
 }

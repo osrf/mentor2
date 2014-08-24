@@ -33,6 +33,8 @@ CMLComponentInspector::CMLComponentInspector(QWidget *_parent)
 
   this->setWindowTitle(tr("Component Inspector"));
 
+  this->setMinimumWidth(220);
+
 /*  QGroupBox *electricalGroupBox = new QGroupBox(tr("Electrical"));
   electricalGroupBox->setLayout(electricalLayout);
 
@@ -70,12 +72,17 @@ CMLComponentInspector::~CMLComponentInspector()
 /////////////////////////////////////////////////
 void CMLComponentInspector::Load(const Simple_msgs::msgs::SimpleModel *_msg)
 {
+  QLabel *nameLabel = new QLabel(tr("Name"));
+  QLabel *nameValueLabel = new QLabel(tr(_msg->name().c_str()));
+  this->propertyLayout->addWidget(nameLabel, 0, 0);
+  this->propertyLayout->addWidget(nameValueLabel, 0, 1);
+
   for (int i = 0; i < _msg->key_size(); ++i)
   {
     QLabel *keyLabel = new QLabel(tr(_msg->key(i).c_str()));
     QWidget *valueWidget = this->GetValueWidget(&_msg->value(i));
-    this->propertyLayout->addWidget(keyLabel, i, 0);
-    this->propertyLayout->addWidget(valueWidget, i, 1);
+    this->propertyLayout->addWidget(keyLabel, i+1, 0);
+    this->propertyLayout->addWidget(valueWidget, i+1, 1);
   }
 }
 
