@@ -180,18 +180,18 @@ void CMLNode::paint(QPainter *_painter, const QStyleOptionGraphicsItem *_option,
   _painter->setBrush(Qt::darkGray);
   _painter->drawRect(pixRect);
 
-  QRadialGradient gradient(-3, -3, 10);
+  QRadialGradient gradient(-3, -3, 30);
   if (_option->state & QStyle::State_Sunken)
   {
     QPointF center = pixRect.center();
     gradient.setCenter(center.x(), center.y());
     gradient.setFocalPoint(center.x(), center.y());
     gradient.setColorAt(1, QColor(230, 230, 230).light(120));
-    gradient.setColorAt(0, QColor(200, 200, 200).light(120));
+    gradient.setColorAt(0, QColor(220, 220, 220).light(120));
   } else
   {
     gradient.setColorAt(1, QColor(230, 230, 230));
-    gradient.setColorAt(0, QColor(200, 200, 200));
+    gradient.setColorAt(0, QColor(220, 220, 220));
   }
   _painter->setBrush(gradient);
 

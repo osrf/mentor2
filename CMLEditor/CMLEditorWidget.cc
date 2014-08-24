@@ -56,9 +56,9 @@ CMLEditorWidget::CMLEditorWidget(QWidget *_parent)
 
   CMLEditorView *view = new CMLEditorView(_parent);
 
-  QColor c(250, 250, 250);
+  /*QColor c(220, 220, 220);
   QBrush brush(c, Qt::SolidPattern);
-  this->scene->setBackgroundBrush(brush);
+  view->setBackgroundBrush(brush);*/
 
 /*  this->minimumWidth = 1240*2;
   this->minimumHeight = 1024*2;

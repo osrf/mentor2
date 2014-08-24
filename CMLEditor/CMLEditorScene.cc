@@ -126,24 +126,28 @@ CMLEdge *CMLEditorScene::AddEdge(const std::string &_node1,
 /////////////////////////////////////////////////
 void CMLEditorScene::drawBackground(QPainter * _painter, const QRectF & _rect)
 {
-    const int gridSize = 25;
+  QColor c(250, 250, 250);
+  QBrush brush(c, Qt::SolidPattern);
+  _painter->setBrush(brush);
+  _painter->drawRect(_rect);
 
-    const qreal left = int(_rect.left()) - (int(_rect.left()) % gridSize);
-    const qreal top = int(_rect.top()) - (int(_rect.top()) % gridSize);
+  const int gridSize = 25;
 
-    QVarLengthArray<QLineF, 100> lines;
+  const qreal left = int(_rect.left()) - (int(_rect.left()) % gridSize);
+  const qreal top = int(_rect.top()) - (int(_rect.top()) % gridSize);
 
-    for (qreal x = left; x < _rect.right(); x += gridSize)
-        lines.append(QLineF(x, _rect.top(), x, _rect.bottom()));
-    for (qreal y = top; y < _rect.bottom(); y += gridSize)
-        lines.append(QLineF(_rect.left(), y, _rect.right(), y));
+  QVarLengthArray<QLineF, 100> lines;
 
-    _painter->setRenderHint(QPainter::Antialiasing, false);
+  for (qreal x = left; x < _rect.right(); x += gridSize)
+      lines.append(QLineF(x, _rect.top(), x, _rect.bottom()));
+  for (qreal y = top; y < _rect.bottom(); y += gridSize)
+      lines.append(QLineF(_rect.left(), y, _rect.right(), y));
 
-    _painter->setPen(QColor(Qt::lightGray).lighter(50));
-    _painter->drawLines(lines.data(), lines.size());
-    _painter->setPen(Qt::black);
-    //_painter->drawRect(sceneRect());
+  _painter->setRenderHint(QPainter::Antialiasing, false);
+
+  _painter->setPen(QColor(200, 200, 200, 125));
+  _painter->drawLines(lines.data(), lines.size());
+  _painter->setPen(Qt::black);
 }
 
 /////////////////////////////////////////////////
