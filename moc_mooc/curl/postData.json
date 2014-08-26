@@ -1,0 +1,1 @@
+{ "Type": "GAZEBO_OBJECTIVE_COMPLETED", "Results": {         "startTime": "2014-07-08T16:01:18.636Z",         "completedAt": "2014-07-08T16:23:15.636Z",         "timeSpent": "1087.3",         "world": "simple.world",         "score": "11",         "issues": ["Simple MOOC plugin", "connecting pully"]     },     "Resources": ["intro.mpg", "lesson1.mpg"],     "userid": "myuser"  }
