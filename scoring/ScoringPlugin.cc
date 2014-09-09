@@ -60,7 +60,7 @@ void ScoringPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
   node->Init(_parent->GetName());
 
   // Create a publisher on the Rest plugin topic
-  pub = node->Advertise<Event_msgs::msgs::RestPost>("~/event/rest_post");
+  pub = node->Advertise<Event_msgs::msgs::RestPost>("/gazebo/event/rest_post");
 
   // Subscribe to model spawning
   spawnSub = node->Subscribe("~/model/info", &ScoringPlugin::OnModelInfo, this );

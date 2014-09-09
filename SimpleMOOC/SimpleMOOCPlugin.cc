@@ -62,9 +62,9 @@ void SimpleMOOCPlugin::Init()
 
   node->Init();
   cout << "   RestLogin subscription" << endl;
-  subRequest = node->Subscribe("~/event/rest_login", &SimpleMOOCPlugin::OnRestLoginRequest, this);
+  subRequest = node->Subscribe("/gazebo/event/rest_login", &SimpleMOOCPlugin::OnRestLoginRequest, this);
   cout << "   RestPost subscription" << endl;
-  subEvent = node->Subscribe("~/event/rest_post", &SimpleMOOCPlugin::OnEventRestPost, this);
+  subEvent = node->Subscribe("/gazebo/event/rest_post", &SimpleMOOCPlugin::OnEventRestPost, this);
   cout << "   starting request thread" << endl;
   requestQThread = new boost::thread( boost::bind(&SimpleMOOCPlugin::RunRequestQ, this));
 }
@@ -248,7 +248,7 @@ void SimpleMOOCPlugin::RunRequestQ()
   
   // be ready to send errors back to the UI
   cout << "SimpleMOOCPlugin::RunRequestQ THREAD started" << endl;
-  pub = node->Advertise<Event_msgs::msgs::RestError>("~/event/rest_error");
+  pub = node->Advertise<Event_msgs::msgs::RestError>("/gazebo/event/rest_error");
 
   // process any login or post data that ha been received
   while (!stopMsgProcessing) {

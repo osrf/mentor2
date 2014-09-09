@@ -32,13 +32,13 @@ MOOCUIWidget::MOOCUIWidget(QWidget *_parent)
   
   cout << "MOOCUIWidget::MOOCUIWidget node setup" << endl;
   node->Init( );
-  cout << "advertizing on ~/event/rest_login" << endl;
-  pub = node->Advertise<Event_msgs::msgs::RestLogin>("~/event/rest_login");
+  cout << "advertizing on /gazebo/event/rest_login" << endl;
+  pub = node->Advertise<Event_msgs::msgs::RestLogin>("/gazebo/event/rest_login");
   // this for a problem where the server cannot subscribe to the topic
   cout << "wait for connection..." << endl;
   pub->WaitForConnection();
-  cout << "subscribing on ~/event/rest_error" << endl;
-  sub = node->Subscribe("~/event/rest_error", &MOOCUIWidget::OnResponse, this);
+  cout << "subscribing on /gazebo/event/rest_error" << endl;
+  sub = node->Subscribe("/gazebo/event/rest_error", &MOOCUIWidget::OnResponse, this);
   cout << "done" << endl;
 }
  
