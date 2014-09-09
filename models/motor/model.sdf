@@ -43,8 +43,12 @@
       </port>
 
       <properties>
-        <max_current>10</max_current>
-        <resistance>5</resistance>
+        <max_current>1</max_current>
+        <resistance>14</resistance>
+        <back_emf>0.00064</back_emf>
+        <rotor_inertia>2.2E-7</rotor_intertia>
+        <inductance>0.00388</inductance>
+        <damping>7.0E-8</damping>
       </properties>
 
     </plugin>
