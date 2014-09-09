@@ -52,7 +52,7 @@ void MOOCUIPlugin::Init()
         event::Events::ConnectPreRender(
         boost::bind(&MOOCUIPlugin::Update, this)));
 
-  std::cerr << "MOOCUIPlugin::Init()" <<  std::endl;
+  std::cerr << "MOOCUIPlugin::Init() done" <<  std::endl;
 
 }
 
@@ -65,6 +65,7 @@ void MOOCUIPlugin::Update()
 
 void MOOCUIPlugin::OnMainWindowReady()
 {
+  cout << "MOOCUIPlugin::OnMainWindowReady()" << endl;
   // add menu for this plugin
   QMenu *menu = new QMenu(QString("&MOOC"));
   QAction* loginAct = new QAction(QString("&Login"), menu );
