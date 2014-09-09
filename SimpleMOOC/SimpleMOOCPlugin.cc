@@ -16,6 +16,7 @@
 */
 
 #include "SimpleMOOCPlugin.hh"
+#include <uuid/uuid.h>
 
 using namespace gazebo;
 using namespace std;
@@ -26,13 +27,21 @@ SimpleMOOCPlugin::SimpleMOOCPlugin()
   stopMsgProcessing(false),
   requestQThread(NULL)
 {
-  
+
+  cout << "SimpleMOOCPlugin::SimpleMOOCPlugin()" << endl;
+  // generate a unique session ID
+  uuid_t uuid;
+  uuid_generate_random ( uuid );
+  char s[37];
+  uuid_unparse ( uuid, s ); 
+
+  this->session = s;
+
+  cout << "Session : " << this->session << endl;
 }
 
 SimpleMOOCPlugin::~SimpleMOOCPlugin()
 {
-  //if (this->userCam)
-  //  this->userCam->EnableSaveFrame(false);
   node.reset();
   subEvent.reset();
   subRequest.reset();
@@ -49,16 +58,20 @@ void SimpleMOOCPlugin::Init()
 {
   std::cerr << "SimpleMOOCPlugin::Init() setting up pubs/sub node" <<  std::endl;
   // setup our node for communication
+//  node->Init( string("default"));
+
   node->Init();
+  cout << "   RestLogin subscription" << endl;
   subRequest = node->Subscribe("~/event/rest_login", &SimpleMOOCPlugin::OnRestLoginRequest, this);
+  cout << "   RestPost subscription" << endl;
   subEvent = node->Subscribe("~/event/rest_post", &SimpleMOOCPlugin::OnEventRestPost, this);
+  cout << "   starting request thread" << endl;
   requestQThread = new boost::thread( boost::bind(&SimpleMOOCPlugin::RunRequestQ, this));
 }
 
 void SimpleMOOCPlugin::Load(int /*_argc*/, char ** /*_argv*/)
 {
   std::cerr << "Simple MOOC server plugin Load()" <<  std::endl;
-  
 }
 
 
@@ -111,7 +124,15 @@ void SimpleMOOCPlugin::OnEventRestPost(ConstRestPostPtr &_msg)
     }
     else
     {
+      event += "\"session\": \"" + this->session + "\", ";
       event += "\"world\": {";
+
+      event += "\"name\": ";
+      event += "\"";
+      event += world->GetName();
+      event += "\", ";
+
+
       if(!world->IsPaused() )
       {
         event += "\"is_running\": \"true\", ";
@@ -166,10 +187,12 @@ void SimpleMOOCPlugin::OnEventRestPost(ConstRestPostPtr &_msg)
 
 void SimpleMOOCPlugin::OnRestLoginRequest(ConstRestLoginPtr &_msg )
 {
-  cout << "SimpleMOOC queuing Request: [";
+  cout << "SimpleMOOC received RestLogin message: [";
   cout << _msg->url() << ", ";
   cout << _msg->username() << ", ";
-  cout << _msg->password() << "]" << endl;
+  cout << "*****"; // _msg->password();
+  cout << "]";
+  cout << endl;
   {
     boost::mutex::scoped_lock lock(this->requestQMutex);
     msgLoginQ.push_back(_msg);
@@ -184,6 +207,7 @@ void SimpleMOOCPlugin::ProcessLoginRequest(ConstRestLoginPtr _msg)
  try
   {
     std::string resp;
+    cout << "LOGIN " <<  _msg->username().c_str() << endl;
     resp = restApi.Login(_msg->url().c_str(), "/login", _msg->username().c_str(), _msg->password().c_str());
   }
   catch(MOOCException &x)
