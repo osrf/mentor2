@@ -40,7 +40,7 @@ namespace gazebo
 
     /// \brief Notify the MOOC of a learning event
     public: void PostLearningEvent(const char* route, const char *json);
-
+   
     /// \brief a Request/Response
     /// \return the response
     private: std::string Request(const char* request, const char *postStr = NULL);

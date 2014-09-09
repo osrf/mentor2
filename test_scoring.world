@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <sdf version="1.4">
-  <world name="default">
+  <world name="test_scoring">
     <include>
       <uri>model://ground_plane</uri>
     </include>
@@ -60,7 +60,7 @@
     <event>
       <name>batiInStart</name>
       <type>inclusion</type>
-      <model>AA_battery</model>
+      <model>AA battery</model>
       <region>start</region>
     </event>
 
@@ -68,7 +68,7 @@
     <event>
       <name>batInEnd</name>
       <type>inclusion</type>
-      <model>AA_battery</model>
+      <model>AA battery</model>
       <region>end</region>
     </event>
 

@@ -94,6 +94,8 @@ namespace gazebo
     /// \brief a mutex to ensure integrity of the request list
     private: boost::mutex requestQMutex;
 
+    /// \brief a session string to keep track of exercises
+    private: std::string session;
  };
 
 }

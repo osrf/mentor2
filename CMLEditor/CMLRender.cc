@@ -72,7 +72,7 @@ CMLRender::CMLRender()
 
   this->restPub =
       this->node->Advertise<Event_msgs::msgs::RestPost>(
-      "~/event/rest_post");
+      "/gazebo/event/rest_post");
 
   this->requestSub = this->node->Subscribe("~/request",
     &CMLRender::OnRequest, this);

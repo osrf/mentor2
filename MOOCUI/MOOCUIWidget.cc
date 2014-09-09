@@ -31,9 +31,15 @@ MOOCUIWidget::MOOCUIWidget(QWidget *_parent)
 {
   
   cout << "MOOCUIWidget::MOOCUIWidget node setup" << endl;
-  node->Init();
-  pub = node->Advertise<Event_msgs::msgs::RestLogin>("~/event/rest_login");
-  sub = node->Subscribe("~/event/rest_error", &MOOCUIWidget::OnResponse, this);
+  node->Init( );
+  cout << "advertizing on /gazebo/event/rest_login" << endl;
+  pub = node->Advertise<Event_msgs::msgs::RestLogin>("/gazebo/event/rest_login");
+  // this for a problem where the server cannot subscribe to the topic
+  cout << "wait for connection..." << endl;
+  pub->WaitForConnection();
+  cout << "subscribing on /gazebo/event/rest_error" << endl;
+  sub = node->Subscribe("/gazebo/event/rest_error", &MOOCUIWidget::OnResponse, this);
+  cout << "done" << endl;
 }
  
 
@@ -53,36 +59,17 @@ void MOOCUIWidget::LoginMOOC()
     msg.set_url(dialog.getUrl());
     msg.set_username(dialog.getUsername());
     msg.set_password(dialog.getPassword());
-    pub->Publish(msg);
-
-    cout << "Login to ~/RestLogin  [";
+    cout << "MOOCUIWidget::LoginMOOC() Login  [";
     cout << dialog.getUrl() << ", ";
     cout << dialog.getUsername() << ", ";
-    cout << dialog.getPassword() << "]"; 
+    // cout << dialog.getPassword()
+    cout << "*****"; 
+    cout << "]"; 
     cout << endl;
+
+    pub->Publish(msg);
   } 
 }
-
-
-/*
-void MOOCUIWidget::PostLearningEvent()
-
-  string json = "{ \"Type\": \""; 
-  json += type;
-  json +=  "\", \"Results\": { ";
-  json += "\"startTime\": \"2014-07-08T16:01:18.636Z\", ";
-  json += "\"completedAt\": \"2014-07-08T16:23:15.636Z\", ";
-  json += "\"timeSpent\": \"1087.3\", \"world\": \"simple.world\", ";
-  json += "\"score\": \""; 
-  std::string d = boost::lexical_cast<std::string>(score);
-  json += d;
-  json += "\", \"issues\": [\"Simple MOOC plugin\", ";
-  json += "\"connecting pully\"] }, \"Resources\": [\"intro.mpg\", ";
-  json += "\"lesson1.mpg\"], \"userid\": \"myuser\"  }";
-
- route =  "/events/new" 
-
-*/
 
 
 void MOOCUIWidget::OnResponse(ConstRestErrorPtr &_msg )
