@@ -14,6 +14,6 @@ Installation
 Dependencies
 ===
 
-Gazebo >= 4.0.0
-
-
+SDFormat >= 2.0.1
+Gazebo >= 4.0.1
+    branch: expose_mainwindow
