@@ -25,6 +25,9 @@ GZ_REGISTER_MODEL_PLUGIN(MotorPlugin)
 MotorPlugin::MotorPlugin()
 {
   this->schematicType = "motor";
+  this->backEmf = 0.0064;
+  this->motorResistance = 14;
+  this->torqueConstant = 0.0046;
 }
 
 /////////////////////////////////////////////////
@@ -41,4 +44,20 @@ void MotorPlugin::LoadImpl(sdf::ElementPtr _sdf)
 void MotorPlugin::Init()
 {
   SimpleModelPlugin::Init();
+}
+
+void MotorPlugin::UpdateImpl(double _timeSinceLastUpdate)
+{
+
+  // std::cout << "MOTOR update!" << std::endl;  
+
+  // get this value from the connectors
+  double voltage = 5; // in Volts 
+    
+  double shaftRotationSpeed = 0.1; // in radians per seconds
+  double emfVolt = this->backEmf * shaftRotationSpeed;
+  double internalVoltage = voltage - emfVolt;
+  double internalCurrent = internalVoltage / this->motorResistance;
+  double torque = internalCurrent * this->torqueConstant;
+   
 }

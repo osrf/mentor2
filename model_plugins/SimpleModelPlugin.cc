@@ -28,6 +28,7 @@ SimpleModelPlugin::SimpleModelPlugin()
 {
   this->receiveMutex = new boost::recursive_mutex();
   this->schematicType = "";
+  this->timeOfLastUpdate = 0;
 }
 
 /////////////////////////////////////////////////
@@ -43,6 +44,27 @@ void SimpleModelPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   GZ_ASSERT(this->parent, "Parent model is NULL");
 
   this->Load(_sdf);
+
+  // Listen to the update event. This event is broadcast every
+  // simulation iteration.
+  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+      boost::bind(&SimpleModelPlugin::Update, this));
+}
+
+void SimpleModelPlugin::Update()
+{
+  physics::WorldPtr world = physics::get_world();
+  double t = world->GetSimTime().Double();
+  double timeSinceLastUpdate = t - this->timeOfLastUpdate; 
+
+  this->UpdateImpl(timeSinceLastUpdate);
+
+  this->timeOfLastUpdate = t;
+}
+
+void SimpleModelPlugin::UpdateImpl(double /*_timeSinceLastUpdate*/)
+{
+
 }
 
 /////////////////////////////////////////////////

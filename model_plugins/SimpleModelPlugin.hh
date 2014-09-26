@@ -49,6 +49,10 @@ namespace gazebo
     /// \param[in] _sdf The SDF of this plugin.
     protected: virtual void LoadImpl(sdf::ElementPtr _sdf);
 
+    protected: void Update();
+
+    protected: virtual void UpdateImpl(double _timeSinceLastUpdate);
+
     /// \brief Fill a message with the ports and properties of this model.
     /// \param[out] _msg A message to be filled with ports and properties of
     /// this model.
@@ -98,6 +102,12 @@ namespace gazebo
 
     /// \brief A thread that publishes a simple model info on init.
     private: boost::thread *initThread;
+
+    /// \brief A connection the update event
+    private: event::ConnectionPtr updateConnection;
+
+    /// \brief SimTime of last update.
+    private: double timeOfLastUpdate;
   };
 }
 

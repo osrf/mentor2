@@ -36,7 +36,19 @@ namespace gazebo
 
     /// \brief Initialize the plugin.
     public: virtual void Init();
+    
+    protected: virtual void UpdateImpl(double _timeSinceLastUpdate);
 
+    /// \brief
+    private: double lastSimTimei;
+
+    private: double backEmf;
+
+    /// \brief
+    private: double motorResistance;
+
+    /// \brief Torque constant in  N*m/A
+    private: double torqueConstant;
   };
 }
 
