@@ -37,6 +37,23 @@ namespace gazebo
     /// \brief Initialize the plugin.
     public: virtual void Init();
 
+    /// \brief update
+    protected: void UpdateImpl(double _timeSinceLastUpdate);
+
+    /// \brief Charge (Ampere-hour)
+    private: double capacity;
+
+    /// \brief nominal voltage (Volts)
+    private: double voltage;
+
+    /// \brief current draw
+    private: double current;
+
+    /// \brief keep track of time between discharges
+    private: double timeAccum;
+
+    /// \brief true if the battery is discharging
+    private: bool discharging;
   };
 }
 
