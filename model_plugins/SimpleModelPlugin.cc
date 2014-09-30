@@ -55,8 +55,11 @@ void SimpleModelPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       boost::bind(&SimpleModelPlugin::Update, this));
 }
 
+/////////////////////////////////////////////////
 void SimpleModelPlugin::Update()
 {
+  this->ProcessSimpleConnectionMsgs();
+
   physics::WorldPtr world = physics::get_world();
   double t = world->GetSimTime().Double();
   double timeSinceLastUpdate = t - this->timeOfLastUpdate;
@@ -66,6 +69,7 @@ void SimpleModelPlugin::Update()
   this->timeOfLastUpdate = t;
 }
 
+/////////////////////////////////////////////////
 void SimpleModelPlugin::UpdateImpl(double /*_timeSinceLastUpdate*/)
 {
 
@@ -263,9 +267,9 @@ void SimpleModelPlugin::OnSimpleConnection(ConstSimpleConnectionPtr &_msg)
   if (_msg->parent() == modelName || _msg->child() == modelName)
     this->simpleConnectionMsgs.push_back(_msg);
 }
-/*
+
 //////////////////////////////////////////////////
-void SimpleModelPlugin::ProcessSimpleConnectionMsg()
+void SimpleModelPlugin::ProcessSimpleConnectionMsgs()
 {
 
   SimpleConnectionMsgs_L::iterator simpleConnectionIter;
@@ -278,13 +282,13 @@ void SimpleModelPlugin::ProcessSimpleConnectionMsg()
     const Simple_msgs::msgs::SimpleConnection _msg = **simpleConnectionIter;
     std::string topic = "~/simple/port/" + _msg.parent() + "_" + _msg.child();
     // currently bidrectional
-    this->portPubs.push_back(this->node->Advertise(topic,
-        &SimpleModelPlugin::OnPortData, this));
-    this->requestPub = this->node->Advertise<msgs::Request>("~/request");
 
-    this->portSubs.push_back(this->node->Subscribe(topic,
-        &SimpleModelPlugin::OnRequest, this));
+    this->portPubs.push_back(
+        this->node->Advertise<Simple_msgs::msgs::Variant>(topic));
+
+    //this->portSubs.push_back(this->node->Subscribe(topic,
+        //&SimpleModelPlugin::OnRequest, this));
   }
 
-
-}*/
+  this->simpleConnectionMsgs.clear();
+}

@@ -46,18 +46,19 @@ void MotorPlugin::Init()
   SimpleModelPlugin::Init();
 }
 
+/////////////////////////////////////////////////
 void MotorPlugin::UpdateImpl(double _timeSinceLastUpdate)
 {
 
-  // std::cout << "MOTOR update!" << std::endl;  
+  // std::cout << "MOTOR update!" << std::endl;
 
   // get this value from the connectors
-  double voltage = 5; // in Volts 
-    
+  double voltage = 5; // in Volts
+
   double shaftRotationSpeed = 0.1; // in radians per seconds
   double emfVolt = this->backEmf * shaftRotationSpeed;
   double internalVoltage = voltage - emfVolt;
   double internalCurrent = internalVoltage / this->motorResistance;
   double torque = internalCurrent * this->torqueConstant;
-   
+
 }

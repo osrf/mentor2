@@ -2,9 +2,10 @@
 find_package(Protobuf REQUIRED)
 
 set (msgs
+  Event.proto
   SimpleConnection.proto
   SimpleModel.proto
-  Event.proto
+  Variant.proto
 )
 
 PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${msgs})

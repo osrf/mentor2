@@ -15,6 +15,7 @@
  *
 */
 
+#include "Variant.pb.h"
 #include "PowerSourcePlugin.hh"
 
 using namespace gazebo;
@@ -64,7 +65,7 @@ void PowerSourcePlugin::UpdateImpl(double _timeSinceLastUpdate)
   {
     this->timeAccum -= 1.0;
   }
-  else 
+  else
   {
     // too early for update
     return;
@@ -82,5 +83,14 @@ void PowerSourcePlugin::UpdateImpl(double _timeSinceLastUpdate)
       loop = 10;
       std::cout << "battery capacity " << this->capacity << " [-" << ampHours<< "]" << std::endl;
     }
+  }
+
+  if (this->portPubs.size() != 0)
+  {
+    Simple_msgs::msgs::Variant msg;
+    msg.set_type(Simple_msgs::msgs::Variant::DOUBLE);
+    msg.set_v_double(this->voltage);
+
+    this->portPubs[0]->Publish(msg);
   }
 }

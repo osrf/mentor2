@@ -23,6 +23,7 @@
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/transport/transport.hh>
 
+#include "Variant.pb.h"
 #include "SimpleModel.pb.h"
 #include "SimpleConnection.pb.h"
 
@@ -88,6 +89,9 @@ namespace gazebo
     /// there is at least a subscriber.
     private: void InitThread();
 
+    /// \brief Process simple connection messages.
+    private: void ProcessSimpleConnectionMsgs();
+
     /// \brief Type of model
     protected: std::string schematicType;
 
@@ -144,6 +148,10 @@ namespace gazebo
 
     /// \brief List of simple connection message to process.
     private: SimpleConnectionMsgs_L simpleConnectionMsgs;
+
+    protected: std::vector<transport::PublisherPtr> portPubs;
+
+    protected: std::vector<transport::SubscriberPtr> portSubs;
   };
 }
 

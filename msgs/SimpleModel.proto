@@ -1,19 +1,6 @@
 package Simple_msgs.msgs;
 
-
-message Variant
-{
-  enum Type { UINT32 = 1; INT32 = 2; DOUBLE = 3; STRING = 4; BOOL = 5;}
-
-  required Type type = 1;
-
-  optional uint32 v_uint32 = 2;
-  optional int32 v_int32 = 3;
-  optional double v_double = 4;
-  optional string v_string = 5;
-  optional bool v_bool = 6;
-}
-
+import "Variant.proto";
 
 message SimpleModel
 {
