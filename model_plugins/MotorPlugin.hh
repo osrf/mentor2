@@ -36,7 +36,8 @@ namespace gazebo
 
     /// \brief Initialize the plugin.
     public: virtual void Init();
-    
+
+    /// Documentation Inherited
     protected: virtual void UpdateImpl(double _timeSinceLastUpdate);
 
     /// \brief

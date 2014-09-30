@@ -27,6 +27,8 @@ using namespace gazebo;
 SimpleModelPlugin::SimpleModelPlugin()
 {
   this->receiveMutex = new boost::recursive_mutex();
+  this->portMutex = new boost::recursive_mutex();
+  this->simpleConnectionMutex = new boost::recursive_mutex();
   this->schematicType = "";
   this->timeOfLastUpdate = 0;
 }
@@ -35,6 +37,8 @@ SimpleModelPlugin::SimpleModelPlugin()
 SimpleModelPlugin::~SimpleModelPlugin()
 {
   delete this->receiveMutex;
+  delete this->portMutex;
+  delete this->simpleConnectionMutex;
 }
 
 /////////////////////////////////////////////////
@@ -55,7 +59,7 @@ void SimpleModelPlugin::Update()
 {
   physics::WorldPtr world = physics::get_world();
   double t = world->GetSimTime().Double();
-  double timeSinceLastUpdate = t - this->timeOfLastUpdate; 
+  double timeSinceLastUpdate = t - this->timeOfLastUpdate;
 
   this->UpdateImpl(timeSinceLastUpdate);
 
@@ -76,7 +80,8 @@ void SimpleModelPlugin::Load(sdf::ElementPtr _sdf)
     while (childElem)
     {
       std::string name = childElem->Get<std::string>("name");
-      this->ports.push_back(name);
+
+      this->ports[name] = 0;
       childElem = childElem->GetNextElement("port");
     }
   }
@@ -96,8 +101,12 @@ void SimpleModelPlugin::Load(sdf::ElementPtr _sdf)
   this->LoadImpl(_sdf);
 
   // DEBUG
-  for (unsigned int i = 0 ; i < this->ports.size(); ++i)
-    std::cerr << " got port " << this->ports[i] << std::endl;
+  std::map<std::string, boost::any>::iterator portIt;
+  for (portIt = this->ports.begin() ; portIt != this->ports.end(); ++portIt)
+    std::cerr << " got port " << portIt->first << std::endl;
+
+  //for (unsigned int i = 0 ; i < this->ports.size(); ++i)
+    //std::cerr << " got port " << this->ports[i] << std::endl;
 
   std::map<std::string, std::string>::iterator it;
   for (it = properties.begin() ; it != properties.end(); ++it)
@@ -127,6 +136,9 @@ void SimpleModelPlugin::Init()
   this->simpleModelPub =
       this->node->Advertise<Simple_msgs::msgs::SimpleModel>(
       "~/simple/model/info");
+
+  this->simpleConnectionSub = this->node->Subscribe("~/simple/connection",
+      &SimpleModelPlugin::OnSimpleConnection, this);
 
   this->initThread = new boost::thread(
       boost::bind(&SimpleModelPlugin::InitThread, this));
@@ -190,13 +202,17 @@ void SimpleModelPlugin::FillMsg(Simple_msgs::msgs::SimpleModel &_msg)
 {
   _msg.set_name(this->parent->GetScopedName());
   _msg.set_schematic_type(this->schematicType);
-  for (unsigned int i =0; i < this->ports.size(); ++i)
+
+  std::map<std::string, boost::any>::iterator portIt;
+  for (portIt = this->ports.begin() ; portIt != this->ports.end(); ++portIt)
+  //for (unsigned int i =0; i < this->ports.size(); ++i)
   {
-    _msg.add_port(this->ports[i]);
+    //_msg.add_port(this->ports[i]);
+    _msg.add_port(portIt->first);
   }
 
   std::map<std::string, std::string>::iterator it;
-  for (it = this->properties.begin() ; it != this->properties.end(); ++it)
+  for (it = this->properties.begin(); it != this->properties.end(); ++it)
   {
     _msg.add_key(it->first);
     Simple_msgs::msgs::Variant *property = _msg.add_value();
@@ -230,3 +246,45 @@ void SimpleModelPlugin::FillMsg(Simple_msgs::msgs::SimpleModel &_msg)
     //_msg.add_value(it->second);
   }
 }
+
+/////////////////////////////////////////////////
+boost::any SimpleModelPlugin::GetProperty(const std::string &_key)
+{
+  if (this->properties.find(_key) != this->properties.end())
+    return this->properties[_key];
+}
+
+//////////////////////////////////////////////////
+void SimpleModelPlugin::OnSimpleConnection(ConstSimpleConnectionPtr &_msg)
+{
+  boost::recursive_mutex::scoped_lock lock(*this->simpleConnectionMutex);
+
+  std::string modelName = this->parent->GetScopedName();
+  if (_msg->parent() == modelName || _msg->child() == modelName)
+    this->simpleConnectionMsgs.push_back(_msg);
+}
+/*
+//////////////////////////////////////////////////
+void SimpleModelPlugin::ProcessSimpleConnectionMsg()
+{
+
+  SimpleConnectionMsgs_L::iterator simpleConnectionIter;
+
+  // Process the simple connection messages.
+  for (simpleConnectionIter = this->simpleConnectionMsgs.begin();
+      simpleConnectionIter != this->simpleConnectionMsgs.end();
+      ++simpleConnectionIter)
+  {
+    const Simple_msgs::msgs::SimpleConnection _msg = **simpleConnectionIter;
+    std::string topic = "~/simple/port/" + _msg.parent() + "_" + _msg.child();
+    // currently bidrectional
+    this->portPubs.push_back(this->node->Advertise(topic,
+        &SimpleModelPlugin::OnPortData, this));
+    this->requestPub = this->node->Advertise<msgs::Request>("~/request");
+
+    this->portSubs.push_back(this->node->Subscribe(topic,
+        &SimpleModelPlugin::OnRequest, this));
+  }
+
+
+}*/

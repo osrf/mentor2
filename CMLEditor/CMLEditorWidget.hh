@@ -166,7 +166,7 @@ namespace gazebo
       /// \brief Communication Node
       private: transport::NodePtr node;
 
-      /// \brief Subscribe to model info updates
+      /// \brief Subscribe to model connection updates
       private: transport::SubscriberPtr simpleConnectionSub;
 
       /// \brief Subscribe to model info updates

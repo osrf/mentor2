@@ -25,6 +25,7 @@ GZ_REGISTER_MODEL_PLUGIN(PowerSourcePlugin)
 PowerSourcePlugin::PowerSourcePlugin()
 {
   this->schematicType = "power";
+  this->voltage = 0;
 }
 
 /////////////////////////////////////////////////
@@ -41,4 +42,9 @@ void PowerSourcePlugin::LoadImpl(sdf::ElementPtr _sdf)
 void PowerSourcePlugin::Init()
 {
   SimpleModelPlugin::Init();
+}
+
+/////////////////////////////////////////////////
+void PowerSourcePlugin::UpdateImpl(double _timeSinceLastUpdate)
+{
 }
