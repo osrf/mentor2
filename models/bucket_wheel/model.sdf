@@ -1,0 +1,174 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <model name="bucket_wheel">
+    <link name="link">
+      <pose>0.2 0 1.05 0 1.5707 0</pose>
+      <inertial>
+        <pose>0 0 0.025 0 0 0</pose>
+        <mass>1.0</mass>
+        <inertia>
+          <ixx>0.2509</ixx>
+          <ixy>0.0</ixy>
+          <ixz>0.0</ixz>
+          <iyy>0.2509</iyy>
+          <iyz>0.0</iyz>
+          <izz>0.5</izz>
+        </inertia>
+      </inertial>
+
+      <collision name="collision_wheel">
+        <geometry>
+          <cylinder>
+            <radius>1.0</radius>
+            <length>0.04</length>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name="visual_wheel">
+        <geometry>
+          <cylinder>
+            <radius>1.0</radius>
+            <length>0.04</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Red</name>
+          </script>
+        </material>
+      </visual>
+
+      <collision name="collision_inner_wheel">
+        <pose>0 0 0.05 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.9</radius>
+            <length>0.1</length>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name="visual_inner_wheel">
+        <pose>0 0 0.05 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.9</radius>
+            <length>0.1</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Green</name>
+          </script>
+        </material>
+      </visual>
+
+      <collision name="collision_spoke1">
+        <pose>0.95 0 0.08 -0.1 0 0.45</pose>
+        <geometry>
+          <box>
+            <size>0.14 0.01 0.05</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="visual_spoke1">
+        <pose>0.95 0 0.08 -0.1 0 0.45</pose>
+        <geometry>
+          <box>
+            <size>0.14 0.01 0.05</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Blue</name>
+          </script>
+        </material>
+      </visual>
+
+      <collision name="collision_spoke2">
+        <pose>-0.95 0 0.08 0.1 0 0.45</pose>
+        <geometry>
+          <box>
+            <size>0.14 0.01 0.05</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="visual_spoke2">
+        <pose>-0.95 0 0.08 0.1 0 0.45</pose>
+        <geometry>
+          <box>
+            <size>0.14 0.01 0.05</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Blue</name>
+          </script>
+        </material>
+      </visual>
+
+      <collision name="collision_spoke3">
+        <pose>0 0.95 0.08 -0.1 0 2.0207</pose>
+        <geometry>
+          <box>
+            <size>0.14 0.01 0.05</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="visual_spoke3">
+        <pose>0 0.95 0.08 -0.1 0 2.0207</pose>
+        <geometry>
+          <box>
+            <size>0.14 0.01 0.05</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Blue</name>
+          </script>
+        </material>
+      </visual>
+
+      <collision name="collision_spoke4">
+        <pose>0 -0.95 0.08 0.1 0 2.0207</pose>
+        <geometry>
+          <box>
+            <size>0.14 0.01 0.05</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="visual_spoke4">
+        <pose>0 -0.95 0.08 0.1 0 2.0207</pose>
+        <geometry>
+          <box>
+            <size>0.14 0.01 0.05</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Blue</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+
+    <joint name="world_joint" type="revolute">
+      <parent>world</parent>
+      <child>link</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1000000</lower>
+          <upper>1000000</upper>
+        </limit>
+      </axis>
+    </joint>
+
+    <plugin filename="libWheelPlugin.so" name="wheel"/>
+  </model>
+</sdf>

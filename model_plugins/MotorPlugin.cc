@@ -24,11 +24,11 @@ GZ_REGISTER_MODEL_PLUGIN(MotorPlugin)
 /////////////////////////////////////////////////
 MotorPlugin::MotorPlugin()
 {
-  this->voltage = 0;
+  this->voltage = 100;
   this->schematicType = "motor";
   this->backEmf = 0.0064;
-  this->motorResistance = 14;
-  this->torqueConstant = 0.0046;
+  this->motorResistance = 5;
+  this->torqueConstant = 5.96;
 }
 
 /////////////////////////////////////////////////
@@ -45,6 +45,8 @@ void MotorPlugin::LoadImpl(sdf::ElementPtr _sdf)
 void MotorPlugin::Init()
 {
   SimpleModelPlugin::Init();
+  this->torquePub = this->node->Advertise<Simple_msgs::msgs::Variant>(
+      "~/motor/torque");
 }
 
 /////////////////////////////////////////////////
@@ -73,6 +75,10 @@ void MotorPlugin::UpdateImpl(double _timeSinceLastUpdate)
   double internalCurrent = internalVoltage / this->motorResistance;
   double torque = internalCurrent * this->torqueConstant;
 
+  Simple_msgs::msgs::Variant torqueMsg;
+  torqueMsg.set_type(Simple_msgs::msgs::Variant::DOUBLE);
+  torqueMsg.set_v_double(torque);
+  this->torquePub->Publish(torqueMsg);
 }
 
 /////////////////////////////////////////////////
