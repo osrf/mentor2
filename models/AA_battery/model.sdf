@@ -38,10 +38,9 @@
         <type>electrical</type>
       </port>
       <properties>
-        <voltage>1.5</voltage>
-        <capacity>3000</capacity>
-        <max_current>10</max_current>
-        <discharge_constant>1.2</discharge_constant>
+        <voltage>1.5</voltage>   <!-- Volts -->
+       <capacity>0.30</capacity> <!-- Amp-hours  -->
+        <current>0.1</current>   <!-- Amps -->
       </properties>
     </plugin>
   </model>

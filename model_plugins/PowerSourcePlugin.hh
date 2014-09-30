@@ -38,11 +38,22 @@ namespace gazebo
     public: virtual void Init();
 
     /// Documentation Inherited
-    protected: virtual void UpdateImpl(double _timeSinceLastUpdate);
+    protected: void UpdateImpl(double _timeSinceLastUpdate);
 
-    /// \brief Source voltage .
+    /// \brief Charge (Ampere-hour)
+    private: double capacity;
+
+    /// \brief nominal voltage (Volts)
     private: double voltage;
 
+    /// \brief current draw
+    private: double current;
+
+    /// \brief keep track of time between discharges
+    private: double timeAccum;
+
+    /// \brief true if the battery is discharging
+    private: bool discharging;
   };
 }
 
