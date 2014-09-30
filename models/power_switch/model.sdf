@@ -1,8 +1,8 @@
 <?xml version="1.0" ?>
 <sdf version="1.5">
   <model name="switch">
-    <pose>0 0 0.12 0 0 0</pose>
-    <link name="link">
+    <pose>0 0 0.155 0 3.14 0</pose>
+    <link name="body">
       <collision name="collision">
         <pose>0 0 0.0 0 0 0</pose>
         <geometry>
@@ -28,18 +28,128 @@
         </material>
       </visual>
     </link>
+
+    <link name="stand">
+      <pose>0 0 0.15 0 0 0</pose>
+      <collision name="collision">
+        <geometry>
+          <box>
+            <size>0.5 0.5 0.01</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <pose>0 0 0.0 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.5 0.5 0.01</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+
+    <link name="button">
+      <pose>0.0 0.0 -0.06 0 0.0 0</pose>
+      <inertial>
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>0.1</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.00006</iyy>
+          <iyz>0</iyz>
+          <izz>0.1</izz>
+        </inertia>
+      </inertial>
+      <collision name="button">
+        <geometry>
+          <box>
+            <size>0.16 0.1 0.08</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="button_on">
+        <pose>0.04 0 0 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.08 0.1 0.08</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Green</name>
+          </script>
+        </material>
+      </visual>
+      <visual name="button_off">
+        <!--<transparency>1.0</transparency>-->
+        <pose>-0.04 0 0 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.08 0.1 0.08</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Red</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+
+    <joint name="button_joint" type="revolute">
+      <parent>body</parent>
+      <child>button</child>
+      <axis>
+        <xyz>0.0 1.0 0.0</xyz>
+        <limit>
+          <lower>-0.3</lower>
+          <upper>0.3</upper>
+        </limit>
+        <dynamics>
+          <damping>0.01</damping>
+        </dynamics>
+        <use_parent_model_frame>true</use_parent_model_frame>
+      </axis>
+      <physics>
+        <ode>
+          <cfm_damping>1</cfm_damping>
+        </ode>
+      </physics>
+    </joint>
+
+    <joint name="stand_joint" type="revolute">
+      <parent>body</parent>
+      <child>stand</child>
+      <axis>
+        <xyz>0.0 0.0 1.0</xyz>
+        <limit>
+          <lower>-0.0</lower>
+          <upper>0.0</upper>
+        </limit>
+        <use_parent_model_frame>true</use_parent_model_frame>
+      </axis>
+    </joint>
+
     <plugin filename="libSwitchPlugin.so" name="switch">
       <port>
-        <name>A</name>
+        <name>connector0</name>
         <type>electrical</type>
       </port>
       <port>
-        <name>B</name>
+        <name>connector1</name>
         <type>electrical</type>
       </port>
       <properties>
         <closed>true</closed>
       </properties>
+      <switch_joint>button_joint</switch_joint>
     </plugin>
   </model>
 </sdf>

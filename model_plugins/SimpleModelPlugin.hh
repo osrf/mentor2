@@ -121,14 +121,14 @@ namespace gazebo
     /// \brief A list of properties associated with this model.
     protected: std::map<std::string, std::string> properties;
 
+    /// \brief Pointer to the parent model.
+    protected: physics::ModelPtr parent;
+
     /// \brief Subscribe to model connection updates
     private: transport::SubscriberPtr simpleConnectionSub;
 
     /// \brief Mutex to protect incoming message buffers.
     private: boost::recursive_mutex *receiveMutex;
-
-    /// \brief Pointer to the parent model.
-    private: physics::ModelPtr parent;
 
     /// \brief A thread that publishes a simple model info on init.
     private: boost::thread *initThread;

@@ -18,7 +18,12 @@
 #ifndef _SWITCH_PLUGIN_HH_
 #define _SWITCH_PLUGIN_HH_
 
+#include <gazebo/common/PID.hh>
+
 #include "SimpleModelPlugin.hh"
+
+typedef const boost::shared_ptr<const Simple_msgs::msgs::Variant>
+    ConstVariantPtr;
 
 namespace gazebo
 {
@@ -37,6 +42,48 @@ namespace gazebo
     /// \brief Initialize the plugin.
     public: virtual void Init();
 
+    /// Documentation Inherited
+    protected: virtual void UpdateImpl(double _timeSinceLastUpdate);
+
+    /// \brief Callback when a connector0 message is received.
+    private: void OnConnector0(ConstVariantPtr &_msg);
+
+    /// \brief Callback when a connector1 message is received.
+    private: void OnConnector1(ConstVariantPtr &_msg);
+
+    /// \brief Mutex to protect connector 0 messages.
+    private: boost::recursive_mutex *connector0Mutex;
+
+    /// \brief Mutex to protect connector 1 messages.
+    private: boost::recursive_mutex *connector1Mutex;
+
+    /// \brief Joint low stop
+    private: double switchLow;
+
+    /// \brief Joint high stop
+    private: double switchHigh;
+
+    /// \brief A revolute joint for the swtich
+    private: physics::JointPtr switchJoint;
+
+    /// \brief Position to set the swtich to.
+    private: double switchCmd;
+
+    /// \brief PID controller for making a bi-stable switch
+    private: common::PID switchPID;
+
+    /// \brief True if the switch is closed.
+    private: bool closed;
+
+    /// \brief Subscriber to the connector 1 topic.
+    private: transport::SubscriberPtr connector0Sub;
+
+    /// \brief Subscriber to the connector 1 topic.
+    private: transport::SubscriberPtr connector1Sub;
+
+    private: Simple_msgs::msgs::Variant connector0Msg;
+
+    private: Simple_msgs::msgs::Variant connector1Msg;
   };
 }
 
