@@ -123,8 +123,8 @@ namespace gazebo
       private: void CreateHotSpot(ConnectionData *_connect);
 
       /// \brief Select a port on the model.
-      /// return True if a port is selected, false otherwise.
-      private: bool SelectPort();
+      /// return Name of port selected, empty string otherwise.
+      private: std::string SelectPort();
 
       /// \brief Qt signal when the connection creation process has ended.
       //Q_SIGNALS: void ConnectionAdded();
@@ -192,6 +192,12 @@ namespace gazebo
 
       /// \brief Child visual of the connection.
       public: rendering::VisualPtr child;
+
+      /// \brief Parent port of the connection.
+      public: std::string parentPort;
+
+      /// \brief Child port of the connection.
+      public: std::string childPort;
 
       /// \brief Visual line used to represent the connection
       public: rendering::DynamicLines *line;

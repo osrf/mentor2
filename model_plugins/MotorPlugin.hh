@@ -20,6 +20,9 @@
 
 #include "SimpleModelPlugin.hh"
 
+typedef const boost::shared_ptr<const Simple_msgs::msgs::Variant>
+    ConstVariantPtr;
+
 namespace gazebo
 {
   class MotorPlugin : public SimpleModelPlugin
@@ -40,6 +43,10 @@ namespace gazebo
     /// Documentation Inherited
     protected: virtual void UpdateImpl(double _timeSinceLastUpdate);
 
+    /// \brief Callback when voltage is received.
+    /// \param[in] _msg Message containing the input voltage value.
+    private: void OnVoltage(ConstVariantPtr &_msg);
+
     /// \brief
     private: double lastSimTimei;
 
@@ -50,6 +57,12 @@ namespace gazebo
 
     /// \brief Torque constant in  N*m/A
     private: double torqueConstant;
+
+    /// \brief Subcriber to the input voltage topic.
+    private: transport::SubscriberPtr voltageSub;
+
+    /// \brief Input voltage.
+    private: double voltage;
   };
 }
 

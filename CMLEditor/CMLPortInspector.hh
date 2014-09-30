@@ -50,6 +50,9 @@ namespace gazebo
       /// \param[in] _msg A simple model message that contains port information.
       public: void Load(const Simple_msgs::msgs::SimpleModel *_msg);
 
+      /// \brief Get the selected port.
+      public: std::string GetPort() const;
+
       /// \brief Qt signal emitted to indicate that changes should be applied.
       Q_SIGNALS: void Applied();
 

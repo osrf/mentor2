@@ -24,6 +24,7 @@ GZ_REGISTER_MODEL_PLUGIN(MotorPlugin)
 /////////////////////////////////////////////////
 MotorPlugin::MotorPlugin()
 {
+  this->voltage = 0;
   this->schematicType = "motor";
   this->backEmf = 0.0064;
   this->motorResistance = 14;
@@ -49,11 +50,22 @@ void MotorPlugin::Init()
 /////////////////////////////////////////////////
 void MotorPlugin::UpdateImpl(double _timeSinceLastUpdate)
 {
+  if (!this->voltageSub)
+  {
+    if (this->portTopics.empty() ||
+        this->portTopics.find("positive") == this->portTopics.end())
+      return;
+
+    this->voltageSub = this->node->Subscribe(this->portTopics["positive"],
+        &MotorPlugin::OnVoltage, this);
+
+    return;
+  }
 
   // std::cout << "MOTOR update!" << std::endl;
 
   // get this value from the connectors
-  double voltage = 5; // in Volts
+  double voltage = this->voltage; // in Volts
 
   double shaftRotationSpeed = 0.1; // in radians per seconds
   double emfVolt = this->backEmf * shaftRotationSpeed;
@@ -61,4 +73,11 @@ void MotorPlugin::UpdateImpl(double _timeSinceLastUpdate)
   double internalCurrent = internalVoltage / this->motorResistance;
   double torque = internalCurrent * this->torqueConstant;
 
+}
+
+/////////////////////////////////////////////////
+void MotorPlugin::OnVoltage(ConstVariantPtr &_msg)
+{
+  this->voltage = _msg->v_double();
+  //std::cerr << "receiving voltage " << this->voltage << std::endl;
 }

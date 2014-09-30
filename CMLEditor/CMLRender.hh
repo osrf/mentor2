@@ -73,7 +73,8 @@ namespace gazebo
       /// \brief Parent of the connection.
       /// \brief Child of the connection.
       private: void OnConnectionCreated(const std::string &_parent,
-          const std::string &_child);
+          const std::string &_parentPort, const std::string &_child,
+          const std::string &_childPort);
 
       /// \brief Callback when a request message is received.
       /// \param[in] _msg The request message.

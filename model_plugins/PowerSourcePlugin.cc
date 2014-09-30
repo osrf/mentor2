@@ -81,16 +81,19 @@ void PowerSourcePlugin::UpdateImpl(double _timeSinceLastUpdate)
     if (loop <0)
     {
       loop = 10;
-      std::cout << "battery capacity " << this->capacity << " [-" << ampHours<< "]" << std::endl;
+      //std::cout << "battery capacity " << this->capacity << " [-" << ampHours<< "]" << std::endl;
     }
   }
 
-  if (this->portPubs.size() != 0)
+  if (!this->portPubs.empty())
   {
     Simple_msgs::msgs::Variant msg;
     msg.set_type(Simple_msgs::msgs::Variant::DOUBLE);
     msg.set_v_double(this->voltage);
 
-    this->portPubs[0]->Publish(msg);
+    if (this->portPubs.find("positive") != this->portPubs.end())
+    {
+      this->portPubs["positive"]->Publish(msg);
+    }
   }
 }

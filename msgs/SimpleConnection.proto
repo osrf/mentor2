@@ -4,6 +4,6 @@ message SimpleConnection
 {
   required string parent      = 1;
   required string child = 2;
-  optional string parentPort = 3;
-  optional string childPort = 4;
+  optional string parent_port = 3;
+  optional string child_port = 4;
 }

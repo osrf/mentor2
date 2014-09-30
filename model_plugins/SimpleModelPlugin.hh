@@ -77,6 +77,10 @@ namespace gazebo
     /// \param[in] _msg Message describing the simple connection.
     protected: void OnSimpleConnection(ConstSimpleConnectionPtr &_msg);
 
+    /// \brief Callback on incoming port data.
+    /// \param[in] _msg Message describing the port data.
+    //protected: void OnPortData(ConstVariantPtr &_msg);
+
     /// \brief Called when a request message is received.
     /// \param[in] _msg The request message.
     private: void OnRequest(ConstRequestPtr &_msg);
@@ -149,9 +153,11 @@ namespace gazebo
     /// \brief List of simple connection message to process.
     private: SimpleConnectionMsgs_L simpleConnectionMsgs;
 
-    protected: std::vector<transport::PublisherPtr> portPubs;
+    protected: std::map<std::string, transport::PublisherPtr> portPubs;
 
-    protected: std::vector<transport::SubscriberPtr> portSubs;
+    protected: std::map<std::string, std::string> portTopics;
+
+    //protected: std::map<std::string, transport::SubscriberPtr> portSubs;
   };
 }
 

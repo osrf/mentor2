@@ -271,7 +271,6 @@ void SimpleModelPlugin::OnSimpleConnection(ConstSimpleConnectionPtr &_msg)
 //////////////////////////////////////////////////
 void SimpleModelPlugin::ProcessSimpleConnectionMsgs()
 {
-
   SimpleConnectionMsgs_L::iterator simpleConnectionIter;
 
   // Process the simple connection messages.
@@ -280,15 +279,28 @@ void SimpleModelPlugin::ProcessSimpleConnectionMsgs()
       ++simpleConnectionIter)
   {
     const Simple_msgs::msgs::SimpleConnection _msg = **simpleConnectionIter;
-    std::string topic = "~/simple/port/" + _msg.parent() + "_" + _msg.child();
+    std::string topic = "~/simple/port/" +
+        _msg.parent() + "_" + _msg.parent_port() + "/" +
+        _msg.child() + "_" + _msg.child_port();
     // currently bidrectional
 
-    this->portPubs.push_back(
-        this->node->Advertise<Simple_msgs::msgs::Variant>(topic));
+    bool isParent = false;
+    if (_msg.parent() == this->parent->GetScopedName())
+      isParent = true;
 
-    //this->portSubs.push_back(this->node->Subscribe(topic,
-        //&SimpleModelPlugin::OnRequest, this));
+    std::string port = isParent ? _msg.parent_port() : _msg.child_port();
+    this->portPubs[port] =
+        this->node->Advertise<Simple_msgs::msgs::Variant>(topic);
+
+    this->portTopics[port] = topic;
   }
 
   this->simpleConnectionMsgs.clear();
 }
+/*
+//////////////////////////////////////////////////
+void SimpleModelPlugin::OnPortData(ConstVariantPtr &_msg)
+{
+  boost::recursive_mutex::scoped_lock lock(*this->portMutex);
+  this->portData =
+}*/

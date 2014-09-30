@@ -22,6 +22,7 @@ using namespace gui;
 
 event::EventT<void (std::string)> CMLEvents::createConnection;
 
-event::EventT<void (std::string, std::string)> CMLEvents::connectionCreated;
+event::EventT<void (std::string, std::string, std::string, std::string)>
+    CMLEvents::connectionCreated;
 
 //event::EventT<void ()> CMLEvents::componentsLoaded;

@@ -87,6 +87,12 @@ void CMLPortInspector::Load(const Simple_msgs::msgs::SimpleModel *_msg)
 }
 
 /////////////////////////////////////////////////
+std::string CMLPortInspector::GetPort() const
+{
+  return portsButtonGroup->checkedButton()->text().toStdString();
+}
+
+/////////////////////////////////////////////////
 void CMLPortInspector::OnCancel()
 {
   this->reject();

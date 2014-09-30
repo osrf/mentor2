@@ -221,7 +221,8 @@ bool CMLConnectionMaker::OnMouseRelease(const common::MouseEvent &_event)
           return false;
 
         // select port, blocking call.
-        if (!this->SelectPort())
+        std::string port = this->SelectPort();
+        if (port.empty())
         {
           this->Stop();
           return false;
@@ -235,12 +236,14 @@ bool CMLConnectionMaker::OnMouseRelease(const common::MouseEvent &_event)
         this->mouseConnection =
             this->CreateConnection(this->selectedVis->GetRootVisual(),
             rendering::VisualPtr());
+        this->mouseConnection->parentPort = port;
       }
       // Pressed child part
       else if (this->selectedVis != this->hoverVis)
       {
         // select port, blocking call.
-        if (!this->SelectPort())
+        std::string port = this->SelectPort();
+        if (port.empty())
         {
           return false;
         }
@@ -250,6 +253,7 @@ bool CMLConnectionMaker::OnMouseRelease(const common::MouseEvent &_event)
         if (this->selectedVis)
           this->selectedVis->SetEmissive(common::Color(0, 0, 0));
         this->mouseConnection->child = this->hoverVis;
+        this->mouseConnection->childPort = port;
 
         // reset variables.
         this->selectedVis.reset();
@@ -261,7 +265,9 @@ bool CMLConnectionMaker::OnMouseRelease(const common::MouseEvent &_event)
         // signal the end of a connect action.
         emit CMLEvents::connectionCreated(
             this->mouseConnection->parent->GetName(),
-            this->mouseConnection->child->GetName());
+            this->mouseConnection->parentPort,
+            this->mouseConnection->child->GetName(),
+            this->mouseConnection->childPort);
 
       }
     }
@@ -272,7 +278,7 @@ bool CMLConnectionMaker::OnMouseRelease(const common::MouseEvent &_event)
 }
 
 /////////////////////////////////////////////////
-bool CMLConnectionMaker::SelectPort()
+std::string CMLConnectionMaker::SelectPort()
 {
   if (!this->hoverVis)
     return false;
@@ -283,6 +289,7 @@ bool CMLConnectionMaker::SelectPort()
   msg = CMLManager::Instance()->GetModelInfo(name);
 
   bool accept = true;
+  std::string selectedPort = "";
   if (msg.port_size() > 0)
   {
     QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
@@ -299,11 +306,12 @@ bool CMLConnectionMaker::SelectPort()
     inspector->Load(&msg);
     int ret = inspector->exec();
     if (ret != QDialog::Accepted)
-      accept = false;
+      return selectedPort;
 
+    selectedPort = inspector->GetPort();
     QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
   }
-  return accept;
+  return selectedPort;
 }
 
 /////////////////////////////////////////////////
@@ -394,6 +402,8 @@ void CMLConnectionMaker::Stop()
       this->mouseConnection->visual.reset();
       delete this->mouseConnection;
       this->mouseConnection = NULL;
+      this->mouseConnection->parentPort = "";
+      this->mouseConnection->childPort = "";
     }
 
     if (this->hoverVis)

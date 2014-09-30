@@ -61,7 +61,7 @@ CMLRender::CMLRender()
 
   this->connections.push_back(
       CMLEvents::ConnectConnectionCreated(
-        boost::bind(&CMLRender::OnConnectionCreated, this, _1, _2)));
+        boost::bind(&CMLRender::OnConnectionCreated, this, _1, _2, _3, _4)));
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
@@ -214,15 +214,17 @@ void CMLRender::OnCreateConnection(const std::string &_type)
 
 /////////////////////////////////////////////////
 void CMLRender::OnConnectionCreated(const std::string &_parent,
-    const std::string &_child)
+    const std::string &_parentPort, const std::string &_child,
+    const std::string &_childPort)
 {
   std::cerr << " connection created " << _parent << " " << _child << std::endl;
 
   Simple_msgs::msgs::SimpleConnection msg;
   msg.set_parent(_parent);
   msg.set_child(_child);
+  msg.set_parent_port(_parentPort);
+  msg.set_child_port(_childPort);
   this->connectionPub->Publish(msg);
-
 
   Event_msgs::msgs::RestPost restMsg;
   restMsg.set_route("/events/new");
@@ -233,7 +235,9 @@ void CMLRender::OnConnectionCreated(const std::string &_parent,
   postStr += "\"name\": \"simple_connection\",";
   postStr += "\"data\": {";
   postStr += "\"parent\": \"" + _parent +"\",";
-  postStr += "\"child\": \"" + _child +"\"";
+  postStr += "\"parent_port\": \"" + _parentPort +"\",";
+  postStr += "\"child\": \"" + _child +"\",";
+  postStr += "\"child_port\": \"" + _childPort +"\"";
   postStr += "}";
   postStr += "}";
   restMsg.set_json(postStr);

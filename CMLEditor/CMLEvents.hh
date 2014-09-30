@@ -57,8 +57,8 @@ namespace gazebo
       public: static event::EventT<void (std::string)> createConnection;
 
       /// \brief A connection has been ben created
-      public: static event::EventT<void (std::string, std::string)>
-          connectionCreated;
+      public: static event::EventT<void (std::string, std::string,
+          std::string, std::string)> connectionCreated;
 
     };
   }
