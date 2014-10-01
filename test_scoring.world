@@ -60,7 +60,7 @@
     <event>
       <name>batiInStart</name>
       <type>inclusion</type>
-      <model>AA battery</model>
+      <model>AA_battery</model>
       <region>start</region>
     </event>
 
@@ -68,7 +68,7 @@
     <event>
       <name>batInEnd</name>
       <type>inclusion</type>
-      <model>AA battery</model>
+      <model>AA_battery</model>
       <region>end</region>
     </event>
 
