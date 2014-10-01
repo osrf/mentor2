@@ -72,6 +72,8 @@ void SwitchPlugin::LoadImpl(sdf::ElementPtr _sdf)
 
   if (this->closed)
     this->switchCmd = this->switchLow;
+  else
+    this->switchCmd = this->switchHigh;
 }
 
 /////////////////////////////////////////////////

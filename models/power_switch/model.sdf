@@ -147,7 +147,7 @@
         <type>electrical</type>
       </port>
       <properties>
-        <closed>true</closed>
+        <closed>false</closed>
       </properties>
       <switch_joint>button_joint</switch_joint>
     </plugin>
