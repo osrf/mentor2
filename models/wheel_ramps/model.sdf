@@ -1,0 +1,281 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <model name="ramps">
+    <pose>0 0 1.05 0 0 0</pose>
+    <static>true</static>
+
+    <link name="link">
+      <collision name="collision_top_ramp1">
+        <pose>0.245 -1.1 0.21 0.1 0.1 0</pose>
+        <geometry>
+          <box>
+            <size>0.01 0.35 0.01</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="visual_top_ramp1">
+        <pose>0.245 -1.1 0.21 0.1 0.1 0</pose>
+        <geometry>
+          <box>
+            <size>0.01 0.35 0.01</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
+      </visual>
+
+      <collision name="collision_top_ramp">
+        <pose>0.38 -1.1 0.19 0.1 0.1 0</pose>
+        <geometry>
+          <box>
+            <size>0.05 0.35 0.01</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="visual_top_ramp">
+        <pose>0.38 -1.1 0.19 0.1 0.1 0</pose>
+        <geometry>
+          <box>
+            <size>0.05 0.35 0.01</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
+      </visual>
+
+      <collision name="collision_turn1_barrier">
+        <pose>0.35 -1.05 0.25 .1 0 1.2</pose>
+        <geometry>
+          <box>
+            <size>0.01 0.15 0.1</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="visual_turn_barrier">
+        <pose>0.35 -1.05 0.25 .1 0 1.2</pose>
+        <geometry>
+          <box>
+            <size>0.01 0.15 0.1</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
+      </visual>
+
+      <collision name="collision_ramp_back">
+        <pose>0.42 0.0 -0.0 -0.1 -0.1 0</pose>
+        <geometry>
+          <box>
+            <size>0.15 2.73 0.01</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="visual_ramp_back">
+        <pose>0.42 0.0 -0.0 -0.1 -0.1 0</pose>
+        <geometry>
+          <box>
+            <size>0.15 2.73 0.01</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
+      </visual>
+      <collision name="collision_ramp_back_wall">
+        <pose>0.55 0 0.05 -0.1 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.01 2.73 0.1</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="visual_ramp_back_wall">
+        <pose>0.55 0 0.05 -0.1 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.01 2.73 0.1</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
+      </visual>
+
+      <collision name="collision_ramp_back_wall2">
+        <pose>0.348 0 0.05 -0.1 0 -0.01</pose>
+        <geometry>
+          <box>
+            <size>0.01 2.0 0.1</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="visual_ramp_back_wall2">
+        <pose>0.348 0 0.05 -0.1 0 -0.01</pose>
+        <geometry>
+          <box>
+            <size>0.01 2.0 0.1</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
+      </visual>
+
+      <collision name="collision_turn2_barrier">
+        <pose>0.42 1.35 -0.12 -0.1 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.15 0.01 0.1</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="visual_turn2_barrier">
+        <pose>0.42 1.35 -0.12 -0.1 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.15 0.01 0.1</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
+      </visual>
+
+      <collision name="collision_feeder_guide">
+        <pose>0.352 1.05 -0.2 0.45 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.01 0.3 0.3</size>
+          </box>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>0</mu>
+              <mu2>0</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="visual_feeder_guide">
+        <pose>0.352 1.05 -0.2 0.45 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.01 0.3 0.3</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
+      </visual>
+
+
+      <collision name="collision_feeder_turn">
+        <pose>0.23 1.33 -0.05 0.45 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.01 0.65 0.1</size>
+          </box>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>0</mu>
+              <mu2>0</mu2>
+            </ode>
+          </friction>
+        </surface>
+
+      </collision>
+      <visual name="visual_feeder_turn">
+        <pose>0.23 1.33 -0.05 0.45 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.01 0.65 0.1</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
+      </visual>
+
+
+      <collision name="collision_feeder_wall">
+        <pose>0.27 1.4 -0.15 0.45 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.01 0.905 0.1</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="visual_feeder_wall">
+        <pose>0.27 1.4 -0.15 0.45 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.01 0.905 0.1</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
+      </visual>
+
+      <collision name="collision_feeder_wall2">
+        <pose>0.32 1.435 -0.15 0.45 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.01 1.2 0.1</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="visual_feeder_wall2">
+        <pose>0.32 1.435 -0.15 0.45 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.01 1.2 0.1</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+
+</sdf>

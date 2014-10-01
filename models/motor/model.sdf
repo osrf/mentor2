@@ -1,8 +1,9 @@
 <?xml version="1.0" ?>
 <sdf version="1.5">
   <model name="motor">
-    <pose>0 0 0.1 0 0 0</pose>
+    <pose>-0.2 0 1.05 0 0 0</pose>
     <link name="link">
+      <self_collide>false</self_collide>
       <collision name="collision">
         <pose>0 0 0.0 0 0 0</pose>
         <geometry>
@@ -28,7 +29,34 @@
         </material>
       </visual>
     </link>
-    <plugin filename="libMotorPlugin.so" name="motor">
+
+    <joint name="world_joint" type="revolute">
+      <parent>world</parent>
+      <child>link</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>0</lower>
+          <upper>0</upper>
+        </limit>
+      </axis>
+    </joint>
+
+    <!--
+    <joint name="wheel_joint" type="revolute">
+      <parent>link</parent>
+      <child>bucket_wheel::link</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1000000000</lower>
+          <upper>1000000000</upper>
+        </limit>
+      </axis>
+    </joint>
+-->
+ 
+      <plugin filename="libMotorPlugin.so" name="motor">
       <port>
         <name>shaft</name>
         <type>mechanical</type>
@@ -50,7 +78,7 @@
         <inductance>0.00388</inductance>
         <damping>7.0E-8</damping>
       </properties>
-
     </plugin>
+
   </model>
 </sdf>

@@ -27,6 +27,8 @@ SwitchPlugin::SwitchPlugin()
 {
   this->schematicType = "switch";
   this->closed = false;
+  this->connector0Dirty = false;
+  this->connector1Dirty = false;
 }
 
 /////////////////////////////////////////////////
@@ -153,18 +155,27 @@ void SwitchPlugin::UpdateImpl(double _timeSinceLastUpdate)
     if (this->portPubs.find("connector0") != this->portPubs.end())
     {
       boost::recursive_mutex::scoped_lock lock(*this->connector0Mutex);
-      if (this->closed &&
-          this->connector1Msg.type() == Simple_msgs::msgs::Variant::DOUBLE)
-        this->connector1Msg.set_v_double(0);
-      this->portPubs["connector0"]->Publish(this->connector1Msg);
+      if (this->connector1Dirty)
+      {
+        if (!this->closed &&
+            this->connector1Msg.type() == Simple_msgs::msgs::Variant::DOUBLE)
+          this->connector1Msg.set_v_double(0);
+
+        this->portPubs["connector0"]->Publish(this->connector1Msg);
+        this->connector1Dirty = false;
+      }
     }
     if (this->portPubs.find("connector1") != this->portPubs.end())
     {
       boost::recursive_mutex::scoped_lock lock(*this->connector1Mutex);
-      if (!this->closed &&
-          this->connector1Msg.type() == Simple_msgs::msgs::Variant::DOUBLE)
-        this->connector1Msg.set_v_double(0);
-      this->portPubs["connector1"]->Publish(this->connector0Msg);
+      if (this->connector0Dirty)
+      {
+        if (!this->closed &&
+            this->connector0Msg.type() == Simple_msgs::msgs::Variant::DOUBLE)
+          this->connector0Msg.set_v_double(0);
+        this->portPubs["connector1"]->Publish(this->connector0Msg);
+        this->connector0Dirty = false;
+      }
     }
   }
 }
@@ -172,7 +183,8 @@ void SwitchPlugin::UpdateImpl(double _timeSinceLastUpdate)
 ////////////////////////////////////////////////////////////////////////////////
 void SwitchPlugin::OnConnector0(ConstVariantPtr &_msg)
 {
- boost::recursive_mutex::scoped_lock lock(*this->connector0Mutex);
+  boost::recursive_mutex::scoped_lock lock(*this->connector0Mutex);
+  this->connector0Dirty = true;
   this->connector0Msg = *_msg;
 }
 
@@ -180,5 +192,6 @@ void SwitchPlugin::OnConnector0(ConstVariantPtr &_msg)
 void SwitchPlugin::OnConnector1(ConstVariantPtr &_msg)
 {
   boost::recursive_mutex::scoped_lock lock(*this->connector1Mutex);
+  this->connector1Dirty = true;
   this->connector1Msg = *_msg;
 }

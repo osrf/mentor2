@@ -291,7 +291,6 @@ void SimpleModelPlugin::ProcessSimpleConnectionMsgs()
     std::string port = isParent ? _msg.parent_port() : _msg.child_port();
     this->portPubs[port] =
         this->node->Advertise<Simple_msgs::msgs::Variant>(topic);
-
     this->portTopics[port] = topic;
   }
 

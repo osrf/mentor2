@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _MOTOR_PLUGIN_HH_
-#define _MOTOR_PLUGIN_HH_
+#ifndef _WHEEL_PLUGIN_HH_
+#define _WHEEL_PLUGIN_HH_
 
 #include "SimpleModelPlugin.hh"
 
@@ -25,13 +25,13 @@ typedef const boost::shared_ptr<const Simple_msgs::msgs::Variant>
 
 namespace gazebo
 {
-  class MotorPlugin : public SimpleModelPlugin
+  class WheelPlugin : public SimpleModelPlugin
   {
     /// \brief Constructor.
-    public: MotorPlugin();
+    public: WheelPlugin();
 
     /// \brief Destructor.
-    public: ~MotorPlugin();
+    public: ~WheelPlugin();
 
     /// \brief Load the model plugin.
     /// param[in] _sdf The SDF of this plugin.
@@ -40,32 +40,15 @@ namespace gazebo
     /// \brief Initialize the plugin.
     public: virtual void Init();
 
-    /// Documentation Inherited
-    protected: virtual void UpdateImpl(double _timeSinceLastUpdate);
-
     /// \brief Callback when voltage is received.
     /// \param[in] _msg Message containing the input voltage value.
-    private: void OnVoltage(ConstVariantPtr &_msg);
+    private: void OnTorque(ConstVariantPtr &_msg);
 
-    /// \brief
-    private: double lastSimTimei;
+    /// \brief Subcriber to the input torque topic.
+    private: transport::SubscriberPtr torqueSub;
 
-    private: double backEmf;
-
-    /// \brief
-    private: double motorResistance;
-
-    /// \brief Torque constant in  N*m/A
-    private: double torqueConstant;
-
-    /// \brief Subcriber to the input voltage topic.
-    private: transport::SubscriberPtr voltageSub;
-
-    /// \brief Publisher of torque values on the ~/motor/torque topic.
-    private: transport::PublisherPtr torquePub;
-
-    /// \brief Input voltage.
-    private: double voltage;
+    /// \brief Joint to rotate.
+    private: gazebo::physics::JointPtr joint;
   };
 }
 

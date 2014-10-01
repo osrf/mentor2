@@ -91,7 +91,8 @@ void PowerSourcePlugin::UpdateImpl(double _timeSinceLastUpdate)
     msg.set_type(Simple_msgs::msgs::Variant::DOUBLE);
     msg.set_v_double(this->voltage);
 
-    if (this->portPubs.find("positive") != this->portPubs.end())
+    if (this->portPubs.find("positive") != this->portPubs.end() &&
+        this->portPubs.find("negative") != this->portPubs.end())
     {
       this->portPubs["positive"]->Publish(msg);
     }

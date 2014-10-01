@@ -7,6 +7,7 @@ set (plugins
   MotorPlugin
   PowerSourcePlugin
   SwitchPlugin
+  WheelPlugin
 )
 
 include_directories(

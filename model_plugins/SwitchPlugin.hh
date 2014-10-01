@@ -84,6 +84,12 @@ namespace gazebo
     private: Simple_msgs::msgs::Variant connector0Msg;
 
     private: Simple_msgs::msgs::Variant connector1Msg;
+
+    /// \brief Flag to keep track of new connector0 messages.
+    private: bool connector0Dirty;
+
+    /// \brief Flag to keep track of new connector1 messages.
+    private: bool connector1Dirty;
   };
 }
 
