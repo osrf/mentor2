@@ -43,26 +43,34 @@ namespace gazebo
     /// Documentation Inherited
     protected: virtual void UpdateImpl(double _timeSinceLastUpdate);
 
-    /// \brief Callback when voltage is received.
+    /// \brief Callback when voltage is received on connector0.
     /// \param[in] _msg Message containing the input voltage value.
-    private: void OnVoltage(ConstVariantPtr &_msg);
+    private: void OnConnector0Voltage(ConstVariantPtr &_msg);
 
-    /// \brief
-    private: double lastSimTimei;
+    /// \brief Callback when voltage is received on connector 1.
+    /// \param[in] _msg Message containing the input voltage value.
+    private: void OnConnector1Voltage(ConstVariantPtr &_msg);
 
+    /// \brief Back-EMF (Electromotive Force).
     private: double backEmf;
 
-    /// \brief
+    /// \brief Motor resistance in ohms.
     private: double motorResistance;
 
     /// \brief Torque constant in  N*m/A
     private: double torqueConstant;
 
-    /// \brief Subcriber to the input voltage topic.
-    private: transport::SubscriberPtr voltageSub;
+    /// \brief Subcriber to the input voltage topic on connector0.
+    private: transport::SubscriberPtr voltageConnector0Sub;
+
+    /// \brief Subcriber to the input voltage topic on connector1.
+    private: transport::SubscriberPtr voltageConnector1Sub;
 
     /// \brief Publisher of torque values on the ~/motor/torque topic.
     private: transport::PublisherPtr torquePub;
+
+    /// \brief Mutex to protect voltage variable.
+    private: boost::recursive_mutex *voltageMutex;
 
     /// \brief Input voltage.
     private: double voltage;

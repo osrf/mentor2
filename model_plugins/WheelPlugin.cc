@@ -52,5 +52,10 @@ void WheelPlugin::OnTorque(ConstVariantPtr &_msg)
   // HACK: This is setting max force, while we are manually controlling the
   // max velocity
   this->joint->SetMaxForce(0, _msg->v_double());
-  this->joint->SetVelocity(0, 0.7);
+//  this->joint->SetForce(0, _msg->v_double());
+
+  if (_msg->v_double() > 1)
+    this->joint->SetVelocity(0, 0.7);
+  else   if (_msg->v_double() < -1)
+    this->joint->SetVelocity(0, -0.7);
 }

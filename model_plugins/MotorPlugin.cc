@@ -29,16 +29,19 @@ MotorPlugin::MotorPlugin()
   this->backEmf = 0.0064;
   this->motorResistance = 5;
   this->torqueConstant = 5.96;
+  //this->torqueConstant = 596;
 }
 
 /////////////////////////////////////////////////
 MotorPlugin::~MotorPlugin()
 {
+  delete this->voltageMutex;
 }
 
 /////////////////////////////////////////////////
 void MotorPlugin::LoadImpl(sdf::ElementPtr _sdf)
 {
+  this->voltageMutex = new boost::recursive_mutex();
 }
 
 /////////////////////////////////////////////////
@@ -52,22 +55,36 @@ void MotorPlugin::Init()
 /////////////////////////////////////////////////
 void MotorPlugin::UpdateImpl(double _timeSinceLastUpdate)
 {
-  if (!this->voltageSub)
-  {
-    if (this->portTopics.empty() ||
-        this->portTopics.find("positive") == this->portTopics.end())
+  if (this->portTopics.empty())
       return;
 
-    this->voltageSub = this->node->Subscribe(this->portTopics["positive"],
-        &MotorPlugin::OnVoltage, this);
-
-    return;
+  if (!this->voltageConnector0Sub)
+  {
+    if (this->portTopics.find("connector0") != this->portTopics.end())
+    {
+      this->voltageConnector0Sub =
+          this->node->Subscribe(this->portTopics["connector0"],
+          &MotorPlugin::OnConnector0Voltage, this);
+    }
   }
+  if (!this->voltageConnector1Sub)
+  {
+    if (this->portTopics.find("connector1") != this->portTopics.end())
+    {
+      this->voltageConnector1Sub =
+          this->node->Subscribe(this->portTopics["connector1"],
+          &MotorPlugin::OnConnector1Voltage, this);
+    }
+  }
+
 
   // std::cout << "MOTOR update!" << std::endl;
 
-  // get this value from the connectors
-  double voltage = this->voltage; // in Volts
+  {
+    boost::recursive_mutex::scoped_lock lock(*this->voltageMutex);
+    // get this value from the connectors
+    double voltage = this->voltage; // in Volts
+  }
 
   double shaftRotationSpeed = 0.1; // in radians per seconds
   double emfVolt = this->backEmf * shaftRotationSpeed;
@@ -84,8 +101,16 @@ void MotorPlugin::UpdateImpl(double _timeSinceLastUpdate)
 }
 
 /////////////////////////////////////////////////
-void MotorPlugin::OnVoltage(ConstVariantPtr &_msg)
+void MotorPlugin::OnConnector0Voltage(ConstVariantPtr &_msg)
 {
+  boost::recursive_mutex::scoped_lock lock(*this->voltageMutex);
   this->voltage = _msg->v_double();
   //std::cerr << "receiving voltage " << this->voltage << std::endl;
+}
+
+/////////////////////////////////////////////////
+void MotorPlugin::OnConnector1Voltage(ConstVariantPtr &_msg)
+{
+  boost::recursive_mutex::scoped_lock lock(*this->voltageMutex);
+  this->voltage = _msg->v_double() * -1;
 }

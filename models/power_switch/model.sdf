@@ -7,7 +7,7 @@
         <pose>0 0 0.0 0 0 0</pose>
         <geometry>
           <mesh>
-            <uri>model://power_switch/meshes/switch.dae</uri>
+            <uri>model://power_switch/meshes/switch_no_button.dae</uri>
             <scale>0.01 0.01 0.01</scale>
           </mesh>
         </geometry>
@@ -16,7 +16,7 @@
         <pose>0 0 0.0 0 0 0</pose>
         <geometry>
           <mesh>
-            <uri>model://power_switch/meshes/switch.dae</uri>
+            <uri>model://power_switch/meshes/switch_no_button.dae</uri>
             <scale>0.01 0.01 0.01</scale>
           </mesh>
         </geometry>

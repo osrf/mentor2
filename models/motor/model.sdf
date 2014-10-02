@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <sdf version="1.5">
   <model name="motor">
-    <pose>-0.2 0 1.05 0 0 0</pose>
+    <pose>0 0 0.1 0 0 0</pose>
     <link name="link">
       <self_collide>false</self_collide>
       <collision name="collision">
@@ -55,18 +55,18 @@
       </axis>
     </joint>
 -->
- 
+
       <plugin filename="libMotorPlugin.so" name="motor">
       <port>
         <name>shaft</name>
         <type>mechanical</type>
       </port>
       <port>
-        <name>positive</name>
+        <name>connector0</name>
         <type>electrical</type>
       </port>
       <port>
-        <name>negative</name>
+        <name>connector1</name>
         <type>electrical</type>
       </port>
 
