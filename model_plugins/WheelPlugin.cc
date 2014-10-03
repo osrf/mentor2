@@ -54,8 +54,8 @@ void WheelPlugin::OnTorque(ConstVariantPtr &_msg)
   this->joint->SetMaxForce(0, _msg->v_double());
 //  this->joint->SetForce(0, _msg->v_double());
 
-  if (_msg->v_double() > 1)
+  if (_msg->v_double() > 0)
     this->joint->SetVelocity(0, 0.7);
-  else   if (_msg->v_double() < -1)
-    this->joint->SetVelocity(0, -0.7);
+  else
+    this->joint->SetVelocity(0, 0.0);
 }

@@ -281,7 +281,7 @@ bool CMLConnectionMaker::OnMouseRelease(const common::MouseEvent &_event)
 std::string CMLConnectionMaker::SelectPort()
 {
   if (!this->hoverVis)
-    return false;
+    return "";
 
   // show the port inspector if there are ports
   std::string name = this->hoverVis->GetName();
