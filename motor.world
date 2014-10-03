@@ -25,6 +25,45 @@
       <uri>model://wheel_ramps</uri>
     </include>
 
+    <plugin name="scoring" filename="libScoringPlugin.so">
+
+    <region>
+      <name>rampRegion</name>
+      <volume>
+          <min>0.3 0.3 0.9</min>
+          <max>0.5 0.5 1.1</max>
+     </volume>
+    </region>
+
+    <!-- bounding box inclusion event -->
+    <event>
+      <name>ball2InRampRegion</name>
+      <type>inclusion</type>
+      <model>ball2</model>
+      <region>rampRegion</region>
+    </event>
+
+    <event>
+      <name>ball1InRampRegion</name>
+      <type>inclusion</type>
+      <model>ball1</model>
+      <region>rampRegion</region>
+    </event>
+
+
+
+    <event>
+      <name>AllModels</name>
+      <type>existence</type>
+    </event>
+  
+    <event>
+      <name>SimState</name>
+      <type>sim_state</type>
+    </event>
+
+    </plugin>
+
     <model name="box_start">
       <pose>-1 0.0 0.1 0 0 0</pose>
       <link name="link">
