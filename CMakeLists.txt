@@ -76,8 +76,6 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${CMAKE_INSTALL_P
 
 add_subdirectory(msgs)
 add_subdirectory(CMLEditor)
-add_subdirectory(SimpleMOOC)
-add_subdirectory(MOOCUI)
 add_subdirectory(scoring)
 add_subdirectory(model_plugins)
 add_subdirectory(models)
