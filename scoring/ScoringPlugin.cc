@@ -97,6 +97,7 @@ void ScoringPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
     EventSourcePtr event;
     if (eventType == "sim_state")
     {
+      std::cerr << " sim state created " << std::endl;
       event.reset(new SimStateEventSource(this->pub, this->world));
     }
     else if (eventType == "motion")

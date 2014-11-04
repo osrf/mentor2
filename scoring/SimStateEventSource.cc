@@ -23,7 +23,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////////
 SimStateEventSource::SimStateEventSource( transport::PublisherPtr _pub,
                                           physics::WorldPtr _world) 
-  :EventSource(_pub, "simstate", _world), hasPaused(false)
+  :EventSource(_pub, "sim_state", _world), hasPaused(false)
 {
 }
 
