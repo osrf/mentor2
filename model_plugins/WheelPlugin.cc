@@ -35,15 +35,33 @@ WheelPlugin::~WheelPlugin()
 /////////////////////////////////////////////////
 void WheelPlugin::LoadImpl(sdf::ElementPtr _sdf)
 {
+  if (_sdf->HasElement("shaft_link"))
+  {
+    sdf::ElementPtr elem = _sdf->GetElement("shaft_link");
+    this->shaftLinkName = elem->Get<std::string>();
+  }
+  if (_sdf->HasElement("body_link"))
+  {
+    sdf::ElementPtr elem = _sdf->GetElement("body_link");
+    this->bodyLinkName = elem->Get<std::string>();
+  }
 }
 
 /////////////////////////////////////////////////
 void WheelPlugin::Init()
 {
   SimpleModelPlugin::Init();
-  this->torqueSub = this->node->Subscribe("~/motor/torque",
-      &WheelPlugin::OnTorque, this);
-  this->joint = this->parent->GetJoint("world_joint");
+
+  // sub not used any more, remove me later
+  //this->torqueSub = this->node->Subscribe("~/motor/torque",
+  //    &WheelPlugin::OnTorque, this);
+  //this->joint = this->parent->GetJoint("world_joint");
+
+  this->shaftLink = boost::dynamic_pointer_cast<physics::Link>(
+      this->parent->GetWorld()->GetEntity(this->shaftLinkName));
+
+  this->bodyLink = boost::dynamic_pointer_cast<physics::Link>(
+      this->parent->GetWorld()->GetEntity(this->bodyLinkName));
 }
 
 /////////////////////////////////////////////////
@@ -51,11 +69,40 @@ void WheelPlugin::OnTorque(ConstVariantPtr &_msg)
 {
   // HACK: This is setting max force, while we are manually controlling the
   // max velocity
-//  this->joint->SetMaxForce(0, _msg->v_double());
-  this->joint->SetForce(0, _msg->v_double());
+
+  // not used any more, remove me later.
+  //this->joint->SetForce(0, _msg->v_double());
 
 /*  if (_msg->v_double() > 0)
     this->joint->SetVelocity(0, 0.7);
   else
     this->joint->SetVelocity(0, 0.0);*/
+}
+
+/////////////////////////////////////////////////
+void WheelPlugin::UpdateImpl(double _timeSinceLastUpdate)
+{
+  if (!this->shaftLink || !this->bodyLink)
+    return;
+
+  if (this->shaftJoint)
+    return;
+
+  this->shaftLink->SetAutoDisable(false);
+  this->shaftJoint = this->parent->GetWorld()->GetPhysicsEngine()->CreateJoint(
+      "revolute", this->parent);
+
+  this->shaftJoint->Attach(this->shaftLink, this->bodyLink);
+  this->shaftJoint->Load(this->shaftLink, this->bodyLink, math::Pose::Zero);
+  {
+    std::stringstream jointNameStream;
+    jointNameStream << this->bodyLinkName + "_" <<
+        this->shaftLinkName << "_joint";
+    this->shaftJoint->SetName(jointNameStream.str());
+  }
+  this->shaftJoint->SetAxis(0, math::Vector3(0, 0 ,1));
+  this->shaftJoint->SetHighStop(0, -1000000);
+  this->shaftJoint->SetLowStop(0, 1000000);
+
+  this->shaftJoint->Init();
 }

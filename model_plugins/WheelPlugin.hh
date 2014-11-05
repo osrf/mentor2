@@ -40,6 +40,9 @@ namespace gazebo
     /// \brief Initialize the plugin.
     public: virtual void Init();
 
+    // Documentation Inherited.
+    protected: void UpdateImpl(double _timeSinceLastUpdate);
+
     /// \brief Callback when voltage is received.
     /// \param[in] _msg Message containing the input voltage value.
     private: void OnTorque(ConstVariantPtr &_msg);
@@ -48,7 +51,22 @@ namespace gazebo
     private: transport::SubscriberPtr torqueSub;
 
     /// \brief Joint to rotate.
-    private: gazebo::physics::JointPtr joint;
+    // private: gazebo::physics::JointPtr joint;
+
+    /// \brief Joint to rotate.
+    private: gazebo::physics::JointPtr shaftJoint;
+
+    /// \brief External shaft link connected to this wheel.
+    private: physics::LinkPtr shaftLink;
+
+    /// \brief Link to be rotated by the shaft.
+    private: physics::LinkPtr bodyLink;
+
+    /// \brief Name of the external shaft link.
+    private: std::string shaftLinkName;
+
+    /// \brief Name of the link to be rotated.
+    private: std::string bodyLinkName;
   };
 }
 

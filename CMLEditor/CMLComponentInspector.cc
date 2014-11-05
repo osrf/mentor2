@@ -173,6 +173,7 @@ QWidget *CMLComponentInspector::GetValueWidget(
       widget = new QDoubleSpinBox();
       QDoubleSpinBox *spinBoxWidget = qobject_cast<QDoubleSpinBox *>(widget);
       spinBoxWidget->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
+      spinBoxWidget->setDecimals(5);
       spinBoxWidget->setValue(_msg->v_double());
       break;
     }

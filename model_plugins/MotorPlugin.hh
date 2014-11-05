@@ -72,6 +72,15 @@ namespace gazebo
     /// \brief Mutex to protect voltage variable.
     private: boost::recursive_mutex *voltageMutex;
 
+    /// \brief Joint to rotate.
+    private: gazebo::physics::JointPtr joint;
+
+    /// \brief Link of the motor shaft.
+    private: gazebo::physics::LinkPtr shaftLink;
+
+    /// \brief Name of the shaft joint.
+    private: std::string shaftJointName;
+
     /// \brief Input voltage.
     private: double voltage;
   };
