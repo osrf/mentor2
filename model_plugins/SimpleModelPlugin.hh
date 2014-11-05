@@ -30,6 +30,9 @@
 typedef const boost::shared_ptr<const Simple_msgs::msgs::SimpleConnection>
     ConstSimpleConnectionPtr;
 
+typedef const boost::shared_ptr<const Simple_msgs::msgs::SimpleModel>
+    ConstSimpleModelPtr;
+
 namespace gazebo
 {
   class SimpleModelPlugin : public ModelPlugin
@@ -49,9 +52,92 @@ namespace gazebo
     public: virtual void Init();
 
     /// \brief Get a value of a property by key
-    /// \param _key String key
+    /// \param[in] _key String key
     /// \return The value of the property
-    public: boost::any GetProperty(const std::string &_key);
+    public: template<typename T>
+            T GetProperty(const std::string &_key)
+            {
+              T result = T();
+
+              if (!this->propertyMutex)
+                return result;
+
+              boost::recursive_mutex::scoped_lock lock(*this->propertyMutex);
+              if (this->properties.find(_key) != this->properties.end())
+              {
+                try
+                {
+                  Simple_msgs::msgs::Variant valueMsg = this->properties[_key];
+                  result = boost::any_cast<T>(this->ConvertVariant(valueMsg));
+                }
+                catch(...)
+                {
+                  return result;
+                }
+              }
+              return result;
+            }
+
+    /// \brief Get a value of a property by key
+    /// \param[in] _key String key
+    /// \return The value of the property
+    public: template<typename T>
+            void SetProperty(const std::string &_key, const T &_value,
+                bool _publish = true)
+            {
+              if (!this->propertyMutex)
+                return;
+
+              boost::recursive_mutex::scoped_lock lock(*this->propertyMutex);
+              if (this->properties.find(_key) != this->properties.end())
+              {
+                Simple_msgs::msgs::Variant valueMsg = this->properties[_key];
+                if (typeid(unsigned int) == typeid(_value))
+                {
+                  valueMsg.set_v_uint32(_value);
+                  valueMsg.set_type(Simple_msgs::msgs::Variant::UINT32);
+                }
+                else if (typeid(int) == typeid(_value))
+                {
+                  valueMsg.set_v_int32(_value);
+                  valueMsg.set_type(Simple_msgs::msgs::Variant::INT32);
+                }
+                else if (typeid(bool) == typeid(_value))
+                {
+                  valueMsg.set_v_bool(_value);
+                  valueMsg.set_type(Simple_msgs::msgs::Variant::BOOL);
+                }
+                else if (typeid(double) == typeid(_value))
+                {
+                  valueMsg.set_v_double(_value);
+                  valueMsg.set_type(Simple_msgs::msgs::Variant::DOUBLE);
+                }
+                else if (typeid(std::string) == typeid(_value))
+                {
+                  valueMsg.set_v_string(
+                      boost::lexical_cast<std::string>(_value));
+                  valueMsg.set_type(Simple_msgs::msgs::Variant::STRING);
+                }
+                /*else if (typeid(Simple_msgs::msgs::Variant) == typeid(_value))
+                {
+                  valueMsg = _value;
+                }*/
+                this->properties[_key] = valueMsg;
+                if (_publish && this->simpleModelPub)
+                {
+                  Simple_msgs::msgs::SimpleModel simpleModelMsg;
+                  this->FillMsg(simpleModelMsg);
+                  this->simpleModelPub->Publish(simpleModelMsg);
+                }
+              }
+            }
+
+    /// \brief Set the value of a property by key
+    /// \param[in] _key String key
+    /// \param[in] The value of the property
+    public: void SetProperty(const std::string &_key,
+        const Simple_msgs::msgs::Variant &_value);
+    //public: void SetProperty(const std::string &_key, const boost::any &_value);
 
     /// \brief Load the model plugin.
     /// param[in] _sdf The SDF of this plugin.
@@ -64,6 +150,11 @@ namespace gazebo
     /// \brief Update the simple model plugin
     protected: void Update();
 
+    /// \brief Convert a variant message to a boost any object.
+    /// \param[in] _variant simple variant msg.
+    /// \return boost any object.
+    protected: boost::any ConvertVariant(Simple_msgs::msgs::Variant _variant);
+
     /// \brief Implementation for updating the simple model plugin.
     /// \param[in] _timeSinceLastUpdate Time in seconds since last world update.
     protected: virtual void UpdateImpl(double _timeSinceLastUpdate);
@@ -72,6 +163,10 @@ namespace gazebo
     /// \param[out] _msg A message to be filled with ports and properties of
     /// this model.
     protected: void FillMsg(Simple_msgs::msgs::SimpleModel &_msg);
+
+    /// \brief Callback on a simple model event.
+    /// \param[in] _msg Message describing the simple model.
+    protected: void OnSimpleModel(ConstSimpleModelPtr &_msg);
 
     /// \brief Callback on a simple connection event.
     /// \param[in] _msg Message describing the simple connection.
@@ -93,8 +188,8 @@ namespace gazebo
     /// there is at least a subscriber.
     private: void InitThread();
 
-    /// \brief Process simple connection messages.
-    private: void ProcessSimpleConnectionMsgs();
+    /// \brief Process incoming messages.
+    private: void ProcessMsgs();
 
     /// \brief Type of model
     protected: std::string schematicType;
@@ -108,6 +203,9 @@ namespace gazebo
     /// \brief Publisher for simple model messages.
     protected: transport::PublisherPtr simpleModelPub;
 
+    /// \brief Subscriber to simple model messages.
+    protected: transport::SubscriberPtr simpleModelSub;
+
     /// \brief Transportation node.
     protected: transport::NodePtr node;
 
@@ -119,7 +217,7 @@ namespace gazebo
     protected: std::map<std::string, boost::any> ports;
 
     /// \brief A list of properties associated with this model.
-    protected: std::map<std::string, std::string> properties;
+    protected: std::map<std::string, Simple_msgs::msgs::Variant> properties;
 
     /// \brief Pointer to the parent model.
     protected: physics::ModelPtr parent;
@@ -145,6 +243,12 @@ namespace gazebo
     /// \brief Mutex for managing connections between simple components.
     private: boost::recursive_mutex *simpleConnectionMutex;
 
+    /// \brief Mutex for protecting messages that simple models.
+    private: boost::recursive_mutex *simpleModelMutex;
+
+    /// \brief Mutex to protect properties.
+    private: boost::recursive_mutex *propertyMutex;
+
     /// \def SimpleConnectionMsgs_L
     /// \brief List of simple connection messages.
     typedef std::list<boost::shared_ptr<
@@ -153,8 +257,18 @@ namespace gazebo
     /// \brief List of simple connection message to process.
     private: SimpleConnectionMsgs_L simpleConnectionMsgs;
 
+    /// \def SimpleModelMsgs_L
+    /// \brief List of simple model messages.
+    typedef std::list<boost::shared_ptr<
+        Simple_msgs::msgs::SimpleModel const> > SimpleModelMsgs_L;
+
+    /// \brief List of simple model message to process.
+    private: SimpleModelMsgs_L simpleModelMsgs;
+
+    /// \brief a map of port data publishers to their name .
     protected: std::map<std::string, transport::PublisherPtr> portPubs;
 
+    /// \brief a map of port name to its associated topic name.
     protected: std::map<std::string, std::string> portTopics;
 
     //protected: std::map<std::string, transport::SubscriberPtr> portSubs;

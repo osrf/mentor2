@@ -24,6 +24,7 @@ set (sources
   CMLManager.cc
   CMLNode.cc
   CMLPortInspector.cc
+  CMLPropertyManager.cc
   CMLRender.cc
   GrabberHandle.cc
   RectItem.cc
@@ -41,6 +42,7 @@ set (qt_headers
   CMLItemListWidget.hh
   CMLNode.hh
   CMLPortInspector.hh
+  CMLPropertyManager.hh
   CMLRender.hh
   RectItem.hh
 )

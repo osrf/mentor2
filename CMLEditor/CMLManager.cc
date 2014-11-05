@@ -18,6 +18,7 @@
 #include <gazebo/transport/transport.hh>
 #include <gazebo/gui/gui.hh>
 
+#include "CMLPropertyManager.hh"
 #include "CMLComponentInspector.hh"
 
 #include "CMLManager.hh"
@@ -29,7 +30,7 @@ using namespace gui;
 CMLManager::CMLManager()
 {
   this->initialized = false;
-
+  this->propertyManager = new CMLPropertyManager;
   this->requestMsg = NULL;
 }
 
@@ -45,6 +46,9 @@ CMLManager::~CMLManager()
 
  delete this->modelInfoMutex;
  this->modelInfoMutex = NULL;
+
+ delete this->propertyManager;
+ this->propertyManager = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -67,6 +71,10 @@ void CMLManager::Init()
   this->simpleModelSub = this->node->Subscribe("~/simple/model/info",
       &CMLManager::OnSimpleModel, this);
 
+  this->simpleModelPub =
+      this->node->Advertise<Simple_msgs::msgs::SimpleModel>(
+      "~/simple/model/modify");
+
   this->requestMsg = msgs::CreateRequest("entity_info", "");
   this->requestPub->Publish(*this->requestMsg);
 
@@ -88,6 +96,20 @@ Simple_msgs::msgs::SimpleModel CMLManager::GetModelInfo(
     // return empty msg for now if nothing is found.
     Simple_msgs::msgs::SimpleModel empty;
     return empty;
+  }
+}
+
+/////////////////////////////////////////////////
+void CMLManager::UpdateModelInfo(const std::string &_name,
+    Simple_msgs::msgs::SimpleModel _info, bool _publish)
+{
+  boost::recursive_mutex::scoped_lock lock(*this->modelInfoMutex);
+  if (this->modelInfo.find(_name) != this->modelInfo.end())
+    this->modelInfo[_name] = _info;
+
+  if (_publish)
+  {
+    this->simpleModelPub->Publish(_info);
   }
 }
 
@@ -135,9 +157,11 @@ bool CMLManager::ShowInspector(const std::string &_name)
     return false;
 
   CMLComponentInspector *inspector = NULL;
-  if (this->componentInspectors.find(_name) != this->componentInspectors.end())
+  if (this->propertyManager->componentInspectors.find(_name)
+      != this->propertyManager->componentInspectors.end())
   {
-    inspector = this->componentInspectors[_name];
+    inspector = this->propertyManager->componentInspectors[_name];
+    inspector->UpdateFromMsg(&this->modelInfo[_name]);
     inspector->activateWindow();
     inspector->setFocus();
   }
@@ -145,9 +169,9 @@ bool CMLManager::ShowInspector(const std::string &_name)
   {
     inspector = new CMLComponentInspector(gui::get_main_window());
     inspector->Load(&this->modelInfo[_name]);
-    this->componentInspectors[_name] = inspector;
-    /*connect(inspector, SIGNAL(Applied()), this,
-        SLOT(OnComponentProperyChanged()));*/
+    this->propertyManager->componentInspectors[_name] = inspector;
+    QObject::connect(inspector, SIGNAL(Applied()),
+        this->propertyManager, SLOT(OnComponentProperyChanged()));
   }
   inspector->show();
   return true;

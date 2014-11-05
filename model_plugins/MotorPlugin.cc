@@ -26,6 +26,8 @@ MotorPlugin::MotorPlugin()
 {
   this->voltage = 0;
   this->schematicType = "motor";
+
+  // some initial values
   this->backEmf = 0.0064;
   this->motorResistance = 5;
   this->torqueConstant = 5.96;
@@ -85,6 +87,10 @@ void MotorPlugin::UpdateImpl(double _timeSinceLastUpdate)
     // get this value from the connectors
     double voltage = this->voltage; // in Volts
   }
+
+  this->backEmf = this->GetProperty<double>("back_emf");
+  this->motorResistance = this->GetProperty<double>("resistance");
+  this->torqueConstant = this->GetProperty<double>("torque_constant");
 
   double shaftRotationSpeed = 0.1; // in radians per seconds
   double emfVolt = this->backEmf * shaftRotationSpeed;

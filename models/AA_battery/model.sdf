@@ -38,7 +38,7 @@
         <type>electrical</type>
       </port>
       <properties>
-        <voltage>100</voltage>   <!-- Volts -->
+        <voltage>1.5</voltage>   <!-- Volts -->
        <capacity>0.30</capacity> <!-- Amp-hours  -->
         <current>0.1</current>   <!-- Amps -->
       </properties>
