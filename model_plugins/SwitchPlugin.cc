@@ -29,20 +29,23 @@ SwitchPlugin::SwitchPlugin()
   this->closed = false;
   this->connector0Dirty = false;
   this->connector1Dirty = false;
+  this->connector0Mutex = NULL;
+  this->connector1Mutex = NULL;
 }
 
 /////////////////////////////////////////////////
 SwitchPlugin::~SwitchPlugin()
 {
-  delete this->connector0Mutex;
-  delete this->connector1Mutex;
+  if (this->connector0Mutex)
+    delete this->connector0Mutex;
+  if (this->connector1Mutex)
+    delete this->connector1Mutex;
 }
 
 /////////////////////////////////////////////////
 void SwitchPlugin::LoadImpl(sdf::ElementPtr _sdf)
 {
-  std::string closedStr = this->properties["closed"];
-  this->closed = closedStr == "true" ? true : false;
+  this->closed  = this->GetProperty<bool>("closed");
 
   if (_sdf->HasElement("switch_joint"))
   {
@@ -69,7 +72,7 @@ void SwitchPlugin::LoadImpl(sdf::ElementPtr _sdf)
   double switchForce = 0.2;
   this->switchPID.Init(30, 0, 0, 0, 0, switchForce, -switchForce);
 
-
+  this->fnrSwitchTime = common::Time::Zero;
   if (this->closed)
     this->switchCmd = this->switchLow;
   else
@@ -121,27 +124,58 @@ void SwitchPlugin::UpdateImpl(double _timeSinceLastUpdate)
     }
   }
 
-  // switch control logic
+  common::Time curTime = this->parent->GetWorld()->GetSimTime();
+
+  // check for world reset
+  if ( (curTime-this->fnrSwitchTime).Double() < 0)
+    this->fnrSwitchTime = common::Time::Zero;
+
   double switchHysteresis = 0.2;
   double switchCmdEps = 0.01;
   double switchState = this->switchJoint->GetAngle(0).Radian();
   double switchPercent = math::clamp((switchState - this->switchLow) /
       (this->switchHigh-this->switchLow), 0.0, 1.0);
 
-  if (this->switchCmd < (this->switchLow + switchCmdEps) &&
-      switchPercent > (0.5 + switchHysteresis))
+  // closed value changed externally (most likely by user)
+  bool newClosed = this->GetProperty<bool>("closed");
+  if (this->closed != newClosed)
   {
-    this->closed = false;
-    this->switchCmd = this->switchHigh;
-    std::cerr << "switch set to false" << std::endl;
+    this->closed = newClosed;
+    if (this->closed)
+      this->switchCmd = this->switchLow;
+    else
+      this->switchCmd = this->switchHigh;
+    this->fnrSwitchTime = curTime;
   }
-  else if (this->switchCmd > (this->switchHigh - switchCmdEps) &&
-      switchPercent < (0.5 - switchHysteresis))
+  else
   {
-    this->closed = true;
-    this->switchCmd = this->switchLow;
-    std::cerr << "switch set to true" << std::endl;
+    // closed value changed on server (most likely by physics engine)
+    // switch control logic
+    if (this->switchCmd < (this->switchLow + switchCmdEps) &&
+        switchPercent > (0.5 + switchHysteresis) &&
+        (curTime-this->fnrSwitchTime).Double() > 0.5)
+    {
+      this->SetProperty<bool>("closed", false);
+      this->closed = false;
+      this->switchCmd = this->switchHigh;
+      this->fnrSwitchTime = curTime;
+      std::cerr << "switch set to false" << std::endl;
+
+    }
+    else if (this->switchCmd > (this->switchHigh - switchCmdEps) &&
+        switchPercent < (0.5 - switchHysteresis) &&
+        (curTime-this->fnrSwitchTime).Double() > 0.5)
+    {
+      this->SetProperty<bool>("closed", true);
+      this->closed = true;
+      this->switchCmd = this->switchLow;
+      this->fnrSwitchTime = curTime;
+      std::cerr << "switch set to true" << std::endl;
+    }
   }
+
+//    std::cerr << "closed " << this->closed<< " " <<
+//        this->switchCmd<< std::endl;
 
   // PID (position) switch
   double switchError = switchState - this->switchCmd;

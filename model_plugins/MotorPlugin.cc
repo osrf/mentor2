@@ -15,6 +15,7 @@
  *
 */
 
+#include <gazebo/physics/physics.hh>
 #include "MotorPlugin.hh"
 
 using namespace gazebo;
@@ -26,9 +27,11 @@ MotorPlugin::MotorPlugin()
 {
   this->voltage = 0;
   this->schematicType = "motor";
+
+  // some initial values
   this->backEmf = 0.0064;
   this->motorResistance = 5;
-  this->torqueConstant = 5.96;
+  this->torqueConstant = 0.0064;
   //this->torqueConstant = 596;
 }
 
@@ -42,12 +45,22 @@ MotorPlugin::~MotorPlugin()
 void MotorPlugin::LoadImpl(sdf::ElementPtr _sdf)
 {
   this->voltageMutex = new boost::recursive_mutex();
+
+  if (_sdf->HasElement("shaft_joint"))
+  {
+    sdf::ElementPtr elem = _sdf->GetElement("shaft_joint");
+    this->shaftJointName = elem->Get<std::string>();
+  }
 }
 
 /////////////////////////////////////////////////
 void MotorPlugin::Init()
 {
   SimpleModelPlugin::Init();
+
+  this->joint = this->parent->GetJoint(this->shaftJointName);
+  this->shaftLink = this->joint->GetJointLink(0);
+
   this->torquePub = this->node->Advertise<Simple_msgs::msgs::Variant>(
       "~/motor/torque");
 }
@@ -77,27 +90,39 @@ void MotorPlugin::UpdateImpl(double _timeSinceLastUpdate)
     }
   }
 
-
-  // std::cout << "MOTOR update!" << std::endl;
-
   {
     boost::recursive_mutex::scoped_lock lock(*this->voltageMutex);
     // get this value from the connectors
     double voltage = this->voltage; // in Volts
   }
 
-  double shaftRotationSpeed = 0.1; // in radians per seconds
+  this->backEmf = this->GetProperty<double>("back_emf");
+  this->motorResistance = this->GetProperty<double>("resistance");
+  this->torqueConstant = this->GetProperty<double>("torque_constant");
+
+
+  double shaftRotationSpeed = 0.1;
+  if (this->shaftLink)
+  {
+    // in radians per seconds
+    shaftRotationSpeed = this->shaftLink->GetRelativeAngularVel().GetLength();
+    //std::cerr << "shaftRotationSpeed " << shaftRotationSpeed << std::endl;
+  }
   double emfVolt = this->backEmf * shaftRotationSpeed;
   double internalVoltage = voltage - emfVolt;
   double internalCurrent = internalVoltage / this->motorResistance;
   double torque = internalCurrent * this->torqueConstant;
 
-  //std::cerr << " voltage " << voltage << " vs torque " << torque << std::endl;
+  std::cerr << " voltage " << voltage << ", torque " << torque
+      << ", shaftRotationSpeed " << shaftRotationSpeed << std::endl;
+
+  if (this->joint)
+    this->joint->SetForce(0, torque);
 
   Simple_msgs::msgs::Variant torqueMsg;
   torqueMsg.set_type(Simple_msgs::msgs::Variant::DOUBLE);
   torqueMsg.set_v_double(torque);
-  this->torquePub->Publish(torqueMsg);
+  //this->torquePub->Publish(torqueMsg);
 }
 
 /////////////////////////////////////////////////
@@ -105,7 +130,6 @@ void MotorPlugin::OnConnector0Voltage(ConstVariantPtr &_msg)
 {
   boost::recursive_mutex::scoped_lock lock(*this->voltageMutex);
   this->voltage = _msg->v_double();
-  //std::cerr << "receiving voltage " << this->voltage << std::endl;
 }
 
 /////////////////////////////////////////////////

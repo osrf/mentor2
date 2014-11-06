@@ -169,6 +169,10 @@
       </axis>
     </joint>
 
-    <plugin filename="libWheelPlugin.so" name="wheel"/>
+    <plugin filename="libWheelPlugin.so" name="wheel">
+      <shaft_link>motor::motor_shaft_link</shaft_link>
+      <body_link>bucket_wheel::link</body_link>
+    </plugin>
+
   </model>
 </sdf>

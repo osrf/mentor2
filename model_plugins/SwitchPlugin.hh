@@ -90,6 +90,9 @@ namespace gazebo
 
     /// \brief Flag to keep track of new connector1 messages.
     private: bool connector1Dirty;
+
+    /// \brief Time when the switch state was changed.
+    private: common::Time fnrSwitchTime;
   };
 }
 

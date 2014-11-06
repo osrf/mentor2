@@ -29,6 +29,9 @@ SimpleModelPlugin::SimpleModelPlugin()
   this->receiveMutex = new boost::recursive_mutex();
   this->portMutex = new boost::recursive_mutex();
   this->simpleConnectionMutex = new boost::recursive_mutex();
+  this->simpleModelMutex = new boost::recursive_mutex();
+  this->propertyMutex = new boost::recursive_mutex();
+
   this->schematicType = "";
   this->timeOfLastUpdate = 0;
 }
@@ -37,8 +40,20 @@ SimpleModelPlugin::SimpleModelPlugin()
 SimpleModelPlugin::~SimpleModelPlugin()
 {
   delete this->receiveMutex;
+  this->receiveMutex = NULL;
+
   delete this->portMutex;
+  this->portMutex = NULL;
+
   delete this->simpleConnectionMutex;
+  this->simpleConnectionMutex = NULL;
+
+  delete this->simpleModelMutex;
+  this->simpleModelMutex = NULL;
+
+  delete this->propertyMutex;
+  this->propertyMutex = NULL;
+
 }
 
 /////////////////////////////////////////////////
@@ -58,7 +73,7 @@ void SimpleModelPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void SimpleModelPlugin::Update()
 {
-  this->ProcessSimpleConnectionMsgs();
+  this->ProcessMsgs();
 
   physics::WorldPtr world = physics::get_world();
   double t = world->GetSimTime().Double();
@@ -91,13 +106,39 @@ void SimpleModelPlugin::Load(sdf::ElementPtr _sdf)
   }
   if (_sdf->HasElement("properties"))
   {
-    sdf::ElementPtr ports = _sdf->GetElement("properties");
-    sdf::ElementPtr childElem = ports->GetFirstElement();
+    sdf::ElementPtr propertiesElem = _sdf->GetElement("properties");
+    sdf::ElementPtr childElem = propertiesElem->GetFirstElement();
     while (childElem)
     {
+      Simple_msgs::msgs::Variant valueVariant;
       std::string key = childElem->GetName();
       std::string value = childElem->GetValue()->GetAsString();
-      this->properties[key] = value;
+      std::transform(value.begin(), value.end(), value.begin(), ::tolower);
+      if (value == "true")
+      {
+        valueVariant.set_type(Simple_msgs::msgs::Variant::BOOL);
+        valueVariant.set_v_bool(true);
+      }
+      else if (value == "false")
+      {
+        valueVariant.set_type(Simple_msgs::msgs::Variant::BOOL);
+        valueVariant.set_v_bool(false);
+      }
+      else
+      {
+        try
+        {
+          double valueD = boost::lexical_cast<double>(value);
+          valueVariant.set_type(Simple_msgs::msgs::Variant::DOUBLE);
+          valueVariant.set_v_double(valueD);
+        }
+        catch (const boost::bad_lexical_cast &)
+        {
+          valueVariant.set_type(Simple_msgs::msgs::Variant::STRING);
+          valueVariant.set_v_string(value);
+        }
+      }
+      this->properties[key] = valueVariant;
       childElem = childElem->GetNextElement("");
     }
   }
@@ -112,10 +153,25 @@ void SimpleModelPlugin::Load(sdf::ElementPtr _sdf)
   //for (unsigned int i = 0 ; i < this->ports.size(); ++i)
     //std::cerr << " got port " << this->ports[i] << std::endl;
 
-  std::map<std::string, std::string>::iterator it;
+  std::map<std::string, Simple_msgs::msgs::Variant>::iterator it;
   for (it = properties.begin() ; it != properties.end(); ++it)
-    std::cerr << " got property " << it->first << ": " <<
-        it->second << std::endl;
+  {
+/*    boost::any value = this->ConvertVariant(it->second);
+    std::string valueStr;
+    try
+    {
+      valueStr = boost::any_cast<std::string>(value);
+
+     }
+     catch (const boost::bad_any_cast &)
+     {
+        std::stringstream ss;
+        ss << boost::any_cast<double>(value);
+        valueStr = ss.str();
+     }
+     std::cerr << " got property " << it->first << ": " <<
+          valueStr << std::endl;*/
+  }
 }
 
 /////////////////////////////////////////////////
@@ -141,11 +197,48 @@ void SimpleModelPlugin::Init()
       this->node->Advertise<Simple_msgs::msgs::SimpleModel>(
       "~/simple/model/info");
 
+  this->simpleModelSub = this->node->Subscribe("~/simple/model/modify",
+      &SimpleModelPlugin::OnSimpleModel, this);
+
   this->simpleConnectionSub = this->node->Subscribe("~/simple/connection",
       &SimpleModelPlugin::OnSimpleConnection, this);
 
   this->initThread = new boost::thread(
       boost::bind(&SimpleModelPlugin::InitThread, this));
+}
+
+/////////////////////////////////////////////////
+boost::any SimpleModelPlugin::ConvertVariant(
+    Simple_msgs::msgs::Variant _variant)
+{
+  switch (_variant.type())
+  {
+    case Simple_msgs::msgs::Variant::UINT32:
+    {
+      return _variant.v_uint32();
+    }
+    case Simple_msgs::msgs::Variant::INT32:
+    {
+      return _variant.v_int32();
+    }
+    case Simple_msgs::msgs::Variant::DOUBLE:
+    {
+      return _variant.v_double();
+    }
+    case Simple_msgs::msgs::Variant::STRING:
+    {
+      return _variant.v_string();
+    }
+    case Simple_msgs::msgs::Variant::BOOL:
+    {
+      return _variant.v_bool();
+    }
+    default:
+    {
+      return _variant.v_string();
+    }
+  }
+  return _variant.v_string();
 }
 
 /////////////////////////////////////////////////
@@ -215,13 +308,13 @@ void SimpleModelPlugin::FillMsg(Simple_msgs::msgs::SimpleModel &_msg)
     _msg.add_port(portIt->first);
   }
 
-  std::map<std::string, std::string>::iterator it;
+  std::map<std::string, Simple_msgs::msgs::Variant>::iterator it;
   for (it = this->properties.begin(); it != this->properties.end(); ++it)
   {
     _msg.add_key(it->first);
     Simple_msgs::msgs::Variant *property = _msg.add_value();
-
-    std::string value = it->second;
+    property->CopyFrom(it->second);
+    /*std::string value = boost::any_cast<std::string>(it->second);
     std::transform(value.begin(), value.end(), value.begin(), ::tolower);
     if (value == "true")
     {
@@ -237,25 +330,29 @@ void SimpleModelPlugin::FillMsg(Simple_msgs::msgs::SimpleModel &_msg)
     {
       try
       {
-        double value = boost::lexical_cast<double>(it->second);
+        double value = boost::any_cast<double>(it->second);
         property->set_type(Simple_msgs::msgs::Variant::DOUBLE);
         property->set_v_double(value);
       }
       catch (const boost::bad_lexical_cast &)
       {
         property->set_type(Simple_msgs::msgs::Variant::STRING);
-        property->set_v_string(it->second);
+        property->set_v_string(value);
       }
-    }
+    }*/
     //_msg.add_value(it->second);
   }
 }
 
 /////////////////////////////////////////////////
-boost::any SimpleModelPlugin::GetProperty(const std::string &_key)
+void SimpleModelPlugin::SetProperty(const std::string &_key,
+    const Simple_msgs::msgs::Variant &_value)
 {
+  boost::recursive_mutex::scoped_lock lock(*this->propertyMutex);
   if (this->properties.find(_key) != this->properties.end())
-    return this->properties[_key];
+  {
+    this->properties[_key] = _value;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -269,32 +366,77 @@ void SimpleModelPlugin::OnSimpleConnection(ConstSimpleConnectionPtr &_msg)
 }
 
 //////////////////////////////////////////////////
-void SimpleModelPlugin::ProcessSimpleConnectionMsgs()
+void SimpleModelPlugin::ProcessMsgs()
 {
-  SimpleConnectionMsgs_L::iterator simpleConnectionIter;
+  // Process the simple model modify messages.
+  SimpleModelMsgs_L::iterator simpleModelIter;
+  for (simpleModelIter = this->simpleModelMsgs.begin();
+      simpleModelIter != this->simpleModelMsgs.end();
+      ++simpleModelIter)
+  {
+    const Simple_msgs::msgs::SimpleModel msg = **simpleModelIter;
+    for (unsigned int i = 0; i < msg.key_size(); ++i)
+    {
+      Simple_msgs::msgs::Variant valueMsg = msg.value(i);
+      this->SetProperty(msg.key(i), valueMsg);
+      /*switch (valueMsg.type())
+      {
+        case  Simple_msgs::msgs::Variant::UINT32:
+        {
+          this->SetProperty(msg.key(i), valueMsg.v_uint32());
+          break;
+        }
+        case  Simple_msgs::msgs::Variant::INT32:
+        {
+          this->SetProperty(msg.key(i), valueMsg.v_int32());
+          break;
+        }
+        case  Simple_msgs::msgs::Variant::DOUBLE:
+        {
+          this->SetProperty(msg.key(i), valueMsg.v_double());
+          break;
+        }
+        case  Simple_msgs::msgs::Variant::STRING:
+        {
+          this->SetProperty(msg.key(i), valueMsg.v_string());
+          break;
+        }
+        case  Simple_msgs::msgs::Variant::BOOL:
+        {
+          this->SetProperty(msg.key(i), valueMsg.v_bool());
+          break;
+        }
+      }*/
+    }
+
+  }
+  this->simpleModelMsgs.clear();
+
 
   // Process the simple connection messages.
+  SimpleConnectionMsgs_L::iterator simpleConnectionIter;
   for (simpleConnectionIter = this->simpleConnectionMsgs.begin();
       simpleConnectionIter != this->simpleConnectionMsgs.end();
       ++simpleConnectionIter)
   {
-    const Simple_msgs::msgs::SimpleConnection _msg = **simpleConnectionIter;
+    const Simple_msgs::msgs::SimpleConnection msg = **simpleConnectionIter;
     std::string topic = "~/simple/port/" +
-        _msg.parent() + "_" + _msg.parent_port() + "/" +
-        _msg.child() + "_" + _msg.child_port();
+        msg.parent() + "_" + msg.parent_port() + "/" +
+        msg.child() + "_" + msg.child_port();
     // currently bidrectional
 
     bool isParent = false;
-    if (_msg.parent() == this->parent->GetScopedName())
+    if (msg.parent() == this->parent->GetScopedName())
       isParent = true;
 
-    std::string port = isParent ? _msg.parent_port() : _msg.child_port();
+    std::string port = isParent ? msg.parent_port() : msg.child_port();
     this->portPubs[port] =
         this->node->Advertise<Simple_msgs::msgs::Variant>(topic);
     this->portTopics[port] = topic;
   }
 
   this->simpleConnectionMsgs.clear();
+
 }
 /*
 //////////////////////////////////////////////////
@@ -303,3 +445,16 @@ void SimpleModelPlugin::OnPortData(ConstVariantPtr &_msg)
   boost::recursive_mutex::scoped_lock lock(*this->portMutex);
   this->portData =
 }*/
+
+/////////////////////////////////////////////////
+void SimpleModelPlugin::OnSimpleModel(ConstSimpleModelPtr &_msg)
+{
+  std::string modelName = this->parent->GetScopedName();
+
+  boost::recursive_mutex::scoped_lock lock(*this->simpleModelMutex);
+  if (_msg->name() == modelName)
+  {
+    this->simpleModelMsgs.push_back(_msg);
+    //std::cerr << _msg->DebugString()<<std::endl;
+  }
+}
