@@ -40,11 +40,7 @@ PowerSourcePlugin::~PowerSourcePlugin()
 /////////////////////////////////////////////////
 void PowerSourcePlugin::LoadImpl(sdf::ElementPtr _sdf)
 {
-  this->capacity = atof(this->properties["capacity"].c_str());
-  this->voltage = atof(this->properties["voltage"].c_str());
-  this->current = atof(this->properties["current"].c_str());
   this->discharging = true;
-
 }
 
 
@@ -70,6 +66,10 @@ void PowerSourcePlugin::UpdateImpl(double _timeSinceLastUpdate)
     // too early for update
     return;
   }
+
+  this->capacity = this->GetProperty<double>("capacity");
+  this->voltage = this->GetProperty<double>("voltage");
+  this->current = this->GetProperty<double>("current");
 
   if(this->discharging && this->capacity > 0.0)
   {

@@ -52,11 +52,23 @@ namespace gazebo
       /// information.
       public: void Load(const Simple_msgs::msgs::SimpleModel *_msg);
 
+      /// \brief Update the inspector from a simple model message
+      /// \param[in] _msg A simple model message that contains property
+      /// information.
+      public: void UpdateFromMsg(const Simple_msgs::msgs::SimpleModel *_msg);
+
+      /// \brief Get a copy of the simple model message.
+      /// \return the simple model message.
+      public: Simple_msgs::msgs::SimpleModel GetSimpleModelMsg();
+
       /// \brief Get the most suitable widget for configuring this property.
       /// \param[in] _msg Variant message containing property type and value.
       /// \return a Qt widget for configuring the property.
       private: QWidget *GetValueWidget(
           const Simple_msgs::msgs::Variant *_msg);
+
+      /// \brief Update the internal copy of simple model message from widgets.
+      private: void Update();
 
       /// \brief Qt signal emitted to indicate that changes should be applied.
       Q_SIGNALS: void Applied();
@@ -76,6 +88,12 @@ namespace gazebo
 
       /// \brief A layout for the properties.
       private: QGridLayout *propertyLayout;
+
+      /// \brief A map of key name to the associated widget.
+      private: std::map<std::string, QWidget *> valueWidgets;
+
+      /// \brief A simple model message containing configurable properties.
+      private: Simple_msgs::msgs::SimpleModel simpleModelMsg;
     };
   }
 }

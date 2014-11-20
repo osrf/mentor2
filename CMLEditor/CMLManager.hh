@@ -19,6 +19,7 @@
 
 #include <gazebo/common/common.hh>
 #include <gazebo/transport/transport.hh>
+#include <gazebo/gui/qt.h>
 
 #include "SimpleModel.pb.h"
 
@@ -30,9 +31,10 @@ namespace gazebo
   namespace gui
   {
     class CMLComponentInspector;
+    class CMLPropertyManager;
 
-    /// \class CMLEditor CMLEditor.hh gui/gui.hh
-    /// \brief Interface to the CML editor.
+    /// \class CMLManager CMLManager.hh gui/gui.hh
+    /// \brief CML simple model manager.
     class CMLManager : public SingletonT<CMLManager>
     {
       /// \brief Constructor
@@ -48,6 +50,9 @@ namespace gazebo
       /// \param[in] _name Node of the component
       public: Simple_msgs::msgs::SimpleModel GetModelInfo(
           const std::string &_name);
+
+      public: void UpdateModelInfo(const std::string &_name,
+          Simple_msgs::msgs::SimpleModel _info, bool _publish = true);
 
       /// \brief Show an inspector for configuring component properties.
       /// \param[in] _Name of component.
@@ -66,11 +71,17 @@ namespace gazebo
       /// \param[in] _msg The request message.
       private: void OnRequest(ConstRequestPtr &_msg);
 
+      /// \brief Qt callback when component properties have changed property.
+      private slots: void OnComponentProperyChanged();
+
       /// \brief Transport node.
       private: transport::NodePtr node;
 
       /// \brief Subscriber for simple model messages.
       private: transport::SubscriberPtr simpleModelSub;
+
+      /// \brief Publisher for simple model messages.
+      private: transport::PublisherPtr simpleModelPub;
 
       /// \brief Subscriber for response messages.
       private: transport::SubscriberPtr responseSub;
@@ -94,9 +105,8 @@ namespace gazebo
       /// \brief A flag to indicate if the manager is initialized or not.
       private: bool initialized;
 
-      /// \brief A map of component name to its inspector.
-      private: std::map<std::string, CMLComponentInspector *>
-          componentInspectors;
+      /// \brief Manager for simple model properties.
+      private: CMLPropertyManager *propertyManager;
 
       /// \brief This is a singleton class.
       private: friend class SingletonT<CMLManager>;

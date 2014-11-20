@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,6 +72,7 @@ CMLComponentInspector::~CMLComponentInspector()
 /////////////////////////////////////////////////
 void CMLComponentInspector::Load(const Simple_msgs::msgs::SimpleModel *_msg)
 {
+  this->simpleModelMsg = *_msg;
   QLabel *nameLabel = new QLabel(tr("Name"));
   QLabel *nameValueLabel = new QLabel(tr(_msg->name().c_str()));
   this->propertyLayout->addWidget(nameLabel, 0, 0);
@@ -81,8 +82,66 @@ void CMLComponentInspector::Load(const Simple_msgs::msgs::SimpleModel *_msg)
   {
     QLabel *keyLabel = new QLabel(tr(_msg->key(i).c_str()));
     QWidget *valueWidget = this->GetValueWidget(&_msg->value(i));
+    this->valueWidgets[_msg->key(i)] = valueWidget;
     this->propertyLayout->addWidget(keyLabel, i+1, 0);
     this->propertyLayout->addWidget(valueWidget, i+1, 1);
+  }
+}
+/////////////////////////////////////////////////
+Simple_msgs::msgs::SimpleModel CMLComponentInspector::GetSimpleModelMsg()
+{
+  return this->simpleModelMsg;
+}
+
+/////////////////////////////////////////////////
+void CMLComponentInspector::UpdateFromMsg(
+    const Simple_msgs::msgs::SimpleModel *_msg)
+{
+  this->simpleModelMsg = *_msg;
+  for (int i = 0; i < _msg->key_size(); ++i)
+  {
+    std::string key = _msg->key(i);
+    if (this->valueWidgets.find(key) != this->valueWidgets.end())
+    {
+      QWidget *valueWidget = this->valueWidgets[key];
+      const Simple_msgs::msgs::Variant variantMsg =
+          this->simpleModelMsg.value(i);
+
+      switch (variantMsg.type())
+      {
+        case  Simple_msgs::msgs::Variant::UINT32:
+        {
+          QSpinBox *widget = qobject_cast<QSpinBox *>(valueWidget);
+          widget->setValue(variantMsg.v_uint32());
+          break;
+        }
+        case  Simple_msgs::msgs::Variant::INT32:
+        {
+          QSpinBox *widget = qobject_cast<QSpinBox *>(valueWidget);
+          widget->setValue(variantMsg.v_int32());
+          break;
+        }
+        case  Simple_msgs::msgs::Variant::DOUBLE:
+        {
+          QDoubleSpinBox *widget = qobject_cast<QDoubleSpinBox *>(valueWidget);
+          widget->setValue(variantMsg.v_double());
+          break;
+        }
+        case  Simple_msgs::msgs::Variant::STRING:
+        {
+          QLineEdit *widget = qobject_cast<QLineEdit *>(valueWidget);
+          widget->setText(tr(variantMsg.v_string().c_str()));
+          break;
+        }
+        case  Simple_msgs::msgs::Variant::BOOL:
+        {
+          QCheckBox *widget = qobject_cast<QCheckBox *>(valueWidget);
+          widget->setCheckState(
+              variantMsg.v_bool() ? Qt::Checked : Qt::Unchecked);
+          break;
+        }
+      }
+    }
   }
 }
 
@@ -114,6 +173,7 @@ QWidget *CMLComponentInspector::GetValueWidget(
       widget = new QDoubleSpinBox();
       QDoubleSpinBox *spinBoxWidget = qobject_cast<QDoubleSpinBox *>(widget);
       spinBoxWidget->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
+      spinBoxWidget->setDecimals(5);
       spinBoxWidget->setValue(_msg->v_double());
       break;
     }
@@ -147,6 +207,43 @@ QWidget *CMLComponentInspector::GetValueWidget(
 }
 
 /////////////////////////////////////////////////
+void CMLComponentInspector::Update()
+{
+  for (int i = 0; i < this->simpleModelMsg.key_size(); ++i)
+  {
+    std::string key = this->simpleModelMsg.key(i);
+    if (this->valueWidgets.find(key) != this->valueWidgets.end())
+    {
+      QWidget *valueWidget = this->valueWidgets[key];
+      Simple_msgs::msgs::Variant *variantMsg =
+          this->simpleModelMsg.mutable_value(i);
+      std::string typeName =
+          std::string(valueWidget->metaObject()->className());
+      if (typeName == "QDoubleSpinBox")
+      {
+        QDoubleSpinBox *widget = qobject_cast<QDoubleSpinBox *>(valueWidget);
+        variantMsg->set_v_double(widget->value());
+      }
+      else if (typeName == "QSpinBox")
+      {
+        QSpinBox *widget = qobject_cast<QSpinBox *>(valueWidget);
+        variantMsg->set_v_double(widget->value());
+      }
+      else if (typeName == "QCheckBox")
+      {
+        QCheckBox *widget = qobject_cast<QCheckBox *>(valueWidget);
+        variantMsg->set_v_bool(widget->checkState() == Qt::Checked);
+      }
+      else if (typeName == "QLineEdit")
+      {
+        QLineEdit *widget = qobject_cast<QLineEdit *>(valueWidget);
+        variantMsg->set_v_string(widget->text().toStdString());
+      }
+    }
+  }
+}
+
+/////////////////////////////////////////////////
 void CMLComponentInspector::BoolPropChanged(int _state)
 {
   QCheckBox *checkBoxWidget = qobject_cast<QCheckBox *>(QObject::sender());
@@ -165,12 +262,14 @@ void CMLComponentInspector::OnCancel()
 /////////////////////////////////////////////////
 void CMLComponentInspector::OnApply()
 {
+  this->Update();
   emit Applied();
 }
 
 /////////////////////////////////////////////////
 void CMLComponentInspector::OnOK()
 {
+  this->Update();
   emit Applied();
   this->accept();
 }
