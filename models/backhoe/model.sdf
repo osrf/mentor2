@@ -1,0 +1,832 @@
+<?xml version="1.0" ?>
+<sdf version='1.5'>
+  <model name='backhoe_arm_assembly'>
+    <pose>0 0 4  0 0 0</pose>
+
+
+  <link name="konsol">
+     <inertial>
+        <mass></mass>
+        <inertia>
+            <ixx></ixx>
+            <iyy></iyy>
+            <izz></izz>
+        </inertia>
+     </inertial>
+     <pose>0 0 0 0 0 0</pose>
+     <collision name="collision1">
+       <pose>0.03 0 0 0 0 0</pose> 
+       <geometry>
+         <box>
+           <size> 0.160 0.130 0.100 </size>
+         </box>
+       </geometry>
+     </collision>
+     <collision name="collision2">
+       <pose>0.10 0 0.250 0 0 0</pose> 
+       <geometry>
+         <box>
+           <size> 0.1 0.130 0.450 </size>
+         </box>
+       </geometry>
+     </collision>
+     <visual name="visual">
+       <pose>0 0 0 0 0 0</pose>
+       <geometry>
+         <mesh>
+           <uri>model://backhoe/meshes/konsol.stl</uri>
+           <scale>0.001 0.001 0.001</scale>
+         </mesh>
+       </geometry>
+         <material>
+           <script>
+             <name>Gazebo/Yellow</name>
+           </script>
+         </material>
+     </visual>
+   </link>
+
+ 
+  <link name="arm1">
+     <pose>0 0 0 0 0 0</pose>
+
+     <collision name="collision_base">
+       <pose> -0.2 0 0.5 0 -0.349065 0</pose> 
+        <geometry>
+         <box>
+           <size> 0.20 0.150 1.10 </size>
+         </box>
+       </geometry>
+     </collision>
+
+     <collision name="collision_circle">
+       <pose> -0.40 0 0.95 1.570796326 0  0</pose> 
+       <geometry>
+         <cylinder>
+              <radius>0.2</radius>
+              <length>0.150</length>
+         </cylinder>
+       </geometry>
+     </collision>
+
+     <collision name="collision_base">
+       <pose> -0.80 0 1.20 0 -1.047197551 0</pose> 
+        <geometry>
+         <box>
+           <size> 0.150 0.150 1.20 </size>
+         </box>
+       </geometry>
+     </collision>
+
+     <visual name="visual">
+       <pose>0 0 0 3.1415926  -0.462512251778  0</pose>
+       <geometry>
+         <mesh>
+           <uri>model://backhoe/meshes/Arm1.STL</uri>
+         </mesh>
+       </geometry>
+         <material>
+           <script>
+             <name>Gazebo/Red</name>
+           </script>
+         </material>
+     </visual>
+   </link>
+ 
+
+  <link name="arm2">
+
+   <pose> -1.29972 0 1.47750 0 0 0</pose>
+    
+    <collision name="collision1">
+       <pose>0 0 -0.4 0 0 0</pose>
+       <geometry>
+         <box>
+           <size> 0.1 0.15 1.0 </size>
+         </box>
+       </geometry>
+     </collision>
+
+    <collision name="collision2">
+       <pose>-0.08 0 -1 0  -0.174530 0</pose>
+       <geometry>
+         <box>
+           <size> 0.1 0.15 1.0 </size>
+         </box>
+       </geometry>
+     </collision>   
+
+    <collision name="collision3">
+       <pose> -0.15 0 -0.2 0 0 0</pose>
+       <geometry>
+         <box>
+           <size> 0.2 0.15 0.9 </size>
+         </box>
+       </geometry>
+     </collision>   
+
+
+     <visual name="visual">
+       <pose> 0 0 0 0 -1.5707960 0</pose>
+       <geometry>/
+         <mesh>
+           <uri>model://backhoe/meshes/arm2.STL</uri>
+         </mesh>
+       </geometry>
+         <material>
+           <script>
+             <name>Gazebo/Green</name>
+           </script>
+         </material>
+     </visual>
+  
+  </link> 
+
+
+
+  <link name="skovl">
+    <pose>   -1.29972 0 0.1375 3.1415927 0.89448124 0</pose>
+
+    <collision name="collision">
+       <pose> 0 0 0.1 0  0.26179938 0</pose>
+       <geometry>
+         <box>
+           <size> 0.15 0.02 0.32 </size>
+         </box>
+       </geometry>
+     </collision>
+
+ 
+    <visual name="visual">
+        <geometry>
+           <mesh>
+             <uri>model://backhoe/meshes/skovl.stl</uri>
+           </mesh>
+        </geometry>
+        <material>
+          <script>
+             <name>Gazebo/Blue</name>
+          </script>
+        </material>
+   </visual>
+
+  </link>
+
+
+  <link name="nedre">
+      <pose>-1.48072 0 0.0625 3.1415927 -2.17729824186292 0  </pose> 
+      <visual name="visual">
+        <geometry>
+           <mesh>
+             <uri>model://backhoe/meshes/nedre.stl</uri>
+           </mesh>
+        </geometry>
+        <material>
+          <script>
+             <name>Gazebo/Red</name>
+          </script>
+        </material>
+       </visual>
+
+       <collision name="collision">
+          <pose>   </pose>
+          <geometry>
+             <box>
+                <size> 0.100 0.020 0.350 </size>
+             </box>
+          </geometry>
+       </collision>
+
+  </link>
+ 
+
+  <link name="shovel">
+      <pose>-1.29972 0 0.0375  -1.5707960  0 0 </pose> 
+       <!-- axis inversion put -z value in 2 column and y value in 3rd column --> 
+       <collision name="collision">
+          <pose>-0.175 0.25 0 0 0 0 </pose>
+          <geometry>
+             <box>
+                <size> 0.400 0.5  0.350 </size>
+             </box>
+          </geometry>
+       </collision>
+
+     <visual name="visual">
+        <pose> 0 0 0 0 0 0</pose>
+        <geometry>
+           <mesh>
+             <uri>model://backhoe/meshes/shovel.stl</uri>
+             <scale>0.001 0.001 0.001 </scale>
+           </mesh>
+        </geometry>
+        <material>
+          <script>
+             <name>Gazebo/Yellow</name>
+          </script>
+        </material>
+       </visual>  
+
+  </link>
+
+<!--
+
+================
+Acutators
+===============
+
+-->
+
+    <link name="cylinder1">
+      <pose>-0.3941 0 0.79256 0 -2.26892802 0</pose>
+      <collision name="collision">
+        <pose>-0.295 0 0 0 -1.5708 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.05</radius>
+            <length>0.59</length>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+            <mesh>
+             <uri>model://backhoe/meshes/cylinder1.stl</uri>
+           </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Black</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+
+    <link name="rod1">
+      <pose>0.076 0 0.2325 0 -0.6982928 0</pose>
+      <collision name="collision">
+        <pose>0 0 0.280 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.022</radius>
+            <length>0.560</length>
+          </cylinder>
+        </geometry>  
+      </collision>
+      <visual name="visual">
+        <geometry>
+            <mesh>
+             <uri>model://backhoe/meshes/rod1.stl</uri>
+           </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+
+    <link name="cylinder2">
+      <pose> -0.3805 0 1.079  0 -1.0369422 0</pose>
+      <collision name="collision">
+        <pose>0 0 0.375 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.04</radius>
+            <length>0.750</length>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+            <mesh>
+             <uri>model://backhoe/meshes/cylinder2.stl</uri>
+           </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Black</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+
+    <link name="rod2">
+      <pose>-1.44971 0 1.7125 0 -4.1785349 0</pose> 
+      <collision name="collision">
+        <pose> 0 0 0.350 0 0 0 </pose>
+        <geometry>
+          <cylinder>
+            <radius>0.022</radius>
+            <length>0.7</length>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <pose>0 0 0 0 0 0 </pose>
+        <geometry>
+            <mesh>
+             <uri>model://backhoe/meshes/rod2.stl</uri>
+           </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+
+
+    <link name="cylinder3">
+      <pose> -1.49612 0 0.88350 0 -3.24107642 0 </pose>
+      <collision name="collision">
+        <pose>0 0 0.3125 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.04</radius>
+            <length>0.625</length>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+            <mesh>
+             <uri>model://backhoe/meshes/cylinder3.stl</uri>
+           </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Black</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+
+    <link name="rod3">
+      <pose>-1.438 0 0.309 0 -0.099483767 0</pose>
+      <collision name="collision">
+        <pose> 0 0 0.2275 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.015</radius>
+            <length>0.475</length>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+            <mesh>
+             <uri>model://backhoe/meshes/rod3.stl</uri>
+           </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+
+<!-- 
+
+===========================================
+ Prismatic  JOINTS
+===========================================
+-->
+
+    <joint name='cylinder1_rod1' type='prismatic'>
+      <pose>0 0 0.0 0 0 0</pose>
+      <child>cylinder1</child>
+      <parent>rod1</parent>
+      <axis>
+        <xyz>-1 0 0</xyz>
+        <limit>
+          <lower>-0.3</lower>
+          <upper>0.147</upper>
+          <effort>10000</effort>
+          <velocity>0</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>30</damping>
+        </dynamics>
+        <use_parent_model_frame>0</use_parent_model_frame>
+      </axis>
+        <physics>
+          <ode>
+            <implicit_spring_damper>1</implicit_spring_damper>
+          </ode>
+        </physics>
+    </joint>
+
+    <joint name='cylinder2_rod2' type='prismatic'>
+      <pose>0 0 0.0 0 0 0</pose>
+      <child>cylinder2</child>
+      <parent>rod2</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-0.0168</lower>
+          <upper>0.43925</upper>
+          <effort>10000</effort>
+          <velocity>0</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>30</damping>
+        </dynamics>
+        <use_parent_model_frame>0</use_parent_model_frame>
+      </axis>
+        <physics>
+          <ode>
+            <implicit_spring_damper>1</implicit_spring_damper>
+          </ode>
+        </physics>
+    </joint>
+
+
+    <joint name='cylinder3_rod3' type='prismatic'>
+      <pose>0 0 0.0 0 0 0</pose>
+      <child>cylinder3</child>
+      <parent>rod3</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-0.3755</lower>
+          <upper>-0.01</upper>
+          <effort>10000</effort>
+          <velocity>0</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>30</damping>
+        </dynamics>
+        <use_parent_model_frame>0</use_parent_model_frame>
+      </axis>
+        <physics>
+          <ode>
+            <implicit_spring_damper>1</implicit_spring_damper>
+          </ode>
+        </physics>
+    </joint>
+
+
+
+
+<!-- 
+===========================================
+ Revolute  JOINTS
+===========================================
+-->
+
+
+  
+    <joint name='world' type='revolute'>
+      <pose>0 0 0 0 0 0</pose>
+      <child>konsol</child>
+      <parent>world</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>0</lower>
+          <upper>0</upper>
+          <effort>0</effort>
+          <velocity>0</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <use_parent_model_frame>0</use_parent_model_frame>
+      </axis>
+    </joint>
+
+    <joint name='Konsol_arm1' type='revolute'>
+      <pose>0 0 0 0 0 0</pose>
+      <child>arm1</child>
+      <parent>konsol</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-180</lower>
+          <upper>180</upper>
+          <effort>0</effort>
+          <velocity>0</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>1</damping>
+        </dynamics>
+        <use_parent_model_frame>0</use_parent_model_frame>
+      </axis>
+        <physics>
+          <ode>
+            <implicit_spring_damper>1</implicit_spring_damper>
+          </ode>
+        </physics>
+    </joint>
+
+    <joint name='arm2_arm1' type='revolute'>
+      <pose> 0 0 0 0 0 0</pose>
+      <child>arm2</child>
+      <parent>arm1</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-180</lower>
+          <upper>180</upper>
+          <effort>0</effort>
+          <velocity>0</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>1</damping>
+        </dynamics>
+        <use_parent_model_frame>0</use_parent_model_frame>
+      </axis>
+        <physics>
+          <ode>
+            <implicit_spring_damper>1</implicit_spring_damper>
+          </ode>
+        </physics>
+    </joint>
+
+    <joint name='Konsol_rod1' type='revolute'>
+      <pose> 0 0 0 0 0 0 </pose>
+      <child>rod1</child>
+      <parent>konsol</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-180</lower>
+          <upper>180</upper>
+          <effort>0</effort>
+          <velocity>0</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>1</damping>
+        </dynamics>
+        <use_parent_model_frame>0</use_parent_model_frame>
+      </axis>
+        <physics>
+          <ode>
+            <implicit_spring_damper>1</implicit_spring_damper>
+          </ode>
+        </physics>
+    </joint>
+
+
+    <joint name='arm1_cylinder1' type='revolute'>
+      <pose> 0 0 0 0 0 0 </pose>
+      <child>cylinder1</child>
+      <parent>arm1</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-180</lower>
+          <upper>180</upper>
+          <effort>0</effort>
+          <velocity>0</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>1</damping>
+        </dynamics>
+        <use_parent_model_frame>0</use_parent_model_frame>
+      </axis>
+        <physics>
+          <ode>
+            <implicit_spring_damper>1</implicit_spring_damper>
+          </ode>
+        </physics>
+    </joint>
+
+    <joint name='arm2_rod2' type='revolute'>
+      <pose> 0 0 0 0 0 0 </pose>
+      <child>rod2</child>
+      <parent>arm2</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-180</lower>
+          <upper>180</upper>
+          <effort>0</effort>
+          <velocity>0</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>1</damping>
+        </dynamics>
+        <use_parent_model_frame>0</use_parent_model_frame>
+      </axis>
+        <physics>
+          <ode>
+            <implicit_spring_damper>1</implicit_spring_damper>
+          </ode>
+        </physics>
+    </joint>
+
+
+    <joint name='arm1_cylinder2' type='revolute'>
+      <pose> 0 0 0 0 0 0 </pose>
+      <child>cylinder2</child>
+      <parent>arm1</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-180</lower>
+          <upper>180</upper>
+          <effort>0</effort>
+          <velocity>0</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>1</damping>
+        </dynamics>
+        <use_parent_model_frame>0</use_parent_model_frame>
+      </axis>
+        <physics>
+          <ode>
+            <implicit_spring_damper>1</implicit_spring_damper>
+          </ode>
+        </physics>
+    </joint>
+
+
+    <joint name='arm2_cylinder3' type='revolute'>
+      <pose> 0 0 0 0 0 0 </pose>
+      <child>cylinder3</child>
+      <parent>arm2</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-180</lower>
+          <upper>180</upper>
+          <effort>0</effort>
+          <velocity>0</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>1</damping>
+        </dynamics>
+        <use_parent_model_frame>0</use_parent_model_frame>
+      </axis>
+        <physics>
+          <ode>
+            <implicit_spring_damper>1</implicit_spring_damper>
+          </ode>
+        </physics>
+    </joint>
+
+    <joint name='nedre_rod3' type='revolute'>
+      <pose> 0 0 0 0 0 0 </pose>
+      <child>rod3</child>
+      <parent>nedre</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-180</lower>
+          <upper>180</upper>
+          <effort>0</effort>
+          <velocity>0</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>1</damping>
+        </dynamics>
+        <use_parent_model_frame>0</use_parent_model_frame>
+      </axis>
+        <physics>
+          <ode>
+            <implicit_spring_damper>1</implicit_spring_damper>
+          </ode>
+        </physics>
+    </joint>
+
+
+    <joint name='skovl_rod3' type='revolute'>
+      <pose> 0 0 0 0 0 0 </pose>
+      <child>rod3</child>
+      <parent>skovl</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-180</lower>
+          <upper>180</upper>
+          <effort>0</effort>
+          <velocity>0</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>1</damping>
+        </dynamics>
+        <use_parent_model_frame>0</use_parent_model_frame>
+      </axis>
+        <physics>
+          <ode>
+            <implicit_spring_damper>1</implicit_spring_damper>
+          </ode>
+        </physics>
+    </joint>
+
+    <joint name='arm2_shovel' type='revolute'>
+      <pose> 0 0 0 0 0 0 </pose>
+      <child>shovel</child>
+      <parent>arm2</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-180</lower>
+          <upper>180</upper>
+          <effort>0</effort>
+          <velocity>0</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>1</damping>
+        </dynamics>
+        <use_parent_model_frame>0</use_parent_model_frame>
+      </axis>
+        <physics>
+          <ode>
+            <implicit_spring_damper>1</implicit_spring_damper>
+          </ode>
+        </physics>
+    </joint>
+
+
+
+    <joint name='arm2_skovl' type='revolute'>
+      <pose> 0 0 0 0 0 0 </pose>
+      <child>skovl</child>
+      <parent>arm2</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-180</lower>
+          <upper>180</upper>
+          <effort>0</effort>
+          <velocity>0</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>1</damping>
+        </dynamics>
+        <use_parent_model_frame>0</use_parent_model_frame>
+      </axis>
+        <physics>
+          <ode>
+            <implicit_spring_damper>1</implicit_spring_damper>
+          </ode>
+        </physics>
+    </joint>
+
+
+    <joint name='shovel_nedre' type='revolute'>
+      <pose> -0.181 0 0.025 0 0 0 </pose>
+      <child>shovel</child>
+      <parent>nedre</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-180</lower>
+          <upper>180</upper>
+          <effort>0</effort>
+          <velocity>0</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>1</damping>
+        </dynamics>
+        <use_parent_model_frame>0</use_parent_model_frame>
+      </axis>
+        <physics>
+          <ode>
+            <implicit_spring_damper>1</implicit_spring_damper>
+          </ode>
+        </physics>
+    </joint>
+
+
+
+
+</model>
+</sdf>
