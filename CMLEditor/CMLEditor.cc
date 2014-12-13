@@ -33,7 +33,7 @@ CMLEditor::CMLEditor(MainWindow *_mainWindow)
 {
   // Create the CML editor tab
   this->CMLPalette = new CMLEditorPalette(_mainWindow);
-  this->Init("CMLEditorTab", "CML Editor", this->CMLPalette);
+  //this->Init("CMLEditorTab", "CML Editor", this->CMLPalette);
 
 //  connect(g_editBuildingAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
 //  this->menuBar = NULL;
@@ -66,10 +66,13 @@ void CMLEditor::OnEdit(bool _checked)
 
   if (_checked)
   {
-    this->mainWindow->ShowLeftColumnWidget("CMLEditorTab");
+    this->mainWindow->AddLeftColumnTab("CMLEditor", "default",
+        this->CMLPalette);
+    //this->mainWindow->ShowLeftColumnWidget("CMLEditorTab");
   }
   else
   {
-    this->mainWindow->ShowLeftColumnWidget();
+    //this->mainWindow->ShowLeftColumnWidget();
+    this->mainWindow->RemoveLeftColumnTab("CMLEditor", "default");
   }
 }

@@ -82,7 +82,7 @@
        <pose>0 0 0 3.1415926  -0.462512251778  0</pose>
        <geometry>
          <mesh>
-           <uri>model://backhoe/meshes/arm1.stl</uri>
+           <uri>model://backhoe/meshes/arm1.dae</uri>
          </mesh>
        </geometry>
          <material>
