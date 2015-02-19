@@ -35,11 +35,14 @@ CMLEditorPlugin::~CMLEditorPlugin()
 /////////////////////////////////////////////////
 void CMLEditorPlugin::Load(int /*_argc*/, char ** /*_argv*/)
 {
+
+  std::cerr << " load plugin " << std::endl;
 }
 
 /////////////////////////////////////////////////
 void CMLEditorPlugin::Init()
 {
+  std::cerr << " init plugin " << std::endl;
   // keep tracks of simple models in the world
   gui::CMLManager::Instance()->Init();
 

@@ -44,7 +44,7 @@ CMLEditor::CMLEditor(MainWindow *_mainWindow)
       QSizePolicy::Expanding);
 //  this->CMLEditorWidget->hide();
 
-  renderWidget->InsertWidget(0, this->CMLEditorWidget);
+ // renderWidget->InsertWidget(0, this->CMLEditorWidget);
 
   this->OnEdit(true);
 }
@@ -66,10 +66,13 @@ void CMLEditor::OnEdit(bool _checked)
 
   if (_checked)
   {
+//    this->mainWindow->AddLeftColumnTab("CMLEditor", "default",
+//        this->CMLPalette);
     this->mainWindow->ShowLeftColumnWidget("CMLEditorTab");
   }
   else
   {
     this->mainWindow->ShowLeftColumnWidget();
+//    this->mainWindow->RemoveLeftColumnTab("CMLEditor", "default");
   }
 }
