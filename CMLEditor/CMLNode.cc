@@ -16,7 +16,6 @@
 */
 
 #include <iostream>
-#include <gazebo/gui/gui.hh>
 
 #include "CMLManager.hh"
 #include "CMLEditorScene.hh"
@@ -292,14 +291,14 @@ void CMLNode::SetIcon(const std::string &_url)
 /////////////////////////////////////////////////
 void CMLNode::contextMenuEvent(QGraphicsSceneContextMenuEvent *_event)
 {
-  ModelRightMenu *contextMenu = gui::get_context_menu();
+/*  ModelRightMenu *contextMenu = gui::get_context_menu();
   if (contextMenu)
   {
     std::vector<QAction *> menuAction;
     menuAction.push_back(this->inspectAct);
     contextMenu->Run(this->name, QCursor::pos(), menuAction);
     _event->accept();
-  }
+  }*/
   QGraphicsPixmapItem::contextMenuEvent(_event);
 }
 

@@ -15,9 +15,10 @@
  *
 */
 
-#include "gazebo/common/Events.hh"
-#include "gazebo/rendering/RenderEvents.hh"
+#include <gazebo/common/Events.hh>
+#include <gazebo/rendering/RenderEvents.hh>
 #include <gazebo/transport/Node.hh>
+#include <gazebo/gui/model/ModelEditorEvents.hh>
 
 //#include "QGVCore/QGVScene.h"
 
@@ -26,6 +27,7 @@
 #include "CMLNode.hh"
 #include "CMLManager.hh"
 #include "CMLEditorScene.hh"
+#include "CMLEditorSceneGV.hh"
 #include "CMLEditorView.hh"
 #include "CMLEditorWidget.hh"
 
@@ -38,23 +40,10 @@ CMLEditorWidget::CMLEditorWidget(QWidget *_parent)
 {
   this->setObjectName("CMLEditorWidget");
 
-  this->scene = new CMLEditorScene(this);
-  /*this->scene = new QGVScene("qgvscene", this);
+//  this->scene = new CMLEditorScene(this);
+  this->scene = new CMLEditorSceneGV(this);
 
-  //Configure scene attributes
-  //this->scene->setGraphAttribute("label", "qgvscene");
-  this->scene->setGraphAttribute("splines", "ortho");
-  this->scene->setGraphAttribute("rankdir", "LR");
-  //_scene->setGraphAttribute("concentrate", "true"); //Error !
-  this->scene->setGraphAttribute("nodesep", "0.4");
-
-  this->scene->setNodeAttribute("shape", "box");
-  this->scene->setNodeAttribute("style", "filled");
-  this->scene->setNodeAttribute("fillcolor", "white");
-  this->scene->setNodeAttribute("height", "1.2");
-  this->scene->setEdgeAttribute("minlen", "3");*/
-
-  CMLEditorView *view = new CMLEditorView(_parent);
+  this->view = new CMLEditorView(_parent);
 
   /*QColor c(220, 220, 220);
   QBrush brush(c, Qt::SolidPattern);
@@ -68,47 +57,19 @@ CMLEditorWidget::CMLEditorWidget(QWidget *_parent)
   canvasLayout->addWidget(view);
   canvasLayout->setAlignment(Qt::AlignHCenter);
 
-  view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-  view->setScene(this->scene);
-  view->centerOn(QPointF(0, 0));
-  view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
-  view->setDragMode(QGraphicsView::ScrollHandDrag);
-  view->show();
+  this->view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  this->view->setScene(this->scene);
+  this->view->centerOn(QPointF(0, 0));
+  this->view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+  this->view->setDragMode(QGraphicsView::ScrollHandDrag);
+  this->view->show();
 
   canvasLayout->setContentsMargins(0, 0, 0, 0);
   canvasLayout->setSpacing(0);
   this->setLayout(canvasLayout);
 
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init();
+  this->editorMode = true;
 
-  this->simpleConnectionSub = this->node->Subscribe("~/simple/connection",
-      &CMLEditorWidget::OnSimpleConnection, this);
-
-  this->simpleModelSub = this->node->Subscribe("~/simple/model/info",
-      &CMLEditorWidget::OnSimpleModel, this);
-
-  this->modelInfoSub = this->node->Subscribe("~/model/info",
-      &CMLEditorWidget::OnModelMsg, this);
-
-  this->sceneSub = this->node->Subscribe("~/scene",
-      &CMLEditorWidget::OnSceneMsg, this);
-
-  // request response for getting the scene msg
-  this->requestPub = this->node->Advertise<msgs::Request>("~/request");
-  this->responseSub = this->node->Subscribe("~/response",
-      &CMLEditorWidget::OnResponse, this, true);
-
-  this->receiveMutex = new boost::mutex();
-  this->connections.push_back(event::Events::ConnectPreRender(
-      boost::bind(&CMLEditorWidget::PreRender, this)));
-
-  this->requestPub->WaitForConnection();
-  this->requestMsg = msgs::CreateRequest("scene_info");
-  this->requestPub->Publish(*this->requestMsg);
-
-  this->requestSub = this->node->Subscribe("~/request",
-      &CMLEditorWidget::OnRequest, this);
 }
 
 /////////////////////////////////////////////////
@@ -116,6 +77,111 @@ CMLEditorWidget::~CMLEditorWidget()
 {
   delete this->requestMsg;
   this->requestMsg = NULL;
+}
+
+/////////////////////////////////////////////////
+void CMLEditorWidget::Init()
+{
+  if (this->editorMode)
+  {
+    this->connections.push_back(gui::model::Events::ConnectLinkAdded(
+        boost::bind(&CMLEditorWidget::AddNode, this, _1)));
+
+    this->connections.push_back(gui::model::Events::ConnectLinkRemoved(
+        boost::bind(&CMLEditorWidget::RemoveNode, this, _1)));
+
+    this->connections.push_back(gui::model::Events::ConnectJointAdded(
+        boost::bind(&CMLEditorWidget::AddEdge, this, _1, _2)));
+
+    this->connections.push_back(gui::model::Events::ConnectJointRemoved(
+        boost::bind(&CMLEditorWidget::RemoveEdge, this, _1, _2)));
+  }
+  else
+  {
+    this->node = transport::NodePtr(new transport::Node());
+    this->node->Init();
+
+    this->simpleConnectionSub = this->node->Subscribe("~/simple/connection",
+        &CMLEditorWidget::OnSimpleConnection, this);
+
+    this->simpleModelSub = this->node->Subscribe("~/simple/model/info",
+        &CMLEditorWidget::OnSimpleModel, this);
+
+    this->modelInfoSub = this->node->Subscribe("~/model/info",
+        &CMLEditorWidget::OnModelMsg, this);
+
+    this->sceneSub = this->node->Subscribe("~/scene",
+        &CMLEditorWidget::OnSceneMsg, this);
+
+    // request response for getting the scene msg
+    this->requestPub = this->node->Advertise<msgs::Request>("~/request");
+    this->responseSub = this->node->Subscribe("~/response",
+        &CMLEditorWidget::OnResponse, this, true);
+
+    this->receiveMutex = new boost::mutex();
+    this->connections.push_back(event::Events::ConnectPreRender(
+        boost::bind(&CMLEditorWidget::PreRender, this)));
+
+    this->requestPub->WaitForConnection();
+    this->requestMsg = msgs::CreateRequest("scene_info");
+    this->requestPub->Publish(*this->requestMsg);
+
+    this->requestSub = this->node->Subscribe("~/request",
+        &CMLEditorWidget::OnRequest, this);
+  }
+}
+
+/////////////////////////////////////////////////
+void CMLEditorWidget::AddNode(const std::string &_node)
+{
+  std::cerr << "Add node " << _node << std::endl;
+  if (this->scene->HasNode(_node))
+    return;
+
+  // this must be called before making changes to the graph
+  this->scene->clearLayout();
+  this->scene->AddNode(_node);
+  //Layout scene
+  this->scene->applyLayout();
+}
+
+/////////////////////////////////////////////////
+void CMLEditorWidget::RemoveNode(const std::string &_node)
+{
+  std::cerr << "remove node " << _node << std::endl;
+  if (this->scene->HasNode(_node))
+    return;
+
+  // this must be called before making changes to the graph
+  this->scene->clearLayout();
+  this->scene->RemoveNode(_node);
+
+  //Layout scene
+  this->scene->applyLayout();
+}
+
+/////////////////////////////////////////////////
+void CMLEditorWidget::AddEdge(const std::string &_parent,
+    const std::string &_child)
+{
+  std::cerr << "add edge " << _parent << " " << _child << std::endl;
+  // this must be called before making changes to the graph
+  this->scene->clearLayout();
+  this->scene->AddEdge(_parent, _child);
+  //Layout scene
+  this->scene->applyLayout();
+}
+
+/////////////////////////////////////////////////
+void CMLEditorWidget::RemoveEdge(const std::string &_parent,
+    const std::string &_child)
+{
+  std::cerr << "remove edge " << _parent << " " << _child << std::endl;
+  // this must be called before making changes to the graph
+  this->scene->clearLayout();
+  this->scene->RemoveEdge(_parent, _child);
+  //Layout scene
+  this->scene->applyLayout();
 }
 
 /////////////////////////////////////////////////
@@ -194,26 +260,34 @@ bool CMLEditorWidget::ProcessSceneMsg(ConstScenePtr &_msg)
 bool CMLEditorWidget::ProcessModelMsg(const msgs::Model &_msg)
 {
   //QGVNode *node = this->scene->addNode(tr(_msg.name().c_str()));
+
+  // this must be called before making changes to the graph
+  this->scene->clearLayout();
+
   if (!this->scene->HasNode(_msg.name()))
   {
-    CMLNode * node = this->scene->AddNode(_msg.name());
+    this->scene->AddNode(_msg.name());
+/*    CMLNode * node = this->scene->AddNode(_msg.name());
     Simple_msgs::msgs::SimpleModel msg =
         CMLManager::Instance()->GetModelInfo(_msg.name());
     if (!msg.name().empty() && !msg.schematic_type().empty())
-      node->SetIcon(this->GetSchematicIcon(msg.schematic_type()));
-    this->scene->itemMoved();
-    this->scene->advance();
+      node->SetIcon(this->GetSchematicIcon(msg.schematic_type()));*/
+
+//    this->scene->itemMoved();
+//    this->scene->advance();
   }
 
 
   //this->graphNodes.push_back(node);
 
-  //this->scene->clearLayout();
+
   //Layout scene
-  //this->scene->applyLayout();
+  this->scene->applyLayout();
 
   //Fit in view
   //ui->graphicsView->fitInView(_scene->sceneRect(), Qt::KeepAspectRatio);
+//  this->view->fitInView(this->scene->sceneRect(), Qt::KeepAspectRatio);
+
   return true;
 }
 
@@ -221,14 +295,14 @@ bool CMLEditorWidget::ProcessModelMsg(const msgs::Model &_msg)
 bool CMLEditorWidget::ProcessSimpleModelMsg(
     const Simple_msgs::msgs::SimpleModel &_msg)
 {
-  CMLNode *node = this->scene->GetNode(_msg.name());
+/*  CMLNode *node = this->scene->GetNode(_msg.name());
   if (node && node->pixmap().isNull())
   {
     Simple_msgs::msgs::SimpleModel msg =
         CMLManager::Instance()->GetModelInfo(_msg.name());
     if (!msg.name().empty() && !msg.schematic_type().empty())
       node->SetIcon(this->GetSchematicIcon(msg.schematic_type()));
-  }
+  }*/
 }
 
 /////////////////////////////////////////////////

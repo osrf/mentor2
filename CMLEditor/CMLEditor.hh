@@ -18,18 +18,19 @@
 #define _CML_EDITOR_HH_
 
 #include <gazebo/gui/qt.h>
-#include <gazebo/gui/Editor.hh>
+//#include <gazebo/gui/Editor.hh>
 
 namespace gazebo
 {
   namespace gui
   {
-    class CMLEditorPalette;
+    class MainWindow;
+//    class CMLEditorPalette;
     class CMLEditorWidget;
 
     /// \class CMLEditor CMLEditor.hh gui/gui.hh
     /// \brief Interface to the CML editor.
-    class CMLEditor : public Editor
+    class CMLEditor : public QObject/*: public Editor*/
     {
       Q_OBJECT
 
@@ -47,7 +48,9 @@ namespace gazebo
       /// \brief Create menus
       //private: void CreateMenus();
 
-      private: gazebo::gui::CMLEditorPalette *CMLPalette;
+//      private: gazebo::gui::CMLEditorPalette *CMLPalette;
+
+      private: gazebo::gui::MainWindow *mainWindow;
 
       private: gazebo::gui::CMLEditorWidget *CMLEditorWidget;
     };

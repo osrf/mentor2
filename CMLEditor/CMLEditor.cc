@@ -19,6 +19,7 @@
 #include <gazebo/gui/TimePanel.hh>
 #include <gazebo/gui/MainWindow.hh>
 #include <gazebo/gui/RenderWidget.hh>
+#include <gazebo/gui/Actions.hh>
 
 #include "CMLEditorWidget.hh"
 #include "CMLEditorPalette.hh"
@@ -29,24 +30,24 @@ using namespace gui;
 
 /////////////////////////////////////////////////
 CMLEditor::CMLEditor(MainWindow *_mainWindow)
-  : Editor(_mainWindow)
+  : mainWindow(_mainWindow)
+//  : Editor(_mainWindow)
 {
   // Create the CML editor tab
-  this->CMLPalette = new CMLEditorPalette(_mainWindow);
-  this->Init("CMLEditorTab", "CML Editor", this->CMLPalette);
-
-//  connect(g_editBuildingAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
-//  this->menuBar = NULL;
+//  this->CMLPalette = new CMLEditorPalette(_mainWindow);
+//  this->Init("CMLEditorTab", "CML Editor", this->CMLPalette);
 
   RenderWidget *renderWidget = this->mainWindow->GetRenderWidget();
   this->CMLEditorWidget = new gazebo::gui::CMLEditorWidget(renderWidget);
   this->CMLEditorWidget->setSizePolicy(QSizePolicy::Expanding,
       QSizePolicy::Expanding);
-//  this->CMLEditorWidget->hide();
+  this->CMLEditorWidget->Init();
 
- // renderWidget->InsertWidget(0, this->CMLEditorWidget);
+  renderWidget->InsertWidget(0, this->CMLEditorWidget);
+  this->CMLEditorWidget->hide();
 
-  this->OnEdit(true);
+  if (g_editModelAct)
+    connect(g_editModelAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
 }
 
 /////////////////////////////////////////////////
@@ -57,14 +58,23 @@ CMLEditor::~CMLEditor()
 /////////////////////////////////////////////////
 void CMLEditor::OnEdit(bool _checked)
 {
-  RenderWidget *renderWidget = this->mainWindow->GetRenderWidget();
-  TimePanel *timePanel = renderWidget->GetTimePanel();
-  timePanel->ShowSimTime(!_checked);
-  timePanel->ShowRealTimeFactor(!_checked);
-  timePanel->ShowStepWidget(!_checked);
-  timePanel->ShowIterations(!_checked);
-
   if (_checked)
+  {
+    RenderWidget *renderWidget = this->mainWindow->GetRenderWidget();
+    this->CMLEditorWidget->show();
+
+    TimePanel *timePanel = renderWidget->GetTimePanel();
+    timePanel->ShowSimTime(!_checked);
+    timePanel->ShowRealTimeFactor(!_checked);
+    timePanel->ShowStepWidget(!_checked);
+    timePanel->ShowIterations(!_checked);
+
+//    this->jointAct->setVisible(_checked);
+//    this->jointTypeAct->setVisible(_checked);
+//    this->jointSeparatorAct->setVisible(_checked);
+  }
+
+ /* if (_checked)
   {
 //    this->mainWindow->AddLeftColumnTab("CMLEditor", "default",
 //        this->CMLPalette);
@@ -74,5 +84,5 @@ void CMLEditor::OnEdit(bool _checked)
   {
     this->mainWindow->ShowLeftColumnWidget();
 //    this->mainWindow->RemoveLeftColumnTab("CMLEditor", "default");
-  }
+  }*/
 }

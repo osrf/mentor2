@@ -1,4 +1,4 @@
-#add_subdirectory(QGVCore)
+add_subdirectory(QGVCore)
 #add_subdirectory(qtpropertybrowser)
 
 include ( ${QT_USE_FILE} )
@@ -17,6 +17,7 @@ set (sources
   CMLEditorPalette.cc
   CMLEditorPlugin.cc
   CMLEditorScene.cc
+  CMLEditorSceneGV.cc
   CMLEditorView.cc
   CMLEditorWidget.cc
   CMLEvents.cc
@@ -38,6 +39,7 @@ set (qt_headers
   CMLEditorItem.hh
   CMLEditorPalette.hh
   CMLEditorScene.hh
+  CMLEditorSceneGV.hh
   CMLEditorView.hh
   CMLItemListWidget.hh
   CMLNode.hh
@@ -71,13 +73,14 @@ include_directories(
   ${OGRE-Terrain_INCLUDE_DIRS}
   ${CMAKE_CURRENT_BINARY_DIR}/../msgs
 )
-#include_directories(${CMAKE_CURRENT_SOURCE_DIR}/QGVCore)
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/QGVCore)
 
 link_directories(${GAZEBO_LIBRARY_DIRS} ${OGRE_LIBRARY_DIRS})
 
 add_library(CMLEditorPlugin SHARED ${sources} ${headers_MOC} ${headers} ${resources_RCC})
 target_link_libraries(CMLEditorPlugin
-#    qgvcore
+    qgvcore
 #    simpleqtpropertybrowser
     SimpleMsgs
     ${GAZEBO_LIBRARIES}

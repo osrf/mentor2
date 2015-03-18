@@ -19,6 +19,7 @@ License along with this library.
 #define QGVSCENE_H
 
 #include <qgv.h>
+#include <QMap>
 #include <QGraphicsScene>
 
 class QGVNode;
@@ -46,7 +47,15 @@ public:
 
     QGVNode* addNode(const QString& label);
     QGVEdge* addEdge(QGVNode* source, QGVNode* target, const QString& label=QString());
+    QGVEdge *addEdge(const QString &source, const QString &target);
+
     QGVSubGraph* addSubGraph(const QString& name, bool cluster=true);
+    void removeNode(const QString& label);
+    void removeEdge(const QString& source, const QString& target);
+    void removeEdge(const QPair<QString, QString>& key);
+
+    bool hasNode(const QString &name);
+    QGVNode *getNode(const QString &name);
 
     void setRootNode(QGVNode *node);
 
@@ -83,9 +92,13 @@ private:
 		QGVGraphPrivate *_graph;
     //QFont _font;
 
-    QList<QGVNode*> _nodes;
-    QList<QGVEdge*> _edges;
-    QList<QGVSubGraph*> _subGraphs;
+//    QList<QGVNode*> _nodes;
+//    QList<QGVEdge*> _edges;
+//    QList<QGVSubGraph*> _subGraphs;
+
+    QMap<QString, QGVNode*> _nodes;
+    QMap<QPair<QString, QString>, QGVEdge*> _edges;
+    QMap<QString, QGVSubGraph*> _subGraphs;
 
 		bool init;
 };

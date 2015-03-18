@@ -133,7 +133,7 @@ bool CMLRender::OnMouseRelease(const common::MouseEvent &_event)
         this->inspectName = msg.name();
         //this->inspectMsg = msg;
 
-        ModelRightMenu *contextMenu = gui::get_context_menu();
+/*        ModelRightMenu *contextMenu = gui::get_context_menu();
         if (contextMenu)
         {
           std::vector<QAction *> menuAction;
@@ -141,7 +141,7 @@ bool CMLRender::OnMouseRelease(const common::MouseEvent &_event)
           contextMenu->Run(name, QCursor::pos(), menuAction);
           return true;
         }
-        else
+        else*/
           return false;
       }
     }

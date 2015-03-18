@@ -18,7 +18,7 @@
  #ifndef CML_NODE_HH
  #define CML_NODE_HH
 
-#include <gazebo/gui/gui.hh>
+#include <gazebo/gui/qt.h>
 
 namespace gazebo
 {

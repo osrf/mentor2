@@ -40,7 +40,9 @@ namespace gazebo
 {
   namespace gui
   {
+    class CMLEditorView;
     class CMLEditorScene;
+    class CMLEditorSceneGV;
 
     /// \class CMLEditorWidget CMLEditorWidget.hh
     /// \brief The parent widget of the CML editor
@@ -52,6 +54,29 @@ namespace gazebo
 
       /// \brief Destructor
       public: ~CMLEditorWidget();
+
+      /// \brief Initialize the widget to listen to events/topics
+      public: void Init();
+
+      /// \brief Add a node to the scene in the widget.
+      /// \param[in] _node Name of node.
+      public: void AddNode(const std::string &_node);
+
+      /// \brief Remove a node from the scene in the widget
+      /// \param[in] _node Name of node.
+      public: void RemoveNode(const std::string &_node);
+
+      /// \brief Add an edge to the scene in the widget
+      /// \param[in] _node Name of parent node.
+      /// \param[in] _node Name of child node.
+      public: void AddEdge(const std::string &_parent,
+          const std::string &_child);
+
+      /// \brief Remove an edge from the scene in the widget
+      /// \param[in] _node Name of parent node.
+      /// \param[in] _node Name of child node.
+      public: void RemoveEdge(const std::string &_parent,
+          const std::string &_child);
 
       /// \brief Qt event received when the widget is being resized
       /// \param[in] _event Resize event.
@@ -119,7 +144,11 @@ namespace gazebo
       /// \brief Qt Graphics Scene where graphics items are drawn in
 //      private: QGVScene *scene;
 //      private: QGraphicsScene *scene;
-      private: CMLEditorScene *scene;
+//      private: CMLEditorScene *scene;
+      private: CMLEditorSceneGV *scene;
+
+      /// \brief Qt Graphics View attached to the scene
+      private: CMLEditorView *view;
 
       /// \brief Minimum width of the Qt graphics scene
       private: int minimumWidth;
@@ -193,7 +222,8 @@ namespace gazebo
       // \brief A list of entities to be removed.
       private: std::set<std::string> removeEntityList;
 
-      //private: std::vector<QGVNode *> graphNodes;
+      // \brief A list of entities to be removed.
+      private: bool editorMode;
     };
   }
 }
