@@ -20,9 +20,9 @@
 #include <gazebo/gui/MainWindow.hh>
 #include <gazebo/gui/RenderWidget.hh>
 #include <gazebo/gui/Actions.hh>
+#include <gazebo/gui/model/ModelEditor.hh>
 
-#include "CMLEditorWidget.hh"
-#include "CMLEditorPalette.hh"
+#include "CMLEvents.hh"
 #include "CMLEditor.hh"
 
 using namespace gazebo;
@@ -31,23 +31,38 @@ using namespace gui;
 /////////////////////////////////////////////////
 CMLEditor::CMLEditor(MainWindow *_mainWindow)
   : mainWindow(_mainWindow)
-//  : Editor(_mainWindow)
 {
   // Create the CML editor tab
 //  this->CMLPalette = new CMLEditorPalette(_mainWindow);
-//  this->Init("CMLEditorTab", "CML Editor", this->CMLPalette);
 
-  RenderWidget *renderWidget = this->mainWindow->GetRenderWidget();
-  this->CMLEditorWidget = new gazebo::gui::CMLEditorWidget(renderWidget);
-  this->CMLEditorWidget->setSizePolicy(QSizePolicy::Expanding,
-      QSizePolicy::Expanding);
-  this->CMLEditorWidget->Init();
+  if (!_mainWindow)
+  {
+    gzerr << "Main window is NULL!" << std::endl;
+    return;
+  }
 
-  renderWidget->InsertWidget(0, this->CMLEditorWidget);
-  this->CMLEditorWidget->hide();
+  std::cerr << " CML loading " << std::endl;
 
-  if (g_editModelAct)
-    connect(g_editModelAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
+  ModelEditor *modelEditor =
+      dynamic_cast<ModelEditor *>(_mainWindow->GetEditor("model"));
+
+  if (!modelEditor)
+  {
+    gzerr << "Model Editor not found. Unable to start CMLEditor plugin"
+        << std::endl;
+    return;
+  }
+  // wiring button
+  QPushButton *wiringButton = new QPushButton(tr("Wires"));
+  wiringButton->setCheckable(false);
+  wiringButton->setChecked(false);
+  connect(wiringButton, SIGNAL(clicked()), this,
+      SLOT(OnElectricalConnection()));
+
+  modelEditor->AddItemToPalette(wiringButton, "Wiring");
+  std::cerr << " got model editor! " << std::endl;
+
+
 }
 
 /////////////////////////////////////////////////
@@ -56,33 +71,7 @@ CMLEditor::~CMLEditor()
 }
 
 /////////////////////////////////////////////////
-void CMLEditor::OnEdit(bool _checked)
+void CMLEditor::OnElectricalConnection()
 {
-  if (_checked)
-  {
-    RenderWidget *renderWidget = this->mainWindow->GetRenderWidget();
-    this->CMLEditorWidget->show();
-
-    TimePanel *timePanel = renderWidget->GetTimePanel();
-    timePanel->ShowSimTime(!_checked);
-    timePanel->ShowRealTimeFactor(!_checked);
-    timePanel->ShowStepWidget(!_checked);
-    timePanel->ShowIterations(!_checked);
-
-//    this->jointAct->setVisible(_checked);
-//    this->jointTypeAct->setVisible(_checked);
-//    this->jointSeparatorAct->setVisible(_checked);
-  }
-
- /* if (_checked)
-  {
-//    this->mainWindow->AddLeftColumnTab("CMLEditor", "default",
-//        this->CMLPalette);
-    this->mainWindow->ShowLeftColumnWidget("CMLEditorTab");
-  }
-  else
-  {
-    this->mainWindow->ShowLeftColumnWidget();
-//    this->mainWindow->RemoveLeftColumnTab("CMLEditor", "default");
-  }*/
+  emit CMLEvents::createConnection("electrical");
 }

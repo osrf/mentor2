@@ -1,4 +1,4 @@
-add_subdirectory(QGVCore)
+#add_subdirectory(QGVCore)
 #add_subdirectory(qtpropertybrowser)
 
 include ( ${QT_USE_FILE} )
@@ -8,56 +8,56 @@ link_directories(
 )
 
 set (sources
-  BreadCrumbWidget.cc
+#  BreadCrumbWidget.cc
   CMLComponentInspector.cc
   CMLConnectionMaker.cc
-  CMLEdge.cc
+#  CMLEdge.cc
   CMLEditor.cc
-  CMLEditorItem.cc
-  CMLEditorPalette.cc
+#  CMLEditorItem.cc
+#  CMLEditorPalette.cc
   CMLEditorPlugin.cc
-  CMLEditorScene.cc
-  CMLEditorSceneGV.cc
-  CMLEditorView.cc
-  CMLEditorWidget.cc
+#  CMLEditorScene.cc
+#  CMLEditorSceneGV.cc
+#  CMLEditorView.cc
+#  CMLEditorWidget.cc
   CMLEvents.cc
-  CMLItemListWidget.cc
+#  CMLItemListWidget.cc
   CMLManager.cc
-  CMLNode.cc
+#  CMLNode.cc
   CMLPortInspector.cc
   CMLPropertyManager.cc
   CMLRender.cc
-  GrabberHandle.cc
-  RectItem.cc
-  RotateHandle.cc
+#  GrabberHandle.cc
+#  RectItem.cc
+#  RotateHandle.cc
 )
 
 set (qt_headers
-  BreadCrumbWidget.hh
+#  BreadCrumbWidget.hh
   CMLComponentInspector.hh
   CMLEditor.hh
-  CMLEditorItem.hh
-  CMLEditorPalette.hh
-  CMLEditorScene.hh
-  CMLEditorSceneGV.hh
-  CMLEditorView.hh
-  CMLItemListWidget.hh
-  CMLNode.hh
+#  CMLEditorItem.hh
+#  CMLEditorPalette.hh
+#  CMLEditorScene.hh
+#  CMLEditorSceneGV.hh
+#  CMLEditorView.hh
+#  CMLItemListWidget.hh
+#  CMLNode.hh
   CMLPortInspector.hh
   CMLPropertyManager.hh
   CMLRender.hh
-  RectItem.hh
+#  RectItem.hh
 )
 
 set (headers
   CMLConnectionMaker.hh
-  CMLEdge.hh
+#  CMLEdge.hh
   CMLEditorPlugin.hh
-  CMLEditorWidget.hh
+#  CMLEditorWidget.hh
   CMLEvents.hh
   CMLManager.hh
-  GrabberHandle.hh
-  RotateHandle.hh
+#  GrabberHandle.hh
+#  RotateHandle.hh
 )
 
 set (resources cmlresources.qrc)
@@ -74,13 +74,13 @@ include_directories(
   ${CMAKE_CURRENT_BINARY_DIR}/../msgs
 )
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/QGVCore)
+#include_directories(${CMAKE_CURRENT_SOURCE_DIR}/QGVCore)
 
 link_directories(${GAZEBO_LIBRARY_DIRS} ${OGRE_LIBRARY_DIRS})
 
 add_library(CMLEditorPlugin SHARED ${sources} ${headers_MOC} ${headers} ${resources_RCC})
 target_link_libraries(CMLEditorPlugin
-    qgvcore
+#    qgvcore
 #    simpleqtpropertybrowser
     SimpleMsgs
     ${GAZEBO_LIBRARIES}

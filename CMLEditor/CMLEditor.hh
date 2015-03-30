@@ -41,18 +41,14 @@ namespace gazebo
       /// \brief Destuctor.
       public: virtual ~CMLEditor();
 
-      /// \brief QT callback when entering CML edit mode
-      /// \param[in] _checked True if the menu item is checked
-      private slots: void OnEdit(bool _checked);
-
-      /// \brief Create menus
-      //private: void CreateMenus();
-
 //      private: gazebo::gui::CMLEditorPalette *CMLPalette;
 
       private: gazebo::gui::MainWindow *mainWindow;
 
-      private: gazebo::gui::CMLEditorWidget *CMLEditorWidget;
+//      private: gazebo::gui::CMLEditorWidget *CMLEditorWidget;
+
+      /// \brief Qt callback when an electrical connection is to be created.
+      private slots: void OnElectricalConnection();
     };
   }
 }
