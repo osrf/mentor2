@@ -1,0 +1,176 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="mentor2_tow">
+    <!-- Remove the grid -->
+    <scene>
+      <grid>false</grid>
+    </scene>
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <!-- a Car  -->
+    <include>
+      <pose>-5 0 0 0 0 0</pose>
+      <uri>model://Car</uri>
+    </include>
+
+
+    <model name="sphere">
+      <pose>-7 0 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Orange</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+
+    <!-- a series of visuals for the regions  -->
+    <include>
+      <pose>0 0 0 0 0 0</pose>
+      <uri>model://concrete_slab</uri>
+    </include>
+    <include>
+      <pose>5 0 0 0 0 0</pose>
+      <uri>model://concrete_slab</uri>
+    </include>
+      
+      <include>
+      <pose>10 0 0 0 0 0</pose>
+      <uri>model://concrete_slab</uri>
+    </include>
+
+    <include>
+      <pose>15 0 0 0 0 0</pose>
+      <uri>model://concrete_slab</uri>
+    </include>
+
+    <!-- background objects to make it less boring -->
+     <include>
+      <pose>0 3.5 0 0 0 0</pose>
+      <uri>model://jersey_barrier</uri>
+    </include>
+     <include>
+      <pose>5 3.5 0 0 0 0</pose>
+      <uri>model://jersey_barrier</uri>
+    </include>
+    <include>
+      <pose>10 3.5 0 0 0 0</pose>
+      <uri>model://jersey_barrier</uri>
+    </include>
+    <include>
+      <pose>15 3.5 0 0 0 0</pose>
+      <uri>model://jersey_barrier</uri>
+    </include>
+   
+    <include>
+      <pose>17.5 3 0 0 0 0</pose>
+      <uri>model://construction_cone</uri>
+    </include>
+
+    <include>
+      <pose>17.5 -3 0 0 0 0</pose>
+      <uri>model://construction_cone</uri>
+    </include>
+
+
+    <plugin name="SimEvents" filename="libSimEventsPlugin.so">
+      <session></session>
+
+      <region>
+        <name>slab_0</name>
+        <volume>
+          <min>0 -5  0</min>
+          <max>5 5 10</max>
+        </volume>
+      </region>
+
+      <region>
+        <name>slab_1</name>
+        <volume>
+          <min>5 -5  0</min>
+          <max>10 5 10</max>
+        </volume>
+      </region>
+
+      <region>
+        <name>slab_2</name>
+        <volume>
+          <min>10 -5  0</min>
+          <max>15 5 10</max>
+        </volume>
+      </region>
+
+      <region>
+        <name>slab_3</name>
+        <volume>
+          <min>15 -5  0</min>
+          <max>20 5 10</max>
+        </volume>
+      </region>
+
+      <event>
+        <name>state</name>
+        <type>sim_state</type>
+      </event>
+
+      <!-- bounding box inclusion event -->
+      <event>
+        <name>on_slab_0</name>
+        <type>inclusion</type>
+        <model>Car</model>
+        <region>slab_0</region>
+      </event>
+
+     <!-- bounding box inclusion event -->
+      <event>
+        <name>on_slab_1</name>
+        <type>inclusion</type>
+        <model>Car</model>
+        <region>slab_1</region>
+      </event>
+
+      <!-- bounding box inclusion event -->
+      <event>
+        <name>on_slab_2</name>
+        <type>inclusion</type>
+        <model>Car</model>
+        <region>slab_2</region>
+      </event>
+ 
+      <!-- bounding box inclusion event -->
+      <event>
+        <name>on_slab_3</name>
+        <type>inclusion</type>
+        <model>Car</model>
+        <region>slab_3</region>
+      </event>
+  
+
+    </plugin>
+
+ </world>
+</sdf>
