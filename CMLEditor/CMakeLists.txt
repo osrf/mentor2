@@ -1,6 +1,3 @@
-#add_subdirectory(QGVCore)
-#add_subdirectory(qtpropertybrowser)
-
 include ( ${QT_USE_FILE} )
 
 link_directories(
@@ -8,56 +5,30 @@ link_directories(
 )
 
 set (sources
-#  BreadCrumbWidget.cc
   CMLComponentInspector.cc
   CMLConnectionMaker.cc
-#  CMLEdge.cc
   CMLEditor.cc
-#  CMLEditorItem.cc
-#  CMLEditorPalette.cc
   CMLEditorPlugin.cc
-#  CMLEditorScene.cc
-#  CMLEditorSceneGV.cc
-#  CMLEditorView.cc
-#  CMLEditorWidget.cc
   CMLEvents.cc
-#  CMLItemListWidget.cc
   CMLManager.cc
-#  CMLNode.cc
   CMLPortInspector.cc
   CMLPropertyManager.cc
   CMLRender.cc
-#  GrabberHandle.cc
-#  RectItem.cc
-#  RotateHandle.cc
 )
 
 set (qt_headers
-#  BreadCrumbWidget.hh
   CMLComponentInspector.hh
   CMLEditor.hh
-#  CMLEditorItem.hh
-#  CMLEditorPalette.hh
-#  CMLEditorScene.hh
-#  CMLEditorSceneGV.hh
-#  CMLEditorView.hh
-#  CMLItemListWidget.hh
-#  CMLNode.hh
   CMLPortInspector.hh
   CMLPropertyManager.hh
   CMLRender.hh
-#  RectItem.hh
 )
 
 set (headers
   CMLConnectionMaker.hh
-#  CMLEdge.hh
   CMLEditorPlugin.hh
-#  CMLEditorWidget.hh
   CMLEvents.hh
   CMLManager.hh
-#  GrabberHandle.hh
-#  RotateHandle.hh
 )
 
 set (resources cmlresources.qrc)
@@ -80,8 +51,6 @@ link_directories(${GAZEBO_LIBRARY_DIRS} ${OGRE_LIBRARY_DIRS})
 
 add_library(CMLEditorPlugin SHARED ${sources} ${headers_MOC} ${headers} ${resources_RCC})
 target_link_libraries(CMLEditorPlugin
-#    qgvcore
-#    simpleqtpropertybrowser
     SimpleMsgs
     ${GAZEBO_LIBRARIES}
     ${OGRE_LIBRARIES})
