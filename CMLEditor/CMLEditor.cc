@@ -41,7 +41,6 @@ CMLEditor::CMLEditor(MainWindow *_mainWindow)
     return;
   }
 
-  std::cerr << " CML loading " << std::endl;
 
   ModelEditor *modelEditor =
       dynamic_cast<ModelEditor *>(_mainWindow->GetEditor("model"));
@@ -60,7 +59,27 @@ CMLEditor::CMLEditor(MainWindow *_mainWindow)
       SLOT(OnElectricalConnection()));
 
   modelEditor->AddItemToPalette(wiringButton, "Wiring");
-  std::cerr << " got model editor! " << std::endl;
+
+
+  // other components
+  QPushButton *motorButton = new QPushButton(tr("Motor"));
+  motorButton->setCheckable(false);
+  motorButton->setChecked(false);
+/*  connect(wiringButton, SIGNAL(clicked()), this,
+      SLOT(OnElectricalConnection()));*/
+
+  QPushButton *batteryButton = new QPushButton(tr("Battery"));
+  batteryButton->setCheckable(false);
+  batteryButton->setChecked(false);
+
+  QPushButton *switchButton = new QPushButton(tr("Switch"));
+  switchButton->setCheckable(false);
+  switchButton->setChecked(false);
+
+
+  modelEditor->AddItemToPalette(motorButton, "Components");
+  modelEditor->AddItemToPalette(batteryButton, "Components");
+  modelEditor->AddItemToPalette(switchButton, "Components");
 
 
 }
