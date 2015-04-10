@@ -54,6 +54,10 @@ namespace gazebo
       public: void UpdateModelInfo(const std::string &_name,
           Simple_msgs::msgs::SimpleModel _info, bool _publish = true);
 
+      /// \brief Add a simple model to the manager
+      /// \param[in] Simple model message describing the model.
+      public: void AddSimpleModel(Simple_msgs::msgs::SimpleModel _msg);
+
       /// \brief Show an inspector for configuring component properties.
       /// \param[in] _Name of component.
       /// \return True if the component exists.

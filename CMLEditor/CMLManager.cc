@@ -150,6 +150,15 @@ void CMLManager::OnSimpleModel(ConstSimpleModelPtr &_msg)
 }
 
 /////////////////////////////////////////////////
+void CMLManager::AddSimpleModel(Simple_msgs::msgs::SimpleModel _msg)
+{
+  std::cerr << " add simple model " << _msg.name() << std::endl;
+
+  boost::recursive_mutex::scoped_lock lock(*this->modelInfoMutex);
+  this->modelInfo[_msg.name()] = _msg;
+}
+
+/////////////////////////////////////////////////
 bool CMLManager::ShowInspector(const std::string &_name)
 {
   boost::recursive_mutex::scoped_lock lock(*this->modelInfoMutex);

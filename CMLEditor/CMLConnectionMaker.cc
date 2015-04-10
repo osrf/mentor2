@@ -409,10 +409,7 @@ void CMLConnectionMaker::Stop()
       this->mouseConnection->visual.reset();
       delete this->mouseConnection;
       this->mouseConnection = NULL;
-      this->mouseConnection->parentPort = "";
-      this->mouseConnection->childPort = "";
     }
-
     if (this->hoverVis)
       this->hoverVis->SetEmissive(common::Color(0, 0, 0));
     if (this->selectedVis)
@@ -460,10 +457,13 @@ bool CMLConnectionMaker::OnMouseMove(const common::MouseEvent &_event)
     else
       entityVis = vis->GetRootVisual();
 
+//    Simple_msgs::msgs::SimpleModel msg =
+//        CMLManager::Instance()->GetModelInfo(entityVis->GetName());
+
     if (vis->GetName().find("_HOTSPOT_") == std::string::npos)
     {
       this->hoverVis = entityVis;
-      if (!entityVis->IsPlane() && (!this->selectedVis ||
+      if (/*msg.port_size() > 0 &&*/ !entityVis->IsPlane() && (!this->selectedVis ||
            (this->selectedVis && this->hoverVis != this->selectedVis)))
       {
         this->hoverVis->SetEmissive(common::Color(0.5, 0.5, 0.5));
@@ -511,8 +511,7 @@ bool CMLConnectionMaker::OnKeyPress(const common::KeyEvent &_event)
       this->selectedConnection.reset();
     }
   }
-  else
-  if (_event.key == Qt::Key_Escape)
+  else if (_event.key == Qt::Key_Escape)
   {
     this->Stop();
   }
