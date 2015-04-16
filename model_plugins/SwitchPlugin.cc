@@ -132,7 +132,9 @@ void SwitchPlugin::UpdateImpl(double _timeSinceLastUpdate)
 
   double switchHysteresis = 0.2;
   double switchCmdEps = 0.01;
-  double switchState = this->switchJoint->GetAngle(0).Radian();
+  double switchState = 0;
+  if (this->switchJoint)
+    switchState = this->switchJoint->GetAngle(0).Radian();
   double switchPercent = math::clamp((switchState - this->switchLow) /
       (this->switchHigh-this->switchLow), 0.0, 1.0);
 
@@ -181,7 +183,8 @@ void SwitchPlugin::UpdateImpl(double _timeSinceLastUpdate)
   double switchError = switchState - this->switchCmd;
   double switchPIDCmd = this->switchPID.Update(switchError,
       _timeSinceLastUpdate);
-  this->switchJoint->SetForce(0, switchPIDCmd);
+  if (this->switchJoint)
+    this->switchJoint->SetForce(0, switchPIDCmd);
 
 
   // publish

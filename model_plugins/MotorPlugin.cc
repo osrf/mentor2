@@ -59,6 +59,12 @@ void MotorPlugin::Init()
   SimpleModelPlugin::Init();
 
   this->joint = this->parent->GetJoint(this->shaftJointName);
+  if (!joint)
+  {
+    gzerr << "Unable to find joint: " << this->shaftJointName << std::endl;
+    return;
+  }
+
   this->shaftLink = this->joint->GetJointLink(0);
 
   this->torquePub = this->node->Advertise<Simple_msgs::msgs::Variant>(
@@ -113,8 +119,8 @@ void MotorPlugin::UpdateImpl(double _timeSinceLastUpdate)
   double internalCurrent = internalVoltage / this->motorResistance;
   double torque = internalCurrent * this->torqueConstant;
 
-  std::cerr << " voltage " << voltage << ", torque " << torque
-      << ", shaftRotationSpeed " << shaftRotationSpeed << std::endl;
+//  std::cerr << " voltage " << voltage << ", torque " << torque
+//      << ", shaftRotationSpeed " << shaftRotationSpeed << std::endl;
 
   if (this->joint)
     this->joint->SetForce(0, torque);

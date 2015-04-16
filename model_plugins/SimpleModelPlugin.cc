@@ -145,6 +145,9 @@ void SimpleModelPlugin::Load(sdf::ElementPtr _sdf)
 
   this->LoadImpl(_sdf);
 
+
+  return;
+
   // DEBUG
   std::map<std::string, boost::any>::iterator portIt;
   for (portIt = this->ports.begin() ; portIt != this->ports.end(); ++portIt)
@@ -205,6 +208,8 @@ void SimpleModelPlugin::Init()
 
   this->initThread = new boost::thread(
       boost::bind(&SimpleModelPlugin::InitThread, this));
+
+  std::cerr << this->schematicType << " Init " << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -250,7 +255,6 @@ void SimpleModelPlugin::InitThread()
   Simple_msgs::msgs::SimpleModel simpleModelMsg;
   this->FillMsg(simpleModelMsg);
   this->simpleModelPub->Publish(simpleModelMsg);
-  std::cerr << " simple model init pub " << std::endl;
 
 }
 
@@ -433,6 +437,8 @@ void SimpleModelPlugin::ProcessMsgs()
     this->portPubs[port] =
         this->node->Advertise<Simple_msgs::msgs::Variant>(topic);
     this->portTopics[port] = topic;
+
+    std::cerr << "creating topic " << topic << std::endl;
   }
 
   this->simpleConnectionMsgs.clear();

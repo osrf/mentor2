@@ -8,6 +8,7 @@ set (plugins
   PowerSourcePlugin
   SwitchPlugin
   WheelPlugin
+  SimpleConnectionsPlugin
 )
 
 include_directories(
