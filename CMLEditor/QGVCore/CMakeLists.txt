@@ -30,14 +30,18 @@ add_definitions(${QT_DEFINITIONS})
 QT4_WRAP_CPP(headers_MOC ${qt_headers})
 
 include_directories(${GRAPHVIZ_GVC_PKG_INCLUDE_DIRS})
+include_directories(${GRAPHVIZ_INCLUDE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/private)
 
-add_library(qgvcore SHARED ${sources} ${headers_MOC} ${headers} ${resources_RCC})
+add_library(qgvcore STATIC ${sources} ${headers_MOC} ${headers} ${resources_RCC})
+set_target_properties(qgvcore PROPERTIES POSITION_INDEPENDENT_CODE ON)
+#add_library(qgvcore SHARED ${sources} ${headers_MOC} ${headers} ${resources_RCC})
 
 link_directories(${GRAPHVIZ_CGRAPH_PKG_LIBRARY_DIRS})
 
-MESSAGE(" ${GRAPHVIZ_GVC_PKG_LIBRARIES} ")
+#MESSAGE(" ${GRAPHVIZ_GVC_PKG_LIBRARIES} ")
+#MESSAGE(" ${GRAPHVIZ_INCLUDE_DIR} ")
 
 target_link_libraries(qgvcore
   ${QT_LIBRARIES}
@@ -49,3 +53,5 @@ target_link_libraries(qgvcore
   ${GRAPHVIZ_CGRAPH_LIBRARY}
   ${GRAPHVIZ_CDT_LIBRARY}
 )
+
+install (TARGETS qgvcore DESTINATION ${SIMPLEGDK_PLUGIN_INSTALL_DIR})

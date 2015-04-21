@@ -1,4 +1,9 @@
-./stop.sh
+#!/bin/bash
+
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
+$DIR/stop.sh
+
 
 echo "SOURCE before you buy ~/local/share/simplegdk/setup.sh"
 

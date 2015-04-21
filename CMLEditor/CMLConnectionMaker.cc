@@ -58,6 +58,8 @@ CMLConnectionMaker::CMLConnectionMaker()
       event::Events::ConnectPreRender(
         boost::bind(&CMLConnectionMaker::Update, this)));
 
+  this->connectionMode = CONNECT_MODE_LINK;
+
   this->updateMutex = new boost::recursive_mutex();
 }
 
@@ -231,10 +233,16 @@ bool CMLConnectionMaker::OnMouseRelease(const common::MouseEvent &_event)
         this->hoverVis->SetEmissive(common::Color(0, 0, 0));
         this->selectedVis = this->hoverVis;
         this->hoverVis.reset();
+
+        rendering::VisualPtr entityVis;
+        if (this->connectionMode == CONNECT_MODE_LINK)
+          entityVis = this->selectedVis->GetParent();
+        else
+          entityVis = this->selectedVis->GetRootVisual();
+
         // Create connection data with selected visual as parent
         // the child will be set on the second mouse release.
-        this->mouseConnection =
-            this->CreateConnection(this->selectedVis->GetRootVisual(),
+        this->mouseConnection = this->CreateConnection(entityVis,
             rendering::VisualPtr());
         this->mouseConnection->parentPort = port;
       }
@@ -268,7 +276,6 @@ bool CMLConnectionMaker::OnMouseRelease(const common::MouseEvent &_event)
             this->mouseConnection->parentPort,
             this->mouseConnection->child->GetName(),
             this->mouseConnection->childPort);
-
       }
     }
 
@@ -402,10 +409,7 @@ void CMLConnectionMaker::Stop()
       this->mouseConnection->visual.reset();
       delete this->mouseConnection;
       this->mouseConnection = NULL;
-      this->mouseConnection->parentPort = "";
-      this->mouseConnection->childPort = "";
     }
-
     if (this->hoverVis)
       this->hoverVis->SetEmissive(common::Color(0, 0, 0));
     if (this->selectedVis)
@@ -447,12 +451,19 @@ bool CMLConnectionMaker::OnMouseMove(const common::MouseEvent &_event)
 
     // only highlight editor entities by making sure it's not an item in the
     // gui tree widget or a connection hotspot.
-    rendering::VisualPtr rootVis = vis->GetRootVisual();
+    rendering::VisualPtr entityVis;
+    if (this->connectionMode == CONNECT_MODE_LINK)
+      entityVis = vis->GetParent();
+    else
+      entityVis = vis->GetRootVisual();
+
+//    Simple_msgs::msgs::SimpleModel msg =
+//        CMLManager::Instance()->GetModelInfo(entityVis->GetName());
 
     if (vis->GetName().find("_HOTSPOT_") == std::string::npos)
     {
-      this->hoverVis = rootVis;
-      if (!rootVis->IsPlane() && (!this->selectedVis ||
+      this->hoverVis = entityVis;
+      if (/*msg.port_size() > 0 &&*/ !entityVis->IsPlane() && (!this->selectedVis ||
            (this->selectedVis && this->hoverVis != this->selectedVis)))
       {
         this->hoverVis->SetEmissive(common::Color(0.5, 0.5, 0.5));
@@ -500,8 +511,7 @@ bool CMLConnectionMaker::OnKeyPress(const common::KeyEvent &_event)
       this->selectedConnection.reset();
     }
   }
-  else
-  if (_event.key == Qt::Key_Escape)
+  else if (_event.key == Qt::Key_Escape)
   {
     this->Stop();
   }

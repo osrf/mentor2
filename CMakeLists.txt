@@ -40,7 +40,7 @@ if (PKG_CONFIG_FOUND)
   pkg_check_modules(GAZEBO gazebo>=3.0.0 REQUIRED)
   pkg_check_modules(OGRE OGRE)
   pkg_check_modules(OGRE-Terrain OGRE-Terrain)
-#  pkg_check_modules(GVC libgvc)
+  #pkg_check_modules(GVC libgvc)
 else()
   message(FATAL_ERROR "pkg-config is required; please install it")
 endif()
@@ -53,10 +53,6 @@ if (NOT QT4_FOUND)
   MESSAGE("Qt4 not found")
 endif()
 
-#find_package (Graphviz)
-#if (NOT QT4_FOUND)
-#  MESSAGE("Graphviz not found")
-#endif()
 
 include(GNUInstallDirs)
 
@@ -73,6 +69,7 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${CMAKE_INSTALL_P
 # Also install the setup.sh in an unversioned location
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${CMAKE_INSTALL_PREFIX}/share/simplegdk/)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
 
 add_subdirectory(msgs)
 add_subdirectory(CMLEditor)

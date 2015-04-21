@@ -17,19 +17,25 @@
 #ifndef _CML_EDITOR_HH_
 #define _CML_EDITOR_HH_
 
+
+#include <sdf/sdf.hh>
+
+#include <gazebo/common/Events.hh>
 #include <gazebo/gui/qt.h>
-#include <gazebo/gui/Editor.hh>
+//#include <gazebo/gui/Editor.hh>
 
 namespace gazebo
 {
   namespace gui
   {
-    class CMLEditorPalette;
+    class ModelEditor;
+    class MainWindow;
+//    class CMLEditorPalette;
     class CMLEditorWidget;
 
     /// \class CMLEditor CMLEditor.hh gui/gui.hh
     /// \brief Interface to the CML editor.
-    class CMLEditor : public Editor
+    class CMLEditor : public QObject/*: public Editor*/
     {
       Q_OBJECT
 
@@ -40,16 +46,38 @@ namespace gazebo
       /// \brief Destuctor.
       public: virtual ~CMLEditor();
 
-      /// \brief QT callback when entering CML edit mode
-      /// \param[in] _checked True if the menu item is checked
-      private slots: void OnEdit(bool _checked);
+      private: void Parse(sdf::ElementPtr _sdf, const std::string &_name);
 
-      /// \brief Create menus
-      //private: void CreateMenus();
+      private: void LoadModels();
 
-      private: gazebo::gui::CMLEditorPalette *CMLPalette;
+      /// \brief Callback when a link is inserted.
+      /// \param[in] _node Name of link.
+      private: void OnLinkInserted(const std::string &_name);
 
-      private: gazebo::gui::CMLEditorWidget *CMLEditorWidget;
+      /// \brief Callback when a link is removed.
+      /// \param[in] _node Name of link.
+      private: void OnLinkRemoved(const std::string &_name);
+
+      /// \brief Qt callback when an entity is to be spawned
+      private slots: void SpawnEntity();
+
+      /// \brief Qt callback when an electrical connection is to be created.
+      private slots: void OnElectricalConnection();
+
+//      private: gazebo::gui::CMLEditorPalette *CMLPalette;
+
+      private: gazebo::gui::MainWindow *mainWindow;
+
+      private: std::string insertName;
+
+      private: std::map<std::string, sdf::SDFPtr> models;
+
+      private: ModelEditor *modelEditor;
+
+//      private: gazebo::gui::CMLEditorWidget *CMLEditorWidget;
+
+      /// \brief A list of gazebo event connects.
+      private: std::vector<event::ConnectionPtr> connections;
     };
   }
 }
