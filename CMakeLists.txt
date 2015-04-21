@@ -53,10 +53,6 @@ if (NOT QT4_FOUND)
   MESSAGE("Qt4 not found")
 endif()
 
-#find_package (Graphviz)
-#if (NOT QT4_FOUND)
-#  MESSAGE("Graphviz not found")
-#endif()
 
 include(GNUInstallDirs)
 
