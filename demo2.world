@@ -1,0 +1,410 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <model name="circuit">
+
+      <link name="circuit_link">
+        <collision name="circuit_collision">
+          <pose>0 0 0.05 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.1 0.1 0.1</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+
+      <!-- ======================battery====================== -->
+
+      <model name="AA_battery">
+        <pose>0 0 0.07 0 0 0</pose>
+        <link name="link">
+          <collision name="collision">
+            <pose>0 0 0.0 0 0 0</pose>
+            <geometry>
+              <mesh>
+                <uri>model://AA_battery/meshes/AA_battery.dae</uri>
+                <scale>0.01 0.01 0.01</scale>
+              </mesh>
+            </geometry>
+          </collision>
+          <visual name="visual">
+            <pose>0 0 0.0 0 0 0</pose>
+            <geometry>
+              <mesh>
+                <uri>model://AA_battery/meshes/AA_battery.dae</uri>
+                <scale>0.01 0.01 0.01</scale>
+              </mesh>
+            </geometry>
+            <material>
+              <script>
+                <uri>file://media/materials/scripts/gazebo.material</uri>
+                <name>Gazebo/Grey</name>
+              </script>
+            </material>
+          </visual>
+        </link>
+        <plugin filename="libPowerSourcePlugin.so" name="battery">
+          <port>
+            <name>positive</name>
+            <type>electrical</type>
+          </port>
+          <port>
+            <name>negative</name>
+            <type>electrical</type>
+          </port>
+          <properties>
+            <voltage>1.5</voltage>   <!-- Volts -->
+           <capacity>0.30</capacity> <!-- Amp-hours  -->
+            <current>0.1</current>   <!-- Amps -->
+          </properties>
+        </plugin>
+      </model>
+
+      <!-- ======================motor====================== -->
+
+      <model name="motor">
+        <pose>1 0 0.1 0 0 0</pose>
+        <link name="link">
+          <self_collide>false</self_collide>
+          <collision name="collision">
+            <pose>0 0 0.0 0 0 0</pose>
+            <geometry>
+              <mesh>
+                <uri>model://motor/meshes/motor.dae</uri>
+                <scale>0.01 0.01 0.01</scale>
+              </mesh>
+            </geometry>
+          </collision>
+          <visual name="visual">
+            <pose>0 0 0.0 0 0 0</pose>
+            <geometry>
+              <mesh>
+                <uri>model://motor/meshes/motor.dae</uri>
+                <scale>0.01 0.01 0.01</scale>
+              </mesh>
+            </geometry>
+            <material>
+              <script>
+                <uri>file://media/materials/scripts/gazebo.material</uri>
+                <name>Gazebo/Grey</name>
+              </script>
+            </material>
+          </visual>
+        </link>
+
+        <!--<joint name="world_joint" type="revolute">
+          <parent>world</parent>
+          <child>link</child>
+          <axis>
+            <xyz>0 0 1</xyz>
+            <limit>
+              <lower>0</lower>
+              <upper>0</upper>
+            </limit>
+          </axis>
+        </joint>-->
+
+        <link name="motor_core_link">
+          <pose>0.02 0 0.0 0 1.57 0</pose>
+          <self_collide>false</self_collide>
+          <gravity>false</gravity>
+          <collision name="collision">
+            <pose>0 0 0.0 0 0 0</pose>
+            <geometry>
+              <cylinder>
+                <radius>0.05</radius>
+                <length>0.05</length>
+              </cylinder>
+            </geometry>
+          </collision>
+          <visual name="visual">
+            <pose>0 0 0.0 0 0 0</pose>
+            <geometry>
+              <cylinder>
+                <radius>0.05</radius>
+                <length>0.05</length>
+              </cylinder>
+            </geometry>
+            <material>
+              <script>
+                <uri>file://media/materials/scripts/gazebo.material</uri>
+                <name>Gazebo/Grey</name>
+              </script>
+            </material>
+          </visual>
+        </link>
+
+        <link name="motor_shaft_link">
+          <pose>0.02 0 0.0 0 1.57 0</pose>
+          <self_collide>false</self_collide>
+          <gravity>false</gravity>
+          <collision name="collision">
+            <pose>0 0 0.0 0 0 0</pose>
+            <geometry>
+              <cylinder>
+                <radius>0.005</radius>
+                <length>0.30</length>
+              </cylinder>
+            </geometry>
+          </collision>
+          <visual name="visual">
+            <pose>0 0 0.0 0 0 0</pose>
+            <geometry>
+              <cylinder>
+                <radius>0.005</radius>
+                <length>0.30</length>
+              </cylinder>
+            </geometry>
+            <material>
+              <script>
+                <uri>file://media/materials/scripts/gazebo.material</uri>
+                <name>Gazebo/Grey</name>
+              </script>
+            </material>
+          </visual>
+        </link>
+
+        <joint name="motor_shaft_joint" type="revolute">
+          <parent>motor_core_link</parent>
+          <child>motor_shaft_link</child>
+          <axis>
+            <xyz>0 0 1</xyz>
+            <limit>
+              <lower>-1000000</lower>
+              <upper>1000000</upper>
+            </limit>
+          </axis>
+        </joint>
+
+        <joint name="motor_joint" type="revolute">
+          <parent>motor_core_link</parent>
+          <child>link</child>
+          <axis>
+            <xyz>0 0 1</xyz>
+            <limit>
+              <lower>0</lower>
+              <upper>0</upper>
+            </limit>
+          </axis>
+        </joint>
+
+        <plugin filename="libMotorPlugin.so" name="motor">
+          <port>
+            <name>shaft</name>
+            <type>mechanical</type>
+          </port>
+          <port>
+            <name>connector0</name>
+            <type>electrical</type>
+          </port>
+          <port>
+            <name>connector1</name>
+            <type>electrical</type>
+          </port>
+
+          <properties>
+            <resistance>5</resistance>
+            <back_emf>0.0064</back_emf>
+            <torque_constant>0.0064</torque_constant>
+          </properties>
+
+          <shaft_joint>motor_shaft_joint</shaft_joint>
+        </plugin>
+
+      </model>
+
+      <!-- ======================switch====================== -->
+
+      <model name="switch">
+        <pose>0 1 0.155 0 3.14 0</pose>
+        <link name="body">
+          <collision name="collision">
+            <pose>0 0 0.0 0 0 0</pose>
+            <geometry>
+              <mesh>
+                <uri>model://power_switch/meshes/switch_no_button.dae</uri>
+                <scale>0.01 0.01 0.01</scale>
+              </mesh>
+            </geometry>
+          </collision>
+          <visual name="visual">
+            <pose>0 0 0.0 0 0 0</pose>
+            <geometry>
+              <mesh>
+                <uri>model://power_switch/meshes/switch_no_button.dae</uri>
+                <scale>0.01 0.01 0.01</scale>
+              </mesh>
+            </geometry>
+            <material>
+              <script>
+                <uri>file://media/materials/scripts/gazebo.material</uri>
+                <name>Gazebo/Grey</name>
+              </script>
+            </material>
+          </visual>
+        </link>
+
+        <link name="stand">
+          <pose>0 0 0.15 0 0 0</pose>
+          <collision name="collision">
+            <geometry>
+              <box>
+                <size>0.5 0.5 0.01</size>
+              </box>
+            </geometry>
+          </collision>
+          <visual name="visual">
+            <pose>0 0 0.0 0 0 0</pose>
+            <geometry>
+              <box>
+                <size>0.5 0.5 0.01</size>
+              </box>
+            </geometry>
+            <material>
+              <script>
+                <uri>file://media/materials/scripts/gazebo.material</uri>
+                <name>Gazebo/Grey</name>
+              </script>
+            </material>
+          </visual>
+        </link>
+
+        <link name="button">
+          <pose>0.0 0.0 -0.06 0 0.0 0</pose>
+          <inertial>
+            <mass>0.1</mass>
+            <inertia>
+              <ixx>0.1</ixx>
+              <ixy>0</ixy>
+              <ixz>0</ixz>
+              <iyy>0.00006</iyy>
+              <iyz>0</iyz>
+              <izz>0.1</izz>
+            </inertia>
+          </inertial>
+          <collision name="button">
+            <geometry>
+              <box>
+                <size>0.16 0.1 0.08</size>
+              </box>
+            </geometry>
+          </collision>
+          <visual name="button_on">
+            <pose>0.04 0 0 0 0 0</pose>
+            <geometry>
+              <box>
+                <size>0.08 0.1 0.08</size>
+              </box>
+            </geometry>
+            <material>
+              <script>
+                <name>Gazebo/Green</name>
+              </script>
+            </material>
+          </visual>
+          <visual name="button_off">
+            <!--<transparency>1.0</transparency>-->
+            <pose>-0.04 0 0 0 0 0</pose>
+            <geometry>
+              <box>
+                <size>0.08 0.1 0.08</size>
+              </box>
+            </geometry>
+            <material>
+              <script>
+                <name>Gazebo/Red</name>
+              </script>
+            </material>
+          </visual>
+        </link>
+
+        <joint name="button_joint" type="revolute">
+          <parent>body</parent>
+          <child>button</child>
+          <axis>
+            <xyz>0.0 1.0 0.0</xyz>
+            <limit>
+              <lower>-0.3</lower>
+              <upper>0.3</upper>
+            </limit>
+            <dynamics>
+              <damping>0.01</damping>
+            </dynamics>
+            <use_parent_model_frame>true</use_parent_model_frame>
+          </axis>
+          <physics>
+            <ode>
+              <cfm_damping>1</cfm_damping>
+            </ode>
+          </physics>
+        </joint>
+
+        <joint name="stand_joint" type="revolute">
+          <parent>body</parent>
+          <child>stand</child>
+          <axis>
+            <xyz>0.0 0.0 1.0</xyz>
+            <limit>
+              <lower>-0.0</lower>
+              <upper>0.0</upper>
+            </limit>
+            <use_parent_model_frame>true</use_parent_model_frame>
+          </axis>
+        </joint>
+
+        <plugin filename="libSwitchPlugin.so" name="switch">
+          <port>
+            <name>connector0</name>
+            <type>electrical</type>
+          </port>
+          <port>
+            <name>connector1</name>
+            <type>electrical</type>
+          </port>
+          <properties>
+            <closed>false</closed>
+          </properties>
+          <switch_joint>button_joint</switch_joint>
+        </plugin>
+      </model>
+
+      <plugin name="simple_connections" filename="libSimpleConnectionsPlugin.so">
+        <connection>
+          <source>AA_battery</source>
+          <source_port>positive</source_port>
+          <target>power_switch</target>
+          <target_port>connector0</target_port>
+        </connection>
+
+        <connection>
+          <source>power_switch</source>
+          <source_port>connector1</source_port>
+          <target>motor</target>
+          <target_port>connector0</target_port>
+        </connection>
+
+        <connection>
+          <source>motor</source>
+          <source_port>connector1</source_port>
+          <target>battery</target>
+          <target_port>negative</target_port>
+        </connection>
+      </plugin>
+    </model>
+
+
+
+  </world>
+</sdf>
