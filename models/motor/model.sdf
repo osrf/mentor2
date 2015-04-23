@@ -29,7 +29,7 @@
         </material>
       </visual>
     </link>
-
+<!--
     <joint name="world_joint" type="revolute">
       <parent>world</parent>
       <child>link</child>
@@ -41,7 +41,7 @@
         </limit>
       </axis>
     </joint>
-
+-->
     <!--
     <joint name="wheel_joint" type="revolute">
       <parent>link</parent>
@@ -110,7 +110,7 @@
         <material>
           <script>
             <uri>file://media/materials/scripts/gazebo.material</uri>
-            <name>Gazebo/Grey</name>
+            <name>Gazebo/Wood</name>
           </script>
         </material>
       </visual>
@@ -139,8 +139,8 @@
         </limit>
       </axis>
     </joint>
-
-    <plugin filename="libMotorPlugin.so" name="motor">
+<!--
+  <plugin filename="libMotorPlugin.so" name="motor">
     <port>
       <name>shaft</name>
       <type>mechanical</type>
@@ -162,6 +162,6 @@
 
     <shaft_joint>motor_shaft_joint</shaft_joint>
   </plugin>
-
+-->
   </model>
 </sdf>

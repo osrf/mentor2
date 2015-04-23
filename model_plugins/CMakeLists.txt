@@ -4,6 +4,7 @@ link_directories(
   )
 
 set (plugins
+  GearboxPlugin
   MotorPlugin
   PowerSourcePlugin
   SwitchPlugin
