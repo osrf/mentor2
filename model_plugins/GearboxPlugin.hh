@@ -56,6 +56,18 @@ namespace gazebo
 
     /// \brief Gear ratio.
     private: double gearRatio;
+
+    /// \brief Parent link name.
+    private: std::string parentLinkName;
+
+    /// \brief Child link name.
+    private: std::string childLinkName;
+
+/*    /// \brief Parent link.
+    private: physics::LinkPtr parentLink;
+
+    /// \brief Child link.
+    private: physics::LinkPtr childLink;*/
   };
 }
 

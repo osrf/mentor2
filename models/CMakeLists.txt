@@ -1,6 +1,7 @@
 set (dirs
   battery_holder
   bucket_wheel
+  car
   motor
   power_switch
   wheel_ramps

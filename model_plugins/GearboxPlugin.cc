@@ -30,6 +30,8 @@ GZ_REGISTER_MODEL_PLUGIN(GearboxPlugin)
 GearboxPlugin::GearboxPlugin()
 {
   this->gearRatio = 1.0;
+  this->parentLinkName = "";
+  this->childLinkName = "";
 }
 
 /////////////////////////////////////////////////
@@ -45,56 +47,12 @@ GearboxPlugin::~GearboxPlugin()
 /////////////////////////////////////////////////
 void GearboxPlugin::LoadImpl(sdf::ElementPtr _sdf)
 {
-/*  if (_sdf->HasElement("gear_ratio"))
-  {
-    sdf::ElementPtr elem = _sdf->GetElement("gear_ratio");
-    this->gearRatio = elem->Get<double>();
-  }*/
 }
 
 /////////////////////////////////////////////////
 void GearboxPlugin::Init()
 {
   SimpleModelPlugin::Init();
-}
-
-/////////////////////////////////////////////////
-physics::JointPtr GearboxPlugin::SpawnJoint(const std::string &_link1,
-    const std::string &_link2, const std::string &_jointType,
-    const math::Vector3 &_jointAxis)
-{
-  msgs::Model msg;
-  std::string modelName = this->parent->GetName();
-  msg.set_name(modelName);
-  msgs::Set(msg.mutable_pose(), this->parent->GetWorldPose());
-
-
-  msgs::Link *link =  msg.add_link();
-  link->set_name(_link1);
-
-  msgs::Link *link2 =  msg.add_link();
-  link2->set_name(_link2);
-
-  msgs::Joint *jointMsg = msg.add_joint();
-  jointMsg->set_name("test_joint");
-  jointMsg->set_type(msgs::ConvertJointType(_jointType));
-  msgs::Set(jointMsg->mutable_pose(), math::Pose::Zero);
-
-  jointMsg->set_parent(_link1);
-  jointMsg->set_child(_link2);
-
-
-  {
-    msgs::Axis *axis = jointMsg->mutable_axis1();
-    msgs::Set(axis->mutable_xyz(), _jointAxis);
-    axis->set_use_parent_model_frame(false);
-  }
-
-  physics::WorldPtr world = this->parent->GetWorld();
-  world->InsertModelString(
-    "<sdf version='" + std::string(SDF_VERSION) + "'>"
-    + msgs::ModelToSDF(msg)->ToString("")
-    + "</sdf>");
 }
 
 /////////////////////////////////////////////////
@@ -106,70 +64,59 @@ void GearboxPlugin::UpdateImpl(double _timeSinceLastUpdate)
   // e.g. Gearbox joint will be created between link1 and link2:
   // link1 -- joint1 -- PARENT_MODEL -- joint2 -- link2
 
+  this->gearRatio = this->GetProperty<double>("gear_ratio");
+  this->parentLinkName = this->GetProperty<std::string>("parent");
+  this->childLinkName = this->GetProperty<std::string>("child");
 
-  // find two joints connected to ththe parent model
-  if (this->joints.empty())
-  {
-    if (this->parent->GetJointCount() < 2u)
-      return;
-
-    std::vector<physics::JointPtr> parentJoints = this->parent->GetJoints();
-    this->joints.push_back(parentJoints[0]->GetName());
-    this->joints.push_back(parentJoints[1]->GetName());
-  }
-
-  // set up a gearbox joint between the two links that are connected to this
-  // parent model
   if (!this->gearboxJoint)
   {
-    this->gearRatio = this->GetProperty<double>("gear_ratio");
 
-    physics::JointPtr joint1 = this->parent->GetJoint(this->joints[0]);
-    physics::JointPtr joint2 = this->parent->GetJoint(this->joints[1]);
+    physics::WorldPtr world = this->parent->GetWorld();
+    physics::LinkPtr parentLink = boost::dynamic_pointer_cast<physics::Link>(
+      world->GetByName(this->parentLinkName));
+    physics::LinkPtr childLink = boost::dynamic_pointer_cast<physics::Link>(
+      world->GetByName(this->childLinkName));
 
-    if (joint1 && joint2)
-    {
-      physics::LinkPtr link1 = joint1->GetJointLink(0);
-      if (link1 && link1->GetName() == this->parent->GetName())
-        link1 = joint1->GetJointLink(1);
-      physics::LinkPtr link2 = joint2->GetJointLink(0);
-      if (link2 && link2->GetName() == this->parent->GetName())
-        link2 = joint2->GetJointLink(1);
+    if (!parentLink || !childLink)
+      return;
 
-      if (link1 && link2)
-      {
-        this->SpawnJoint(link1->GetName(), link2->GetName(), "gearbox",
-            math::Vector3::UnitX);
-/*        link1->SetAutoDisable(false);
-        link2->SetAutoDisable(false);
-        physics::WorldPtr world = this->parent->GetWorld();
-        physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-        this->gearboxJoint = physics->CreateJoint("gearbox", this->parent);
-        gearboxJoint->Attach(link1, link2);
-        gearboxJoint->Load(link1, link2, math::Pose::Zero);
-        physics::GearboxJoint *gbJoint;
-//            dynamic_cast<physics::GearboxJoint *>(this->gearboxJoint.get());
 
-        if (gbJoint)
-          gbJoint->SetGearboxRatio(this->gearRatio);
-        gearboxJoint->Init();*/
-      }
-    }
+    parentLink->SetAutoDisable(false);
+    childLink->SetAutoDisable(false);
+    physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+    this->gearboxJoint = physics->CreateJoint("gearbox", this->parent);
+    this->gearboxJoint->SetModel(parentLink->GetModel());
+
+    sdf::ElementPtr jointSDF;
+    jointSDF.reset(new sdf::Element);
+    sdf::initFile("joint.sdf", jointSDF);
+    jointSDF->GetElement("parent")->Set(this->parentLinkName);
+    jointSDF->GetElement("child")->Set(this->childLinkName);
+    jointSDF->GetElement("gearbox_ratio")->Set(this->gearRatio);
+    std::cerr << "gear ratio " << this->gearRatio << std::endl;
+    jointSDF->GetElement("gearbox_reference_body")->Set(
+        this->parentLinkName);
+    jointSDF->GetElement("axis")->GetElement("xyz")->Set(
+        math::Vector3::UnitZ);
+
+    this->gearboxJoint->Load(jointSDF);
+
+/*    physics::GearboxJoint *gbJoint =
+        dynamic_cast<physics::GearboxJoint *>(this->gearboxJoint.get());
+
+    if (gbJoint)
+      gbJoint->SetGearboxRatio(this->gearRatio);*/
+
+    this->gearboxJoint->Init();
+
+/*        physics::GearboxJoint *gbJoint =
+        dynamic_cast<physics::GearboxJoint *>(this->gearboxJoint.get());
+
+    if (gbJoint)
+      gbJoint->SetGearboxRatio(this->gearRatio);
+    gearboxJoint->Init();*/
+
   }
-  else
-  {
-    // check if the two joints still exist, if not remove the gearbox joint
-    if (this->joints.size() == 2u)
-    {
-      physics::JointPtr joint1 = this->parent->GetJoint(this->joints[0]);
-      physics::JointPtr joint2 = this->parent->GetJoint(this->joints[1]);
 
-      if (!joint1 || !joint2)
-      {
-        this->joints.clear();
-        this->gearboxJoint->Detach();
-        this->gearboxJoint.reset();
-      }
-    }
-  }
+  return;
 }
