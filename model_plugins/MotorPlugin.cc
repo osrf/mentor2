@@ -75,7 +75,13 @@ void MotorPlugin::Init()
 void MotorPlugin::UpdateImpl(double _timeSinceLastUpdate)
 {
   if (this->portTopics.empty())
-      return;
+  {
+    if (this->joint)
+    {
+      this->joint->SetForce(0, 0);
+    }
+    return;
+  }
 
   if (!this->voltageConnector0Sub)
   {
@@ -119,8 +125,8 @@ void MotorPlugin::UpdateImpl(double _timeSinceLastUpdate)
   double internalCurrent = internalVoltage / this->motorResistance;
   double torque = internalCurrent * this->torqueConstant;
 
-//  std::cerr << " voltage " << voltage << ", torque " << torque
-//      << ", shaftRotationSpeed " << shaftRotationSpeed << std::endl;
+  std::cerr << " voltage " << voltage << ", torque " << torque
+      << ", shaftRotationSpeed " << shaftRotationSpeed << std::endl;
 
   if (this->joint)
     this->joint->SetForce(0, torque);

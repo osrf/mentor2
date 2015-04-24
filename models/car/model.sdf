@@ -86,7 +86,7 @@
       </collision>
     </link>
     <link name='axle'>
-      <pose>0.744995 8e-06 -0.042789 1.57 -6.77626e-21 0.00011</pose>
+      <pose>0.744995 8e-06 -0.042789 0 0.0 0.0</pose>
       <inertial>
         <mass>1</mass>
         <pose>0 0 0 0 -0 0</pose>
@@ -101,8 +101,16 @@
       </inertial>
       <self_collide>0</self_collide>
       <kinematic>0</kinematic>
+      <!--<visual name='debug_vis'>
+        <pose>0.0 0.0 0.0 0 0.0 0.0</pose>
+        <geometry>
+          <box>
+            <size>.1 .2 .3</size>
+          </box>
+        </geometry>
+      </visual>-->
       <visual name='visual'>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose>0.0 0.0 0.0 1.57079632679 0.0 0.0</pose>
         <geometry>
           <cylinder>
             <radius>0.0806153</radius>
@@ -129,7 +137,7 @@
       <collision name='collision'>
         <laser_retro>0</laser_retro>
         <max_contacts>10</max_contacts>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose>0.0 0.0 0.0 1.57079632679 0.0 0.0</pose>
         <geometry>
           <cylinder>
             <radius>0.080615</radius>
@@ -567,7 +575,7 @@
       <parent>chassis</parent>
       <child>axle</child>
       <axis>
-        <xyz>0 0 1</xyz>
+        <xyz>0 1 0</xyz>
         <use_parent_model_frame>0</use_parent_model_frame>
         <limit>
           <lower>10000</lower>

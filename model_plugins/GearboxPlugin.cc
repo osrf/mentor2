@@ -85,7 +85,7 @@ void GearboxPlugin::UpdateImpl(double _timeSinceLastUpdate)
     childLink->SetAutoDisable(false);
     physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
     this->gearboxJoint = physics->CreateJoint("gearbox", this->parent);
-    this->gearboxJoint->SetModel(parentLink->GetModel());
+    this->gearboxJoint->SetModel(this->parent);
 
     sdf::ElementPtr jointSDF;
     jointSDF.reset(new sdf::Element);
@@ -93,11 +93,14 @@ void GearboxPlugin::UpdateImpl(double _timeSinceLastUpdate)
     jointSDF->GetElement("parent")->Set(this->parentLinkName);
     jointSDF->GetElement("child")->Set(this->childLinkName);
     jointSDF->GetElement("gearbox_ratio")->Set(this->gearRatio);
+//    jointSDF->GetElement("gearbox_ratio")->Set(1.000);
     std::cerr << "gear ratio " << this->gearRatio << std::endl;
     jointSDF->GetElement("gearbox_reference_body")->Set(
-        this->parentLinkName);
+        this->parent->GetLink()->GetName());
     jointSDF->GetElement("axis")->GetElement("xyz")->Set(
-        math::Vector3::UnitZ);
+        math::Vector3::UnitY);
+    jointSDF->GetElement("axis2")->GetElement("xyz")->Set(
+        math::Vector3::UnitY);
 
     this->gearboxJoint->Load(jointSDF);
 
