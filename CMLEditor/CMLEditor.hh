@@ -52,11 +52,11 @@ namespace gazebo
 
       /// \brief Callback when a link is inserted.
       /// \param[in] _node Name of link.
-      private: void OnLinkInserted(const std::string &_name);
+      private: void OnNestedModelInserted(const std::string &_name);
 
       /// \brief Callback when a link is removed.
       /// \param[in] _node Name of link.
-      private: void OnLinkRemoved(const std::string &_name);
+      private: void OnNestedModelRemoved(const std::string &_name);
 
       /// \brief Qt callback when an entity is to be spawned
       private slots: void SpawnEntity();

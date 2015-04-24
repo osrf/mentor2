@@ -127,11 +127,11 @@ CMLEditor::CMLEditor(MainWindow *_mainWindow)
   this->modelEditor->AddItemToPalette(switchButton, "Components");
 
 
-  this->connections.push_back(gui::model::Events::ConnectLinkInserted(
-      boost::bind(&CMLEditor::OnLinkInserted, this, _1)));
+  this->connections.push_back(gui::model::Events::ConnectNestedModelInserted(
+      boost::bind(&CMLEditor::OnNestedModelInserted, this, _1)));
 
-  this->connections.push_back(gui::model::Events::ConnectLinkRemoved(
-      boost::bind(&CMLEditor::OnLinkRemoved, this, _1)));
+  this->connections.push_back(gui::model::Events::ConnectNestedModelRemoved(
+      boost::bind(&CMLEditor::OnNestedModelRemoved, this, _1)));
 
 
   this->LoadModels();
@@ -294,23 +294,26 @@ void CMLEditor::Parse(sdf::ElementPtr _sdf, const std::string &_name)
 
 
 /////////////////////////////////////////////////
-void CMLEditor::OnLinkInserted(const std::string &_name)
+void CMLEditor::OnNestedModelInserted(const std::string &_name)
 {
   if (this->insertName.empty())
     return;
 
-  std::map<std::string, sdf::SDFPtr>::iterator it =
-      this->models.find(this->insertName);
-  if (it == this->models.end())
-    return;
+  for (auto it : this->models)
+  {
+    if (_name.find(it.first) != std::string::npos)
+    {
+      this->Parse(it.second->Root()->GetElement("model")->GetElement("plugin"),
+          _name);
+      break;
+    }
+  }
 
-  this->Parse(it->second->Root()->GetElement("model")->GetElement("plugin"),
-      _name);
   this->insertName == "";
 }
 
 /////////////////////////////////////////////////
-void CMLEditor::OnLinkRemoved(const std::string &_name)
+void CMLEditor::OnNestedModelRemoved(const std::string &_name)
 {
 }
 
@@ -332,6 +335,4 @@ void CMLEditor::SpawnEntity()
     return;
 
   this->modelEditor->SpawnEntity(it->second->Root()->GetElement("model"));
-
-
 }

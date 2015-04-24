@@ -89,14 +89,13 @@ Simple_msgs::msgs::SimpleModel CMLManager::GetModelInfo(
     const std::string &_name)
 {
   boost::recursive_mutex::scoped_lock lock(*this->modelInfoMutex);
+
   if (this->modelInfo.find(_name) != this->modelInfo.end())
     return this->modelInfo[_name];
-  else
-  {
-    // return empty msg for now if nothing is found.
-    Simple_msgs::msgs::SimpleModel empty;
-    return empty;
-  }
+
+  // return empty msg for now if nothing is found.
+  Simple_msgs::msgs::SimpleModel empty;
+  return empty;
 }
 
 /////////////////////////////////////////////////

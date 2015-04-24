@@ -56,17 +56,6 @@ namespace gazebo
         CONNECT_MECHANICAL
       };
 
-      /// \enum Connection mode
-      /// \brief Unique identifiers for connection mode
-      public: enum ConnectMode
-      {
-        /// \brief link
-        CONNECT_MODE_LINK,
-
-        /// \brief model
-        CONNECT_MODE_MODEL
-      };
-
       /// \brief Constructor
       public: CMLConnectionMaker();
 
@@ -175,9 +164,6 @@ namespace gazebo
 
       /// \brief Selected joint.
       private: rendering::VisualPtr selectedConnection;
-
-      /// \brief Connection mode.
-      private: CMLConnectionMaker::ConnectMode connectionMode;
 
       /// \brief A map of connection type to its corresponding material.
       private: std::map<CMLConnectionMaker::ConnectType, std::string>

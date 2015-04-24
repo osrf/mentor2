@@ -1,6 +1,12 @@
 <?xml version="1.0"?>
 <sdf version="1.4">
   <world name="test_scoring">
+<!--
+    <gui>
+     <plugin name="CMLEditor" filename="libCMLEditorPlugin.so">
+     </plugin>
+    </gui>
+-->
     <include>
       <uri>model://ground_plane</uri>
     </include>
@@ -30,7 +36,7 @@
       </volume>
     </region>
 
-<!--    
+<!--
     <event>
       <name>connect</name>
       <type>topic</type>
@@ -55,7 +61,7 @@
       <name>Sim</name>
       <type>sim_state</type>
     </event>
-    
+
     <!-- bounding box intersection event-->
     <event>
       <name>batiInStart</name>
@@ -81,7 +87,7 @@
       <vel>5</vel>
     </event>
     </plugin>
-    
+
 
     <include>
       <pose>0 0 0 0 0 0</pose>
@@ -105,7 +111,7 @@
 
 
 
-<!-- first box of two 
+<!-- first box of two
     <model name='unit_box_1'>
       <pose>-2 -2 0.5 0 -0 0</pose>
       <link name='link'>
@@ -162,7 +168,7 @@
     </model>
 -->
 
-<!-- second box of two 
+<!-- second box of two
     <model name='unit_box_2'>
       <pose>0 -5 0.5 0 -0 0</pose>
       <link name='link'>
