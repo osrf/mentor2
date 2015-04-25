@@ -19,6 +19,7 @@
 #include <gazebo/gui/GuiIface.hh>
 #include <gazebo/gui/MainWindow.hh>
 #include <gazebo/gui/GuiEvents.hh>
+#include <gazebo/gui/Actions.hh>
 
 #include "CMLRender.hh"
 #include "CMLEditor.hh"
