@@ -148,7 +148,8 @@
         </limit>
       </axis>
     </joint>
-<!--    <plugin filename="libMotorPlugin.so" name="motor">
+
+    <plugin filename="libMotorPlugin.so" name="motor">
       <port>
         <name>shaft</name>
         <type>mechanical</type>
@@ -169,6 +170,6 @@
       </properties>
 
       <shaft_joint>motor_shaft_joint</shaft_joint>
-    </plugin>-->
+    </plugin>
   </model>
 </sdf>
