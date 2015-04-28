@@ -21,7 +21,8 @@
 
 #include <gazebo/common/common.hh>
 #include <gazebo/rendering/rendering.hh>
-#include "gazebo/gui/model/ModelEditorEvents.hh"
+#include <gazebo/gui/model/ModelEditorEvents.hh>
+#include <gazebo/gui/model/ModelEditor.hh>
 #include <gazebo/gui/gui.hh>
 
 #include "CMLEvents.hh"
@@ -258,12 +259,44 @@ bool CMLConnectionMaker::OnMouseRelease(const common::MouseEvent &_event)
 
         this->newConnectionCreated = true;
 
-        // signal the end of a connect action.
-        emit CMLEvents::connectionCreated(
-            this->mouseConnection->parent->GetName(),
-            this->mouseConnection->parentPort,
-            this->mouseConnection->child->GetName(),
-            this->mouseConnection->childPort);
+        // Create connection SDF
+        sdf::ElementPtr connectionElem;
+        connectionElem.reset(new sdf::Element);
+        connectionElem->SetName("connection");
+
+        sdf::ElementPtr sourceElem;
+        sourceElem.reset(new sdf::Element);
+        sourceElem->SetName("source");
+        sourceElem->AddValue("string", this->mouseConnection->parent->GetName(),
+            "_none_", "source");
+        connectionElem->InsertElement(sourceElem);
+
+        sdf::ElementPtr sourcePortElem;
+        sourcePortElem.reset(new sdf::Element);
+        sourcePortElem->SetName("source_port");
+        sourcePortElem->AddValue("string", this->mouseConnection->parentPort,
+            "_none_", "sourcePort");
+        connectionElem->InsertElement(sourcePortElem);
+
+        sdf::ElementPtr targetElem;
+        targetElem.reset(new sdf::Element);
+        targetElem->SetName("target");
+        targetElem->AddValue("string", this->mouseConnection->child->GetName(),
+            "_none_", "target");
+        connectionElem->InsertElement(targetElem);
+
+        sdf::ElementPtr targetPortElem;
+        targetPortElem.reset(new sdf::Element);
+        targetPortElem->SetName("target_port");
+        targetPortElem->AddValue("string", this->mouseConnection->childPort,
+            "_none_", "targetPort");
+        connectionElem->InsertElement(targetPortElem);
+
+        // Append to model SDF
+        gazebo::gui::MainWindow *mainWindow = gui::get_main_window();
+        gazebo::gui::ModelEditor *modelEditor = dynamic_cast<
+            gazebo::gui::ModelEditor *>(mainWindow->GetEditor("model"));
+        modelEditor->AppendSDFElement(connectionElem);
       }
     }
 
