@@ -1,0 +1,37 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+
+  <model name="gearbox">
+    <pose>0.0 0.0 0.075 0 0 0</pose>
+    <link name="gearbox_link">
+      <collision name="gearbox_collision">
+        <geometry>
+          <box>
+            <size>0.15 0.15 0.15</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="gearbox_visual">
+        <geometry>
+          <box>
+            <size>0.15 0.15 0.15</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Red</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+
+    <plugin filename="libGearboxPlugin.so" name="gearbox">
+      <properties>
+        <parent>motor::motor_shaft_link</parent>
+        <child>car::axle</child>
+        <gear_ratio>1.0</gear_ratio>
+      </properties>
+    </plugin>
+
+    </model>
+</sdf>

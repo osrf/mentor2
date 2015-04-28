@@ -158,6 +158,24 @@ void CMLManager::AddSimpleModel(Simple_msgs::msgs::SimpleModel _msg)
 }
 
 /////////////////////////////////////////////////
+void CMLManager::RemoveSimpleModel(const std::string &_name)
+{
+  std::cerr << " remove simple model " << _name << std::endl;
+
+  boost::recursive_mutex::scoped_lock lock(*this->modelInfoMutex);
+
+  std::map<std::string, Simple_msgs::msgs::SimpleModel>::iterator it
+      = this->modelInfo.find(_name);
+  if (it != this->modelInfo.end())
+    this->modelInfo.erase(it);
+
+  std::map<std::string, CMLComponentInspector *>::iterator inspectIt =
+      this->propertyManager->componentInspectors.find(_name);
+  if (inspectIt != this->propertyManager->componentInspectors.end())
+    this->propertyManager->componentInspectors.erase(inspectIt);
+}
+
+/////////////////////////////////////////////////
 bool CMLManager::ShowInspector(const std::string &_name)
 {
   boost::recursive_mutex::scoped_lock lock(*this->modelInfoMutex);
@@ -181,6 +199,7 @@ bool CMLManager::ShowInspector(const std::string &_name)
     QObject::connect(inspector, SIGNAL(Applied()),
         this->propertyManager, SLOT(OnComponentProperyChanged()));
   }
+  inspector->move(QCursor::pos());
   inspector->show();
   return true;
 }

@@ -4,10 +4,12 @@ link_directories(
   )
 
 set (plugins
+  GearboxPlugin
   MotorPlugin
   PowerSourcePlugin
   SwitchPlugin
   WheelPlugin
+  SimpleConnectionsPlugin
 )
 
 include_directories(

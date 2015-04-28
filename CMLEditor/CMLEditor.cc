@@ -133,7 +133,6 @@ CMLEditor::CMLEditor(MainWindow *_mainWindow)
   this->connections.push_back(gui::model::Events::ConnectNestedModelRemoved(
       boost::bind(&CMLEditor::OnNestedModelRemoved, this, _1)));
 
-
   this->LoadModels();
 }
 
@@ -315,6 +314,7 @@ void CMLEditor::OnNestedModelInserted(const std::string &_name)
 /////////////////////////////////////////////////
 void CMLEditor::OnNestedModelRemoved(const std::string &_name)
 {
+  CMLManager::Instance()->RemoveSimpleModel(_name);
 }
 
 /////////////////////////////////////////////////

@@ -17,8 +17,10 @@
 
 #include <gazebo/common/common.hh>
 #include <gazebo/rendering/rendering.hh>
+
 #include <gazebo/gui/gui.hh>
 #include <gazebo/gui/qt.h>
+#include <gazebo/gui/model/ModelEditor.hh>
 
 #include "CMLManager.hh"
 #include "CMLEvents.hh"
@@ -46,10 +48,6 @@ CMLRender::CMLRender()
 
   MouseEventHandler::Instance()->AddMoveFilter("CML_Render",
       boost::bind(&CMLRender::OnMouseMove, this, _1));*/
-
-  // Add an event filter, which allows the CMLRender to capture mouse events.
-  MouseEventHandler::Instance()->AddReleaseFilter("CML_Render",
-      boost::bind(&CMLRender::OnMouseRelease, this, _1));
 
 /*  this->connections.push_back(
       event::Events::ConnectPreRender(
@@ -81,13 +79,19 @@ CMLRender::CMLRender()
   this->inspectAct = new QAction(tr("Open Inspector"), this);
   connect(this->inspectAct, SIGNAL(triggered()), this,
       SLOT(OnOpenInspector()));
+
+  if (g_editModelAct)
+  {
+    QObject::connect(g_editModelAct, SIGNAL(toggled(bool)), this,
+      SLOT(OnModelEditorMode(bool)));
+  }
 }
 
 /////////////////////////////////////////////////
 CMLRender::~CMLRender()
 {
 //  MouseEventHandler::Instance()->RemovePressFilter("CML_Render");
-  MouseEventHandler::Instance()->RemoveReleaseFilter("CML_Render");
+
 //  MouseEventHandler::Instance()->RemoveMoveFilter("CML_Render");
 //  MouseEventHandler::Instance()->RemoveDoubleClickFilter("CML_Render");
 }
@@ -100,7 +104,35 @@ bool CMLRender::OnMousePress(const common::MouseEvent &_event)
 
   return false;
 }*/
+/////////////////////////////////////////////////
+void CMLRender::OnModelEditorMode(bool _enabled)
+{
+  if (_enabled)
+  {
+    this->EnableEventHandlers();
+  }
+  else
+  {
+    this->DisableEventHandlers();
+  }
+}
 
+/////////////////////////////////////////////////
+void CMLRender::EnableEventHandlers()
+{
+  // Add an event filter, which allows the CMLRender to capture mouse events.
+  MouseEventHandler::Instance()->AddReleaseFilter("CML_Render",
+      boost::bind(&CMLRender::OnMouseRelease, this, _1));
+  MouseEventHandler::Instance()->AddDoubleClickFilter("CML_Render",
+      boost::bind(&CMLRender::OnMouseDoubleClick, this, _1));
+}
+
+/////////////////////////////////////////////////
+void CMLRender::DisableEventHandlers()
+{
+  MouseEventHandler::Instance()->RemoveReleaseFilter("CML_Render");
+  MouseEventHandler::Instance()->RemoveDoubleClickFilter("CML_Render");
+}
 
 /////////////////////////////////////////////////
 void CMLRender::OnRequest(ConstRequestPtr &_msg)
@@ -112,6 +144,7 @@ void CMLRender::OnRequest(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 bool CMLRender::OnMouseRelease(const common::MouseEvent &_event)
 {
+  std::cerr << "cml render OnMouseRelease " << std::endl;
   // Get the active camera and scene.
   rendering::UserCameraPtr camera = gui::get_active_camera();
   rendering::ScenePtr scene = camera->GetScene();
@@ -121,17 +154,26 @@ bool CMLRender::OnMouseRelease(const common::MouseEvent &_event)
   {
     if (vis)
     {
-      rendering::VisualPtr rootVis = vis->GetRootVisual();
-      std::string name = rootVis->GetName();
+      rendering::VisualPtr topLevelVis = vis->GetFirstAncestorFromRootVisual();
+      std::string name = topLevelVis->GetName();
 
       Simple_msgs::msgs::SimpleModel msg;
       msg = CMLManager::Instance()->GetModelInfo(name);
 
       if (!msg.name().empty())
       {
-        std::cerr << " name " << name << " " << msg.name() << std::endl;
+        std::cerr << " got name " << name << " " << msg.name() << std::endl;
         this->inspectName = msg.name();
-        //this->inspectMsg = msg;
+
+        QMenu menu;
+        if (this->inspectAct)
+        {
+          menu.addAction(this->inspectAct);
+        }
+        QAction *deleteAct = new QAction(tr("Delete"), this);
+        connect(deleteAct, SIGNAL(triggered()), this, SLOT(OnDelete()));
+        menu.addAction(deleteAct);
+        menu.exec(QCursor::pos());
 
 /*        ModelRightMenu *contextMenu = gui::get_context_menu();
         if (contextMenu)
@@ -142,33 +184,40 @@ bool CMLRender::OnMouseRelease(const common::MouseEvent &_event)
           return true;
         }
         else*/
-          return false;
+        return true;
       }
     }
   }
 
-  /*if (_event.button == common::MouseEvent::LEFT)
+  return false;
+}
+
+/////////////////////////////////////////////////
+bool CMLRender::OnMouseDoubleClick(const common::MouseEvent &_event)
+{
+  // Get the active camera and scene.
+  rendering::UserCameraPtr camera = gui::get_active_camera();
+  rendering::ScenePtr scene = camera->GetScene();
+  rendering::VisualPtr vis = camera->GetVisual(_event.pos);
+
+  if (vis)
   {
-    if (vis)
+    rendering::VisualPtr topLevelVis = vis->GetFirstAncestorFromRootVisual();
+    std::string name = topLevelVis->GetName();
+
+    Simple_msgs::msgs::SimpleModel msg;
+    msg = CMLManager::Instance()->GetModelInfo(name);
+
+    if (!msg.name().empty())
     {
-      std::string name = vis->GetRootVisual()->GetName();
-      Simple_msgs::msgs::SimpleModel msg;
-      msg = CMLManager::Instance()->GetModelInfo(name);
-
-      std::cerr << " name " << name << " " << msg.name() << std::endl;
-
-      CMLPortInspector *inspector =
-          new CMLPortInspector(gui::get_main_window());
-      inspector->Load(&msg);
-      inspector->show();
+      CMLManager::Instance()->ShowInspector(name);
+      return true;
     }
-    //connect(inspector, Applied(), this,
-    return false;
-  }*/
-
+  }
 
   return false;
 }
+
 /*
 /////////////////////////////////////////////////
 bool CMLRender::OnMouseMove(const common::MouseEvent &_event)
@@ -181,19 +230,6 @@ bool CMLRender::OnMouseMove(const common::MouseEvent &_event)
   rendering::ScenePtr scene = camera->GetScene();
 
   rendering::VisualPtr vis = camera->GetVisual(_event.pos);
-
-  return false;
-}
-
-/////////////////////////////////////////////////
-bool CMLRender::OnMouseDoubleClick(const common::MouseEvent &_event)
-{
-  rendering::UserCameraPtr camera = gui::get_active_camera();
-  rendering::VisualPtr vis = camera->GetVisual(_event.pos);
-
-  if (vis)
-  {
-  }
 
   return false;
 }
@@ -244,6 +280,22 @@ void CMLRender::OnConnectionCreated(const std::string &_parent,
   this->restPub->Publish(restMsg);
 
   //CMLConnectionMaker::Instance()->Start();
+}
+
+/////////////////////////////////////////////////
+void CMLRender::OnDelete()
+{
+  MainWindow *mainWindow = gui::get_main_window();
+  if (mainWindow)
+  {
+    ModelEditor *modelEditor =
+        dynamic_cast<ModelEditor *>(mainWindow->GetEditor("model"));
+
+    if (modelEditor)
+      modelEditor->RemoveEntity(this->inspectName);
+  }
+
+  this->inspectName = "";
 }
 
 /////////////////////////////////////////////////

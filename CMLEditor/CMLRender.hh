@@ -45,6 +45,12 @@ namespace gazebo
       /// \brief Update callback on PreRender.
       public: void Update();
 
+      /// \brief Enable the mouse and key event handlers.
+      public: void EnableEventHandlers();
+
+      /// \brief Disable the mouse and key event handlers.
+      public: void DisableEventHandlers();
+
       /// \brief Mouse event filter callback when mouse button is pressed.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
@@ -82,6 +88,13 @@ namespace gazebo
 
       /// \brief Qt Callback to open component inspector
       private slots: void OnOpenInspector();
+
+      /// \brief Qt Callback when a component is to be deleted.
+      private slots: void OnDelete();
+
+      /// \brief Callback when the model editor mode has been toggled.
+      /// \param[in] _enabled True if the model editor mode is active.
+      private slots: void OnModelEditorMode(bool _enabled);
 
       /// \brief All the event connections.
       private: std::vector<event::ConnectionPtr> connections;

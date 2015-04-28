@@ -3,6 +3,7 @@
   <model name="motor">
     <pose>0 0 0.1 0 0 0</pose>
     <link name="link">
+      <pose>0.0 0 0.0 0 0 1.57079632679</pose>
       <self_collide>false</self_collide>
       <collision name="collision">
         <pose>0 0 0.0 0 0 0</pose>
@@ -29,7 +30,7 @@
         </material>
       </visual>
     </link>
-
+<!--
     <joint name="world_joint" type="revolute">
       <parent>world</parent>
       <child>link</child>
@@ -41,7 +42,7 @@
         </limit>
       </axis>
     </joint>
-
+-->
     <!--
     <joint name="wheel_joint" type="revolute">
       <parent>link</parent>
@@ -57,11 +58,11 @@
 -->
 
     <link name="motor_core_link">
-      <pose>0.02 0 0.0 0 1.57 0</pose>
+      <pose>0.0 0 0.0 0 0 0</pose>
       <self_collide>false</self_collide>
       <gravity>false</gravity>
       <collision name="collision">
-        <pose>0 0 0.0 0 0 0</pose>
+        <pose>0.0 0 0.0 1.57079632679 0 0</pose>
         <geometry>
           <cylinder>
             <radius>0.05</radius>
@@ -70,7 +71,7 @@
         </geometry>
       </collision>
       <visual name="visual">
-        <pose>0 0 0.0 0 0 0</pose>
+        <pose>0.0 0 0.0 1.57079632679 0 0</pose>
         <geometry>
           <cylinder>
             <radius>0.05</radius>
@@ -87,30 +88,38 @@
     </link>
 
     <link name="motor_shaft_link">
-      <pose>0.02 0 0.0 0 1.57 0</pose>
+      <pose>0.0 0 0.0 0 0 0</pose>
       <self_collide>false</self_collide>
       <gravity>false</gravity>
+<!--      <visual name='debug_vis'>
+        <pose>0.0 0.0 0.0 0 0.0 0.0</pose>
+        <geometry>
+          <box>
+            <size>.01 .02 .03</size>
+          </box>
+        </geometry>
+      </visual>-->
       <collision name="collision">
-        <pose>0 0 0.0 0 0 0</pose>
+        <pose>0.0 0 0.0 1.57079632679 0 0</pose>
         <geometry>
           <cylinder>
             <radius>0.005</radius>
-            <length>0.30</length>
+            <length>0.20</length>
           </cylinder>
         </geometry>
       </collision>
       <visual name="visual">
-        <pose>0 0 0.0 0 0 0</pose>
+        <pose>0.0 0 0.0 1.57079632679 0 0</pose>
         <geometry>
           <cylinder>
             <radius>0.005</radius>
-            <length>0.30</length>
+            <length>0.20</length>
           </cylinder>
         </geometry>
         <material>
           <script>
             <uri>file://media/materials/scripts/gazebo.material</uri>
-            <name>Gazebo/Grey</name>
+            <name>Gazebo/Wood</name>
           </script>
         </material>
       </visual>
@@ -120,7 +129,7 @@
       <parent>motor_core_link</parent>
       <child>motor_shaft_link</child>
       <axis>
-        <xyz>0 0 1</xyz>
+        <xyz>0 1 0</xyz>
         <limit>
           <lower>-1000000</lower>
           <upper>1000000</upper>
@@ -141,27 +150,26 @@
     </joint>
 
     <plugin filename="libMotorPlugin.so" name="motor">
-    <port>
-      <name>shaft</name>
-      <type>mechanical</type>
-    </port>
-    <port>
-      <name>connector0</name>
-      <type>electrical</type>
-    </port>
-    <port>
-      <name>connector1</name>
-      <type>electrical</type>
-    </port>
+      <port>
+        <name>shaft</name>
+        <type>mechanical</type>
+      </port>
+      <port>
+        <name>connector0</name>
+        <type>electrical</type>
+      </port>
+      <port>
+        <name>connector1</name>
+        <type>electrical</type>
+      </port>
 
-    <properties>
-      <resistance>5</resistance>
-      <back_emf>0.0064</back_emf>
-      <torque_constant>0.0064</torque_constant>
-    </properties>
+      <properties>
+        <resistance>5</resistance>
+        <back_emf>0.0064</back_emf>
+        <torque_constant>0.0064</torque_constant>
+      </properties>
 
-    <shaft_joint>motor_shaft_joint</shaft_joint>
-  </plugin>
-
+      <shaft_joint>motor_shaft_joint</shaft_joint>
+    </plugin>
   </model>
 </sdf>
