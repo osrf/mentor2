@@ -21,12 +21,8 @@
 
 #include <gazebo/common/common.hh>
 #include <gazebo/rendering/rendering.hh>
+#include "gazebo/gui/model/ModelEditorEvents.hh"
 #include <gazebo/gui/gui.hh>
-
-/*#include <gazebo/gui/GuiIface.hh>
-#include <gazebo/gui/KeyEventHandler.hh>
-#include <gazebo/gui/MouseEventHandler.hh>
-#include <gazebo/gui/GuiEvents.hh>*/
 
 #include "CMLEvents.hh"
 #include "CMLManager.hh"
@@ -58,6 +54,10 @@ CMLConnectionMaker::CMLConnectionMaker()
       event::Events::ConnectPreRender(
         boost::bind(&CMLConnectionMaker::Update, this)));
 
+  this->connections.push_back(
+      gui::model::Events::ConnectFinishModel(
+      boost::bind(&CMLConnectionMaker::OnFinish, this)));
+
   this->updateMutex = new boost::recursive_mutex();
 }
 
@@ -84,7 +84,6 @@ void CMLConnectionMaker::Reset()
   this->connectType = CMLConnectionMaker::CONNECT_NONE;
   this->selectedVis.reset();
   this->hoverVis.reset();
-  this->prevHoverVis.reset();
   this->selectedConnection.reset();
 
   while (this->connects.size() > 0)
@@ -561,27 +560,36 @@ void CMLConnectionMaker::Update()
   }
 
   // update connect line and hotspot position.
-  std::map<std::string, ConnectionData *>::iterator it;
-  for (it = this->connects.begin(); it != this->connects.end(); ++it)
+  for (auto it : connects)
   {
-    ConnectionData *connect = it->second;
-    if (connect->dirty)
+    ConnectionData *connect = it.second;
+    if (connect->hotspot)
     {
       if (connect->child && connect->parent)
       {
-        // get centroid of parent part visuals
-        math::Vector3 parentCentroid =
-            connect->parent->GetWorldPose().pos;
+        bool poseUpdate = false;
+        if (connect->parentPose != connect->parent->GetWorldPose() ||
+            connect->childPose != connect->child->GetWorldPose())
+         {
+           connect->parentPose = connect->parent->GetWorldPose();
+           connect->childPose = connect->child->GetWorldPose();
+           poseUpdate = true;
+         }
 
-        // get centroid of child part visuals
-        math::Vector3 childCentroid =
-            connect->child->GetWorldPose().pos;
+        if (connect->dirty || poseUpdate)
+        {
+        // get origin of parent part visuals
+        math::Vector3 parentOrigin = connect->parent->GetWorldPose().pos;
+
+        // get progom of child part visuals
+        math::Vector3 childOrigin = connect->child->GetWorldPose().pos;
 
         // set orientation of connect hotspot
-        math::Vector3 dPos = (childCentroid - parentCentroid);
-        math::Vector3 center = dPos/2.0;
-        connect->hotspot->SetScale(math::Vector3(0.02, 0.02, dPos.GetLength()));
-        connect->hotspot->SetWorldPosition(parentCentroid + center);
+        math::Vector3 dPos = (childOrigin - parentOrigin);
+        math::Vector3 center = dPos * 0.5;
+        double length = std::max(dPos.GetLength(), 0.001);
+        connect->hotspot->SetScale(math::Vector3(0.008, 0.008, length));
+        connect->hotspot->SetWorldPosition(parentOrigin + center);
         math::Vector3 u = dPos.Normalize();
         math::Vector3 v = math::Vector3::UnitZ;
         double cosTheta = v.Dot(u);
@@ -590,6 +598,9 @@ void CMLConnectionMaker::Update()
         math::Quaternion q;
         q.SetFromAxis(w, angle);
         connect->hotspot->SetWorldRotation(q);
+
+        connect->dirty = false;
+        }
       }
     }
   }
@@ -606,3 +617,9 @@ unsigned int CMLConnectionMaker::GetConnectionCount()
 {
   return this->connects.size();
 }*/
+
+/////////////////////////////////////////////////
+void CMLConnectionMaker::OnFinish()
+{
+  this->Reset();
+}

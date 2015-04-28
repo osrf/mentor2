@@ -82,6 +82,9 @@ namespace gazebo
       /// \brief Update callback on PreRender.
       public: void Update();
 
+      /// \brief Update callback on PreRender.
+      public: void OnFinish();
+
       /// \brief Remove connection by name
       /// \param[in] _connectionName Name of connection to be removed.
       public: void RemoveConnection(const std::string &_connectionName);
@@ -134,9 +137,6 @@ namespace gazebo
 
       /// \brief Visual that is currently hovered over by the mouse
       private: rendering::VisualPtr hoverVis;
-
-      /// \brief Visual that is previously hovered over by the mouse
-      private: rendering::VisualPtr prevHoverVis;
 
       /// \brief Currently selected visual
       private: rendering::VisualPtr selectedVis;
@@ -192,6 +192,14 @@ namespace gazebo
 
       /// \brief Child visual of the connection.
       public: rendering::VisualPtr child;
+
+      /// \internal
+      /// \brief Parent visual pose used to determine if updates are needed.
+      public: math::Pose parentPose;
+
+      /// \internal
+      /// \brief Child visual pose used to determine if updates are needed.
+      public: math::Pose childPose;
 
       /// \brief Parent port of the connection.
       public: std::string parentPort;
