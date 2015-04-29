@@ -154,7 +154,7 @@ bool CMLRender::OnMouseRelease(const common::MouseEvent &_event)
   {
     if (vis)
     {
-      rendering::VisualPtr topLevelVis = vis->GetFirstAncestorFromRootVisual();
+      rendering::VisualPtr topLevelVis = vis->GetNthAncestor(2);
       std::string name = topLevelVis->GetName();
 
       Simple_msgs::msgs::SimpleModel msg;
@@ -202,7 +202,7 @@ bool CMLRender::OnMouseDoubleClick(const common::MouseEvent &_event)
 
   if (vis)
   {
-    rendering::VisualPtr topLevelVis = vis->GetFirstAncestorFromRootVisual();
+    rendering::VisualPtr topLevelVis = vis->GetNthAncestor(2);
     std::string name = topLevelVis->GetName();
 
     Simple_msgs::msgs::SimpleModel msg;

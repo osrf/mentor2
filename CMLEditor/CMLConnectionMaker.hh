@@ -56,17 +56,6 @@ namespace gazebo
         CONNECT_MECHANICAL
       };
 
-      /// \enum Connection mode
-      /// \brief Unique identifiers for connection mode
-      public: enum ConnectMode
-      {
-        /// \brief link
-        CONNECT_MODE_LINK,
-
-        /// \brief model
-        CONNECT_MODE_MODEL
-      };
-
       /// \brief Constructor
       public: CMLConnectionMaker();
 
@@ -92,6 +81,9 @@ namespace gazebo
 
       /// \brief Update callback on PreRender.
       public: void Update();
+
+      /// \brief Update callback on PreRender.
+      public: void OnFinish();
 
       /// \brief Remove connection by name
       /// \param[in] _connectionName Name of connection to be removed.
@@ -146,9 +138,6 @@ namespace gazebo
       /// \brief Visual that is currently hovered over by the mouse
       private: rendering::VisualPtr hoverVis;
 
-      /// \brief Visual that is previously hovered over by the mouse
-      private: rendering::VisualPtr prevHoverVis;
-
       /// \brief Currently selected visual
       private: rendering::VisualPtr selectedVis;
 
@@ -175,9 +164,6 @@ namespace gazebo
 
       /// \brief Selected joint.
       private: rendering::VisualPtr selectedConnection;
-
-      /// \brief Connection mode.
-      private: CMLConnectionMaker::ConnectMode connectionMode;
 
       /// \brief A map of connection type to its corresponding material.
       private: std::map<CMLConnectionMaker::ConnectType, std::string>
@@ -206,6 +192,14 @@ namespace gazebo
 
       /// \brief Child visual of the connection.
       public: rendering::VisualPtr child;
+
+      /// \internal
+      /// \brief Parent visual pose used to determine if updates are needed.
+      public: math::Pose parentPose;
+
+      /// \internal
+      /// \brief Child visual pose used to determine if updates are needed.
+      public: math::Pose childPose;
 
       /// \brief Parent port of the connection.
       public: std::string parentPort;

@@ -21,12 +21,9 @@
 
 #include <gazebo/common/common.hh>
 #include <gazebo/rendering/rendering.hh>
+#include <gazebo/gui/model/ModelEditorEvents.hh>
+#include <gazebo/gui/model/ModelEditor.hh>
 #include <gazebo/gui/gui.hh>
-
-/*#include <gazebo/gui/GuiIface.hh>
-#include <gazebo/gui/KeyEventHandler.hh>
-#include <gazebo/gui/MouseEventHandler.hh>
-#include <gazebo/gui/GuiEvents.hh>*/
 
 #include "CMLEvents.hh"
 #include "CMLManager.hh"
@@ -58,7 +55,9 @@ CMLConnectionMaker::CMLConnectionMaker()
       event::Events::ConnectPreRender(
         boost::bind(&CMLConnectionMaker::Update, this)));
 
-  this->connectionMode = CONNECT_MODE_LINK;
+  this->connections.push_back(
+      gui::model::Events::ConnectFinishModel(
+      boost::bind(&CMLConnectionMaker::OnFinish, this)));
 
   this->updateMutex = new boost::recursive_mutex();
 }
@@ -86,7 +85,6 @@ void CMLConnectionMaker::Reset()
   this->connectType = CMLConnectionMaker::CONNECT_NONE;
   this->selectedVis.reset();
   this->hoverVis.reset();
-  this->prevHoverVis.reset();
   this->selectedConnection.reset();
 
   while (this->connects.size() > 0)
@@ -213,9 +211,6 @@ bool CMLConnectionMaker::OnMouseRelease(const common::MouseEvent &_event)
   {
     if (this->hoverVis)
     {
-      if (this->hoverVis->IsPlane())
-        return false;
-
       // Pressed parent part
       if (!this->selectedVis)
       {
@@ -234,11 +229,8 @@ bool CMLConnectionMaker::OnMouseRelease(const common::MouseEvent &_event)
         this->selectedVis = this->hoverVis;
         this->hoverVis.reset();
 
-        rendering::VisualPtr entityVis;
-        if (this->connectionMode == CONNECT_MODE_LINK)
-          entityVis = this->selectedVis->GetParent();
-        else
-          entityVis = this->selectedVis->GetRootVisual();
+        rendering::VisualPtr entityVis =
+            this->selectedVis->GetNthAncestor(2);
 
         // Create connection data with selected visual as parent
         // the child will be set on the second mouse release.
@@ -256,10 +248,7 @@ bool CMLConnectionMaker::OnMouseRelease(const common::MouseEvent &_event)
           return false;
         }
 
-        if (this->hoverVis)
-          this->hoverVis->SetEmissive(common::Color(0, 0, 0));
-        if (this->selectedVis)
-          this->selectedVis->SetEmissive(common::Color(0, 0, 0));
+        this->hoverVis->SetEmissive(common::Color(0, 0, 0));
         this->mouseConnection->child = this->hoverVis;
         this->mouseConnection->childPort = port;
 
@@ -270,12 +259,50 @@ bool CMLConnectionMaker::OnMouseRelease(const common::MouseEvent &_event)
 
         this->newConnectionCreated = true;
 
-        // signal the end of a connect action.
-        emit CMLEvents::connectionCreated(
-            this->mouseConnection->parent->GetName(),
-            this->mouseConnection->parentPort,
-            this->mouseConnection->child->GetName(),
-            this->mouseConnection->childPort);
+        // Create connection SDF
+        sdf::ElementPtr connectionElem(new sdf::Element);
+        connectionElem->SetName("connection");
+
+        sdf::ElementPtr sourceElem(new sdf::Element);
+        sourceElem->SetName("source");
+
+        std::string leafName = this->mouseConnection->parent->GetName();
+        size_t pIdx = leafName.find_last_of("::");
+        if (pIdx != std::string::npos)
+          leafName = leafName.substr(pIdx+1);
+
+        sourceElem->AddValue("string", leafName, "_none_", "source");
+        connectionElem->InsertElement(sourceElem);
+
+        sdf::ElementPtr sourcePortElem(new sdf::Element);
+        sourcePortElem->SetName("source_port");
+        sourcePortElem->AddValue("string", this->mouseConnection->parentPort,
+            "_none_", "sourcePort");
+        connectionElem->InsertElement(sourcePortElem);
+
+        sdf::ElementPtr targetElem(new sdf::Element);
+        targetElem->SetName("target");
+
+        leafName = this->mouseConnection->child->GetName();
+        pIdx = leafName.find_last_of("::");
+        if (pIdx != std::string::npos)
+          leafName = leafName.substr(pIdx+1);
+
+        targetElem->AddValue("string", leafName, "_none_", "target");
+        connectionElem->InsertElement(targetElem);
+
+        sdf::ElementPtr targetPortElem(new sdf::Element);
+        targetPortElem->SetName("target_port");
+        targetPortElem->AddValue("string", this->mouseConnection->childPort,
+            "_none_", "targetPort");
+        connectionElem->InsertElement(targetPortElem);
+
+        // Append to model SDF
+        gazebo::gui::MainWindow *mainWindow = gui::get_main_window();
+        gazebo::gui::ModelEditor *modelEditor = dynamic_cast<
+            gazebo::gui::ModelEditor *>(mainWindow->GetEditor("model"));
+        modelEditor->AppendPluginElement("simple_connections",
+            "libSimpleConnectionsPlugin.so", connectionElem);
       }
     }
 
@@ -305,10 +332,6 @@ std::string CMLConnectionMaker::SelectPort()
         new CMLPortInspector(gui::get_main_window());
 
     inspector->move(QCursor::pos());
-/*        gui::get_main_window()->pos().x() +
-        this->mouseEvent.pos.x,
-        gui::get_main_window()->pos().y() +
-        this->mouseEvent.pos.y);*/
     inspector->setModal(true);
     inspector->Load(&msg);
     int ret = inspector->exec();
@@ -435,68 +458,74 @@ bool CMLConnectionMaker::OnMouseMove(const common::MouseEvent &_event)
   if (_event.dragging)
     return false;
 
+  // de-highlight previously highlighted visual
+  if (this->hoverVis && this->hoverVis != this->selectedVis)
+  {
+    this->hoverVis->SetEmissive(common::Color(0.0, 0.0, 0.0));
+  }
+
   // Get the active camera and scene.
   rendering::UserCameraPtr camera = gui::get_active_camera();
   rendering::ScenePtr scene = camera->GetScene();
 
+  // Highlight visual on hover
   rendering::VisualPtr vis = camera->GetVisual(_event.pos);
 
-  // Highlight visual on hover
-  if (vis)
-  {
-    if (this->hoverVis && this->hoverVis != this->selectedVis)
-    {
-      this->hoverVis->SetEmissive(common::Color(0.0, 0.0, 0.0));
-    }
+  if (!vis)
+    return true;
 
-    // only highlight editor entities by making sure it's not an item in the
-    // gui tree widget or a connection hotspot.
-    rendering::VisualPtr entityVis;
-    if (this->connectionMode == CONNECT_MODE_LINK)
-      entityVis = vis->GetParent();
-    else
-      entityVis = vis->GetRootVisual();
+  // Check if the visual contains one of the components' names and is not a
+  // hotspot. FIXME: this is a hack
+  bool isComponent = false;
+  if ((vis->GetName().find("AA_battery") != std::string::npos ||
+       vis->GetName().find("motor") != std::string::npos ||
+       vis->GetName().find("switch") != std::string::npos) &&
+       vis->GetName().find("_HOTSPOT_") == std::string::npos)
+  {
+    isComponent = true;
+  }
+
+  // Get the top level visual
+  if (isComponent && vis->GetNthAncestor(2) != this->selectedVis)
+  {
+    this->hoverVis = vis->GetNthAncestor(2);
+    this->hoverVis->SetEmissive(common::Color(0.5, 0.5, 0.5));
 
 //    Simple_msgs::msgs::SimpleModel msg =
 //        CMLManager::Instance()->GetModelInfo(entityVis->GetName());
-
-    if (vis->GetName().find("_HOTSPOT_") == std::string::npos)
-    {
-      this->hoverVis = entityVis;
-      if (/*msg.port_size() > 0 &&*/ !entityVis->IsPlane() && (!this->selectedVis ||
-           (this->selectedVis && this->hoverVis != this->selectedVis)))
-      {
-        this->hoverVis->SetEmissive(common::Color(0.5, 0.5, 0.5));
-      }
-    }
+  }
+  else
+  {
+    this->hoverVis.reset();
   }
 
   // Case when a parent part is already selected and currently
   // extending the connect line to a child part
-  if (this->selectedVis && this->hoverVis
-      && this->mouseConnection && this->mouseConnection->line)
+  if (this->selectedVis && this->mouseConnection && this->mouseConnection->line)
   {
-    math::Vector3 parentPos;
+    math::Vector3 parentPos, currentPos;
+    if (this->mouseConnection->parent)
+      parentPos = this->mouseConnection->parent->GetWorldPose().pos;
+
     // Set end point to center of child part
-    if (!this->hoverVis->IsPlane())
+    if (this->hoverVis)
     {
-      if (this->mouseConnection->parent)
-        parentPos =  this->mouseConnection->parent->GetWorldPose().pos;
-      this->mouseConnection->line->SetPoint(1,
-          this->hoverVis->GetWorldPose().pos - parentPos);
+      currentPos = this->hoverVis->GetWorldPose().pos - parentPos;
     }
-    else
+    // Set end point to mouse plane intersection
+    else if (!this->hoverVis && vis->GetRootVisual() &&
+             vis->GetRootVisual()->IsPlane())
     {
-      // Set end point to mouse plane intersection
       math::Vector3 pt;
       camera->GetWorldPointOnPlane(_event.pos.x, _event.pos.y,
           math::Plane(math::Vector3(0, 0, 1)), pt);
-      if (this->mouseConnection->parent)
-        parentPos = this->mouseConnection->parent->GetWorldPose().pos;
-      this->mouseConnection->line->SetPoint(1,
-          this->hoverVis->GetWorldPose().pos - parentPos + pt);
+
+      currentPos = vis->GetRootVisual()->GetWorldPose().pos - parentPos + pt;
     }
+    if (currentPos != math::Vector3::Zero)
+      this->mouseConnection->line->SetPoint(1, currentPos);
   }
+
   return true;
 }
 
@@ -570,27 +599,36 @@ void CMLConnectionMaker::Update()
   }
 
   // update connect line and hotspot position.
-  std::map<std::string, ConnectionData *>::iterator it;
-  for (it = this->connects.begin(); it != this->connects.end(); ++it)
+  for (auto it : connects)
   {
-    ConnectionData *connect = it->second;
-    if (connect->dirty)
+    ConnectionData *connect = it.second;
+    if (connect->hotspot)
     {
       if (connect->child && connect->parent)
       {
-        // get centroid of parent part visuals
-        math::Vector3 parentCentroid =
-            connect->parent->GetWorldPose().pos;
+        bool poseUpdate = false;
+        if (connect->parentPose != connect->parent->GetWorldPose() ||
+            connect->childPose != connect->child->GetWorldPose())
+         {
+           connect->parentPose = connect->parent->GetWorldPose();
+           connect->childPose = connect->child->GetWorldPose();
+           poseUpdate = true;
+         }
 
-        // get centroid of child part visuals
-        math::Vector3 childCentroid =
-            connect->child->GetWorldPose().pos;
+        if (connect->dirty || poseUpdate)
+        {
+        // get origin of parent part visuals
+        math::Vector3 parentOrigin = connect->parent->GetWorldPose().pos;
+
+        // get progom of child part visuals
+        math::Vector3 childOrigin = connect->child->GetWorldPose().pos;
 
         // set orientation of connect hotspot
-        math::Vector3 dPos = (childCentroid - parentCentroid);
-        math::Vector3 center = dPos/2.0;
-        connect->hotspot->SetScale(math::Vector3(0.02, 0.02, dPos.GetLength()));
-        connect->hotspot->SetWorldPosition(parentCentroid + center);
+        math::Vector3 dPos = (childOrigin - parentOrigin);
+        math::Vector3 center = dPos * 0.5;
+        double length = std::max(dPos.GetLength(), 0.001);
+        connect->hotspot->SetScale(math::Vector3(0.008, 0.008, length));
+        connect->hotspot->SetWorldPosition(parentOrigin + center);
         math::Vector3 u = dPos.Normalize();
         math::Vector3 v = math::Vector3::UnitZ;
         double cosTheta = v.Dot(u);
@@ -599,6 +637,9 @@ void CMLConnectionMaker::Update()
         math::Quaternion q;
         q.SetFromAxis(w, angle);
         connect->hotspot->SetWorldRotation(q);
+
+        connect->dirty = false;
+        }
       }
     }
   }
@@ -615,3 +656,9 @@ unsigned int CMLConnectionMaker::GetConnectionCount()
 {
   return this->connects.size();
 }*/
+
+/////////////////////////////////////////////////
+void CMLConnectionMaker::OnFinish()
+{
+  this->Reset();
+}

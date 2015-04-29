@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <sdf version="1.5">
-  <model name="switch">
+  <model name="power_switch">
     <pose>0 0 0.155 0 3.14 0</pose>
     <link name="body">
       <collision name="collision">

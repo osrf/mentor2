@@ -298,13 +298,16 @@ void CMLEditor::OnNestedModelInserted(const std::string &_name)
   if (this->insertName.empty())
     return;
 
-  std::map<std::string, sdf::SDFPtr>::iterator it =
-      this->models.find(this->insertName);
-  if (it == this->models.end())
-    return;
+  for (auto it : this->models)
+  {
+    if (_name.find(it.first) != std::string::npos)
+    {
+      this->Parse(it.second->Root()->GetElement("model")->GetElement("plugin"),
+          _name);
+      break;
+    }
+  }
 
-  this->Parse(it->second->Root()->GetElement("model")->GetElement("plugin"),
-      _name);
   this->insertName == "";
 }
 
@@ -332,6 +335,4 @@ void CMLEditor::SpawnEntity()
     return;
 
   this->modelEditor->SpawnEntity(it->second->Root()->GetElement("model"));
-
-
 }
