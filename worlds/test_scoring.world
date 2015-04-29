@@ -15,7 +15,7 @@
       <uri>model://sun</uri>
     </include>
 
-    <plugin name="scoring" filename="libScoringPlugin.so">
+   <plugin name="SimEvents" filename="libSimEventsPlugin.so">
 
     <session></session>
 
@@ -78,7 +78,7 @@
       <region>end</region>
     </event>
 
-    <!-- detect sudden movement (fall)  -->
+    <!-- detect sudden movement (fall)  
     <event>
       <type>motion</type>
       <name>fall</name>
@@ -87,7 +87,7 @@
       <vel>5</vel>
     </event>
     </plugin>
-
+    -->
 
     <include>
       <pose>0 0 0 0 0 0</pose>

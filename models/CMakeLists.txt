@@ -5,6 +5,7 @@ set (dirs
   bucket_wheel
   car
   chassis
+  concrete_slab
   motor
   motor_box
   power_switch
