@@ -260,33 +260,38 @@ bool CMLConnectionMaker::OnMouseRelease(const common::MouseEvent &_event)
         this->newConnectionCreated = true;
 
         // Create connection SDF
-        sdf::ElementPtr connectionElem;
-        connectionElem.reset(new sdf::Element);
+        sdf::ElementPtr connectionElem(new sdf::Element);
         connectionElem->SetName("connection");
 
-        sdf::ElementPtr sourceElem;
-        sourceElem.reset(new sdf::Element);
+        sdf::ElementPtr sourceElem(new sdf::Element);
         sourceElem->SetName("source");
-        sourceElem->AddValue("string", this->mouseConnection->parent->GetName(),
-            "_none_", "source");
+
+        std::string leafName = this->mouseConnection->parent->GetName();
+        size_t pIdx = leafName.find_last_of("::");
+        if (pIdx != std::string::npos)
+          leafName = leafName.substr(pIdx+1);
+
+        sourceElem->AddValue("string", leafName, "_none_", "source");
         connectionElem->InsertElement(sourceElem);
 
-        sdf::ElementPtr sourcePortElem;
-        sourcePortElem.reset(new sdf::Element);
+        sdf::ElementPtr sourcePortElem(new sdf::Element);
         sourcePortElem->SetName("source_port");
         sourcePortElem->AddValue("string", this->mouseConnection->parentPort,
             "_none_", "sourcePort");
         connectionElem->InsertElement(sourcePortElem);
 
-        sdf::ElementPtr targetElem;
-        targetElem.reset(new sdf::Element);
+        sdf::ElementPtr targetElem(new sdf::Element);
         targetElem->SetName("target");
-        targetElem->AddValue("string", this->mouseConnection->child->GetName(),
-            "_none_", "target");
+
+        leafName = this->mouseConnection->child->GetName();
+        pIdx = leafName.find_last_of("::");
+        if (pIdx != std::string::npos)
+          leafName = leafName.substr(pIdx+1);
+
+        targetElem->AddValue("string", leafName, "_none_", "target");
         connectionElem->InsertElement(targetElem);
 
-        sdf::ElementPtr targetPortElem;
-        targetPortElem.reset(new sdf::Element);
+        sdf::ElementPtr targetPortElem(new sdf::Element);
         targetPortElem->SetName("target_port");
         targetPortElem->AddValue("string", this->mouseConnection->childPort,
             "_none_", "targetPort");
@@ -296,7 +301,8 @@ bool CMLConnectionMaker::OnMouseRelease(const common::MouseEvent &_event)
         gazebo::gui::MainWindow *mainWindow = gui::get_main_window();
         gazebo::gui::ModelEditor *modelEditor = dynamic_cast<
             gazebo::gui::ModelEditor *>(mainWindow->GetEditor("model"));
-        modelEditor->AppendSDFElement(connectionElem);
+        modelEditor->AppendPluginElement("simple_connections",
+            "libSimpleConnectionsPlugin.so", connectionElem);
       }
     }
 
@@ -480,7 +486,7 @@ bool CMLConnectionMaker::OnMouseMove(const common::MouseEvent &_event)
   }
 
   // Get the top level visual
-  if (isComponent)
+  if (isComponent && vis->GetFirstAncestorFromRootVisual() != this->selectedVis)
   {
     this->hoverVis = vis->GetFirstAncestorFromRootVisual();
     this->hoverVis->SetEmissive(common::Color(0.5, 0.5, 0.5));
