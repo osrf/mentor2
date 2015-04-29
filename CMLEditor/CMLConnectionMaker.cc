@@ -230,7 +230,7 @@ bool CMLConnectionMaker::OnMouseRelease(const common::MouseEvent &_event)
         this->hoverVis.reset();
 
         rendering::VisualPtr entityVis =
-            this->selectedVis->GetFirstAncestorFromRootVisual();
+            this->selectedVis->GetNthAncestor(2);
 
         // Create connection data with selected visual as parent
         // the child will be set on the second mouse release.
@@ -486,9 +486,9 @@ bool CMLConnectionMaker::OnMouseMove(const common::MouseEvent &_event)
   }
 
   // Get the top level visual
-  if (isComponent && vis->GetFirstAncestorFromRootVisual() != this->selectedVis)
+  if (isComponent && vis->GetNthAncestor(2) != this->selectedVis)
   {
-    this->hoverVis = vis->GetFirstAncestorFromRootVisual();
+    this->hoverVis = vis->GetNthAncestor(2);
     this->hoverVis->SetEmissive(common::Color(0.5, 0.5, 0.5));
 
 //    Simple_msgs::msgs::SimpleModel msg =
