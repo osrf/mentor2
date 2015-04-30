@@ -30,6 +30,7 @@ GZ_REGISTER_MODEL_PLUGIN(GearboxPlugin)
 GearboxPlugin::GearboxPlugin()
 {
   this->gearRatio = 1.0;
+  this->efficiency = 1.0;
   this->parentLinkName = "";
   this->childLinkName = "";
 }
@@ -60,17 +61,14 @@ void GearboxPlugin::UpdateImpl(double _timeSinceLastUpdate)
 {
 
   // GearboxPlugin: Dynamically creates a gearbox joint between two links
-  // that are connected to the parent model
-  // e.g. Gearbox joint will be created between link1 and link2:
-  // link1 -- joint1 -- PARENT_MODEL -- joint2 -- link2
 
   this->gearRatio = this->GetProperty<double>("gear_ratio");
   this->parentLinkName = this->GetProperty<std::string>("parent");
   this->childLinkName = this->GetProperty<std::string>("child");
+  this->efficiency = this->GetProperty<double>("efficiency");
 
   if (!this->gearboxJoint)
   {
-
     physics::WorldPtr world = this->parent->GetWorld();
     physics::LinkPtr parentLink = boost::dynamic_pointer_cast<physics::Link>(
       world->GetByName(this->parentLinkName));
@@ -79,6 +77,86 @@ void GearboxPlugin::UpdateImpl(double _timeSinceLastUpdate)
 
     if (!parentLink || !childLink)
       return;
+
+    // auto determine gearbox axes
+    math::Quaternion axisTransform =
+        this->parent->GetLink()->GetWorldPose().rot.GetInverse();
+
+    // parent link axis
+    math::Vector3 parentLinkAxis = math::Vector3::UnitY;
+    physics::ModelPtr parentLinkModel = parentLink->GetModel();
+    bool foundParentLinkAxis = false;
+    while (parentLinkModel)
+    {
+      physics::Joint_V parentLinkJoints = parentLinkModel->GetJoints();
+      std::cerr << " parentLinkModel " << parentLinkModel->GetName() << " " <<
+          parentLinkJoints.size() <<  std::endl;
+      for (unsigned int i = 0; i < parentLinkJoints.size(); ++i)
+      {
+        physics::JointPtr joint = parentLinkJoints[i];
+        std::cerr << " parent model joint "  << joint->GetName() << std::endl;
+        if (joint->GetParent() == parentLink ||
+            joint->GetChild() == parentLink)
+        {
+          if (joint->GetMsgType() == msgs::Joint::REVOLUTE &&
+              (joint->GetLowerLimit(0) != math::Angle(0) ||
+              joint->GetUpperLimit(0) != math::Angle(0)))
+          {
+            parentLinkAxis = axisTransform * joint->GetGlobalAxis(0);
+            std::cerr << "parent " << parentLinkAxis <<  " VS " <<
+                joint->GetGlobalAxis(0) << std::endl;
+            foundParentLinkAxis = true;
+            break;
+
+          }
+        }
+      }
+      if (foundParentLinkAxis)
+        break;
+
+      physics::BasePtr p = parentLinkModel->GetParent();
+      if (p->HasType(physics::Base::MODEL))
+        parentLinkModel = boost::static_pointer_cast<physics::Model>(p);
+      else
+        break;
+    }
+
+    // child link axis
+    math::Vector3 childLinkAxis = math::Vector3::UnitY;
+    physics::ModelPtr childLinkModel = childLink->GetModel();
+    bool foundChildLinkAxis = false;
+    while (childLinkModel)
+    {
+      physics::Joint_V childLinkJoints = childLinkModel->GetJoints();
+      std::cerr << " childLinkModel " << childLinkModel->GetName() << " " <<
+          childLinkJoints.size() <<  std::endl;
+      for (unsigned int i = 0; i < childLinkJoints.size(); ++i)
+      {
+        physics::JointPtr joint = childLinkJoints[i];
+        std::cerr << " child model joint "  << joint->GetName() << std::endl;
+        if (joint->GetParent() == childLink ||
+            joint->GetChild() == childLink)
+        {
+          if (joint->GetMsgType() == msgs::Joint::REVOLUTE &&
+              (joint->GetLowerLimit(0) != math::Angle(0) ||
+              joint->GetUpperLimit(0) != math::Angle(0)))
+          {
+            childLinkAxis = axisTransform * joint->GetGlobalAxis(0);
+            std::cerr << "child " << childLinkAxis << std::endl;
+            foundChildLinkAxis = true;
+            break;
+          }
+        }
+      }
+      if (foundChildLinkAxis)
+        break;
+
+      physics::BasePtr p = childLinkModel->GetParent();
+      if (p->HasType(physics::Base::MODEL))
+        childLinkModel = boost::static_pointer_cast<physics::Model>(p);
+      else
+        break;
+    }
 
 
     parentLink->SetAutoDisable(false);
@@ -93,14 +171,15 @@ void GearboxPlugin::UpdateImpl(double _timeSinceLastUpdate)
     jointSDF->GetElement("parent")->Set(this->parentLinkName);
     jointSDF->GetElement("child")->Set(this->childLinkName);
     jointSDF->GetElement("gearbox_ratio")->Set(this->gearRatio);
-//    jointSDF->GetElement("gearbox_ratio")->Set(1.000);
-    std::cerr << "gear ratio " << this->gearRatio << std::endl;
     jointSDF->GetElement("gearbox_reference_body")->Set(
         this->parent->GetLink()->GetName());
     jointSDF->GetElement("axis")->GetElement("xyz")->Set(
-        math::Vector3::UnitY);
+        parentLinkAxis);
     jointSDF->GetElement("axis2")->GetElement("xyz")->Set(
-        math::Vector3::UnitY);
+        childLinkAxis);
+
+    std::cerr << "gear ratio " << this->gearRatio << std::endl;
+    std::cerr << "efficiency " << this->efficiency << std::endl;
 
     this->gearboxJoint->Load(jointSDF);
 
