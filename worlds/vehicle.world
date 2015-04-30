@@ -1,0 +1,503 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+
+    <model name="vehicle">
+      <model name="chassis">
+        <pose>0 0 0.0132 0 0 0</pose>
+        <link name="link">
+          <inertial>
+            <mass>0.1</mass>
+            <inertia>
+              <ixx>0.0001</ixx>
+              <ixy>0</ixy>
+              <ixz>0</ixz>
+              <iyy>0.0001</iyy>
+              <iyz>0</iyz>
+              <izz>0.0001</izz>
+            </inertia>
+          </inertial>
+          <collision name="collision">
+            <pose>0.0005 -0.00065 0 1.57079632679 0 0</pose>
+            <geometry>
+              <box>
+                <size>0.051 0.0035 0.153</size>
+              </box>
+            </geometry>
+          </collision>
+          <visual name="visual">
+            <pose>0 0 0.0 1.57079632679 0 0</pose>
+            <geometry>
+              <mesh>
+                <uri>model://chassis/meshes/chassis.dae</uri>
+                <scale>0.001 0.001 0.001</scale>
+              </mesh>
+            </geometry>
+            <material>
+              <script>
+                <uri>file://media/materials/scripts/gazebo.material</uri>
+                <name>Gazebo/Grey</name>
+              </script>
+            </material>
+          </visual>
+        </link>
+      </model>
+
+      <model name="axle_wheels">
+        <pose>0 0.040 0.028 0 0 0</pose>
+        <link name="link">
+          <inertial>
+            <mass>0.1</mass>
+            <inertia>
+              <ixx>0.0001</ixx>
+              <ixy>0</ixy>
+              <ixz>0</ixz>
+              <iyy>0.0001</iyy>
+              <iyz>0</iyz>
+              <izz>0.0001</izz>
+            </inertia>
+          </inertial>
+          <collision name="axle_collision">
+            <pose>0 0 0.0 0 1.57079632679 0</pose>
+            <geometry>
+              <cylinder>
+                <radius>0.0025</radius>
+                <length>0.08</length>
+              </cylinder>
+            </geometry>
+          </collision>
+          <collision name="wheel_0_collision">
+            <pose>-0.0405 0 0.0 0 1.57079632679 0</pose>
+            <geometry>
+              <cylinder>
+                <radius>0.028</radius>
+                <length>0.02</length>
+              </cylinder>
+            </geometry>
+          </collision>
+          <collision name="wheel_1_collision">
+            <pose>0.0405 0 0.0 0 1.57079632679 0</pose>
+            <geometry>
+              <cylinder>
+                <radius>0.028</radius>
+                <length>0.02</length>
+              </cylinder>
+            </geometry>
+          </collision>
+          <visual name="visual">
+            <pose>0 0 0.0 0 0 0</pose>
+            <geometry>
+              <mesh>
+                <uri>model://axle_wheels/meshes/axle_wheels.dae</uri>
+                <scale>0.001 0.001 0.001</scale>
+              </mesh>
+            </geometry>
+            <material>
+              <script>
+                <uri>file://media/materials/scripts/gazebo.material</uri>
+                <name>Gazebo/Grey</name>
+              </script>
+            </material>
+          </visual>
+        </link>
+      </model>
+
+      <model name="caster_wheel">
+        <pose>0 -0.06 0.0058 0 0 0</pose>
+        <link name="link">
+          <inertial>
+            <mass>0.1</mass>
+            <inertia>
+              <ixx>0.0001</ixx>
+              <ixy>0</ixy>
+              <ixz>0</ixz>
+              <iyy>0.0001</iyy>
+              <iyz>0</iyz>
+              <izz>0.0001</izz>
+            </inertia>
+          </inertial>
+          <collision name="collision">
+            <pose>0 0 0.0 0 0 0</pose>
+            <geometry>
+              <sphere>
+                <radius>0.0057</radius>
+              </sphere>
+            </geometry>
+          </collision>
+
+          <visual name="visual">
+            <pose>0 0 0.0 0 0 0</pose>
+            <geometry>
+              <sphere>
+                <radius>0.0057</radius>
+              </sphere>
+            </geometry>
+            <material>
+              <script>
+                <uri>file://media/materials/scripts/gazebo.material</uri>
+                <name>Gazebo/Grey</name>
+              </script>
+            </material>
+          </visual>
+        </link>
+      </model>
+
+      <model name="battery_pack">
+        <pose>0 -0.057 0.025 0 0 0</pose>
+        <link name="link">
+          <inertial>
+            <mass>0.1</mass>
+            <inertia>
+              <ixx>0.0001</ixx>
+              <ixy>0</ixy>
+              <ixz>0</ixz>
+              <iyy>0.0001</iyy>
+              <iyz>0</iyz>
+              <izz>0.0001</izz>
+            </inertia>
+          </inertial>
+          <collision name="collision">
+            <pose>0 0 0.000 1.57079632679 0 0</pose>
+            <geometry>
+              <box>
+                <size>0.065 0.018 0.07</size>
+              </box>
+            </geometry>
+          </collision>
+          <visual name="visual">
+            <pose>0 0 0.003 1.57079632679 0 0</pose>
+            <geometry>
+              <mesh>
+                <uri>model://battery_pack/meshes/battery_pack.dae</uri>
+                <scale>0.001 0.001 0.001</scale>
+              </mesh>
+            </geometry>
+            <material>
+              <script>
+                <uri>file://media/materials/scripts/gazebo.material</uri>
+                <name>Gazebo/Grey</name>
+              </script>
+            </material>
+          </visual>
+        </link>
+        <plugin filename="libPowerSourcePlugin.so" name="battery">
+          <port>
+            <name>positive</name>
+            <type>electrical</type>
+          </port>
+          <port>
+            <name>negative</name>
+            <type>electrical</type>
+          </port>
+          <properties>
+            <voltage>1.5</voltage>   <!-- Volts -->
+           <capacity>0.30</capacity> <!-- Amp-hours  -->
+            <current>0.1</current>   <!-- Amps -->
+          </properties>
+        </plugin>
+      </model>
+
+
+      <model name="motor">
+        <pose>0 0.013 0.0285 0 0 0</pose>
+        <link name="link">
+          <pose>0.0 0 0.0 0 0 0</pose>
+          <self_collide>false</self_collide>
+<!--          <collision name="collision">
+            <pose>0 0 0.0 0 0 0</pose>
+            <geometry>
+              <mesh>
+                <uri>model://motor/meshes/motor.dae</uri>
+                <scale>0.001 0.001 0.001</scale>
+              </mesh>
+            </geometry>
+          </collision>-->
+          <visual name="visual">
+            <pose>0 0 0.0 0 0 0</pose>
+            <geometry>
+              <mesh>
+                <uri>model://motor/meshes/motor.dae</uri>
+                <scale>0.001 0.001 0.001</scale>
+              </mesh>
+            </geometry>
+            <material>
+              <script>
+                <uri>file://media/materials/scripts/gazebo.material</uri>
+                <name>Gazebo/Grey</name>
+              </script>
+            </material>
+          </visual>
+        </link>
+
+        <link name="motor_core_link">
+          <pose>0.002 0 0.0 0 0 0</pose>
+          <self_collide>false</self_collide>
+          <gravity>false</gravity>
+          <inertial>
+            <mass>0.1</mass>
+            <inertia>
+              <ixx>0.0001</ixx>
+              <ixy>0</ixy>
+              <ixz>0</ixz>
+              <iyy>0.0001</iyy>
+              <iyz>0</iyz>
+              <izz>0.0001</izz>
+            </inertia>
+          </inertial>
+          <collision name="collision">
+            <pose>0.0 0 0.0 0 1.57079632679 0</pose>
+            <geometry>
+              <cylinder>
+                <radius>0.005</radius>
+                <length>0.005</length>
+              </cylinder>
+            </geometry>
+          </collision>
+          <visual name="visual">
+            <pose>0.0 0 0.0 0 1.57079632679 0</pose>
+            <geometry>
+              <cylinder>
+                <radius>0.005</radius>
+                <length>0.005</length>
+              </cylinder>
+            </geometry>
+            <material>
+              <script>
+                <uri>file://media/materials/scripts/gazebo.material</uri>
+                <name>Gazebo/Grey</name>
+              </script>
+            </material>
+          </visual>
+        </link>
+
+        <link name="motor_shaft_link">
+          <pose>0.002 0 0.0 0 0 0</pose>
+          <self_collide>false</self_collide>
+          <gravity>false</gravity>
+          <inertial>
+            <mass>0.1</mass>
+            <inertia>
+              <ixx>0.0001</ixx>
+              <ixy>0</ixy>
+              <ixz>0</ixz>
+              <iyy>0.0001</iyy>
+              <iyz>0</iyz>
+              <izz>0.0001</izz>
+            </inertia>
+          </inertial>
+          <collision name="collision">
+            <pose>0.0 0 0.0 0 1.57079632679 0</pose>
+            <geometry>
+              <cylinder>
+                <radius>0.0005</radius>
+                <length>0.020</length>
+              </cylinder>
+            </geometry>
+          </collision>
+          <visual name="debug_visual">
+            <pose>0.0 0 0.0 0 1.57079632679 0</pose>
+            <geometry>
+              <box>
+                <size>0.01 0.02 0.03</size>
+              </box>
+            </geometry>
+          </visual>
+
+          <visual name="visual">
+            <pose>0.0 0 0.0 0 1.57079632679 0</pose>
+            <geometry>
+              <cylinder>
+                <radius>0.0005</radius>
+                <length>0.020</length>
+              </cylinder>
+            </geometry>
+            <material>
+              <script>
+                <uri>file://media/materials/scripts/gazebo.material</uri>
+                <name>Gazebo/Wood</name>
+              </script>
+            </material>
+          </visual>
+        </link>
+
+        <joint name="motor_shaft_joint" type="revolute">
+          <parent>vehicle::motor::motor_core_link</parent>
+          <child>vehicle::motor::motor_shaft_link</child>
+          <axis>
+            <xyz>1 0 0</xyz>
+            <limit>
+              <lower>-1000000</lower>
+              <upper>1000000</upper>
+            </limit>
+          </axis>
+        </joint>
+
+        <joint name="motor_joint" type="revolute">
+          <parent>vehicle::motor::motor_core_link</parent>
+          <child>vehicle::motor::link</child>
+          <axis>
+            <xyz>0 0 1</xyz>
+            <limit>
+              <lower>0</lower>
+              <upper>0</upper>
+            </limit>
+          </axis>
+        </joint>
+
+        <plugin filename="libMotorPlugin.so" name="motor">
+          <port>
+            <name>shaft</name>
+            <type>mechanical</type>
+          </port>
+          <port>
+            <name>connector0</name>
+            <type>electrical</type>
+          </port>
+          <port>
+            <name>connector1</name>
+            <type>electrical</type>
+          </port>
+
+          <properties>
+            <resistance>5</resistance>
+            <back_emf>0.0064</back_emf>
+            <torque_constant>0.0064</torque_constant>
+          </properties>
+
+          <shaft_joint>motor_shaft_joint</shaft_joint>
+        </plugin>
+
+      </model>
+
+      <model name="motor_box">
+        <pose>0 0.013 0.0285 0 0 0</pose>
+        <link name="link">
+          <inertial>
+            <mass>0.1</mass>
+            <inertia>
+              <ixx>0.0001</ixx>
+              <ixy>0</ixy>
+              <ixz>0</ixz>
+              <iyy>0.0001</iyy>
+              <iyz>0</iyz>
+              <izz>0.0001</izz>
+            </inertia>
+          </inertial>
+          <collision name="collision">
+            <pose>0 0.0 0.013 1.57079632679 0 1.57079632679</pose>
+            <geometry>
+              <box>
+                <size>0.06 0.001 0.04</size>
+              </box>
+            </geometry>
+          </collision>
+          <visual name="visual">
+            <pose>0 0 0.0 1.57079632679 0 1.57079632679</pose>
+            <geometry>
+              <mesh>
+                <uri>model://motor_box/meshes/motor_box.dae</uri>
+                <scale>0.001 0.001 0.001</scale>
+              </mesh>
+            </geometry>
+            <material>
+              <script>
+                <uri>file://media/materials/scripts/gazebo.material</uri>
+                <name>Gazebo/Grey</name>
+              </script>
+            </material>
+          </visual>
+        </link>
+        <plugin filename="libGearboxPlugin.so" name="gearbox">
+          <properties>
+            <parent>vehicle::motor::motor_shaft_link</parent>
+            <child>vehicle::axle_wheels::link</child>
+            <gear_ratio>0.05</gear_ratio>
+            <efficiency>0.95</efficiency>
+          </properties>
+        </plugin>
+      </model>
+
+      <joint name="chassis_battery_pack_joint" type="revolute">
+        <parent>vehicle::chassis::link</parent>
+        <child>vehicle::battery_pack::link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>0</lower>
+            <upper>0</upper>
+          </limit>
+        </axis>
+      </joint>
+
+      <joint name="chassis_motor_box_joint" type="revolute">
+        <parent>vehicle::chassis::link</parent>
+        <child>vehicle::motor_box::link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>0</lower>
+            <upper>0</upper>
+          </limit>
+        </axis>
+      </joint>
+
+      <joint name="chassis_motor_joint" type="revolute">
+        <parent>vehicle::chassis::link</parent>
+        <child>vehicle::motor::link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>0</lower>
+            <upper>0</upper>
+          </limit>
+        </axis>
+      </joint>
+
+      <joint name="chassis_axle_joint" type="revolute">
+        <parent>vehicle::chassis::link</parent>
+        <child>vehicle::axle_wheels::link</child>
+        <axis>
+          <xyz>1 0 0</xyz>
+          <limit>
+            <lower>-1000000000000000</lower>
+            <upper>1000000000000000</upper>
+          </limit>
+        </axis>
+      </joint>
+
+      <joint name="chassis_caster_joint" type="ball">
+        <parent>vehicle::chassis::link</parent>
+        <child>vehicle::caster_wheel::link</child>
+      </joint>
+
+
+      <plugin name="simple_connections" filename="libSimpleConnectionsPlugin.so">
+        <connection>
+          <source>battery_pack</source>
+          <source_port>positive</source_port>
+          <target>motor</target>
+          <target_port>connector0</target_port>
+        </connection>
+
+        <connection>
+          <source>motor</source>
+          <source_port>connector1</source_port>
+          <target>battery_pack</target>
+          <target_port>negative</target_port>
+        </connection>
+      </plugin>
+
+
+    </model>
+
+  </world>
+</sdf>
