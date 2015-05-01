@@ -164,6 +164,7 @@ bool CMLRender::OnMouseRelease(const common::MouseEvent &_event)
       rendering::VisualPtr topLevelVis = vis->GetNthAncestor(2);
       if (!topLevelVis)
         return false;
+
       std::string name = topLevelVis->GetName();
 
       Simple_msgs::msgs::SimpleModel msg;

@@ -483,6 +483,9 @@ void CMLConnectionMaker::CreateConnectionFromSDF(
   connection->childPort = targetPort;
   this->connectType = CONNECT_NONE;
 
+  std::cerr << " create connection from sdf " <<
+    sourceVis->GetName() << " " << targetVis->GetName() << std::endl;
+
   this->CreateHotSpot(connection);
   this->InsertConnectionElement(connection);
 }
