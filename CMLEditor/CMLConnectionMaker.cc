@@ -45,12 +45,6 @@ CMLConnectionMaker::CMLConnectionMaker()
   this->connectionMaterials[CONNECT_MECHANICAL] = "Gazebo/White";
   this->connectionMaterials[CONNECT_ELECTRICAL] = "Gazebo/Black";
 
-  MouseEventHandler::Instance()->AddReleaseFilter("cml_connection",
-      boost::bind(&CMLConnectionMaker::OnMouseRelease, this, _1));
-
-  KeyEventHandler::Instance()->AddPressFilter("cml_connection",
-      boost::bind(&CMLConnectionMaker::OnKeyPress, this, _1));
-
   this->connections.push_back(
       event::Events::ConnectPreRender(
         boost::bind(&CMLConnectionMaker::Update, this)));
@@ -65,9 +59,7 @@ CMLConnectionMaker::CMLConnectionMaker()
 /////////////////////////////////////////////////
 CMLConnectionMaker::~CMLConnectionMaker()
 {
-  MouseEventHandler::Instance()->RemoveReleaseFilter("cml_connection");
-  KeyEventHandler::Instance()->RemovePressFilter("cml_connection");
-
+  this->DisableEventHandlers();
   this->Reset();
 }
 
@@ -90,6 +82,23 @@ void CMLConnectionMaker::Reset()
   while (this->connects.size() > 0)
     this->RemoveConnection(this->connects.begin()->first);
   this->connects.clear();
+}
+
+/////////////////////////////////////////////////
+void CMLConnectionMaker::EnableEventHandlers()
+{
+  MouseEventHandler::Instance()->AddReleaseFilter("cml_connection",
+      boost::bind(&CMLConnectionMaker::OnMouseRelease, this, _1));
+
+  KeyEventHandler::Instance()->AddPressFilter("cml_connection",
+      boost::bind(&CMLConnectionMaker::OnKeyPress, this, _1));
+}
+
+/////////////////////////////////////////////////
+void CMLConnectionMaker::DisableEventHandlers()
+{
+  MouseEventHandler::Instance()->RemoveReleaseFilter("cml_connection");
+  KeyEventHandler::Instance()->RemovePressFilter("cml_connection");
 }
 
 /////////////////////////////////////////////////
@@ -165,9 +174,6 @@ bool CMLConnectionMaker::OnMousePress(const common::MouseEvent &_event)
 bool CMLConnectionMaker::OnMouseRelease(const common::MouseEvent &_event)
 {
   this->mouseEvent = _event;
-
-  if (_event.button != common::MouseEvent::LEFT)
-    return false;
 
   if (this->connectType == CMLConnectionMaker::CONNECT_NONE)
   {
@@ -380,17 +386,15 @@ std::string CMLConnectionMaker::SelectPort()
   {
     QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
 
-    CMLPortInspector *inspector =
-        new CMLPortInspector(gui::get_main_window());
-
-    inspector->move(QCursor::pos());
-    inspector->setModal(true);
-    inspector->Load(&msg);
-    int ret = inspector->exec();
+    CMLPortInspector inspector(gui::get_main_window());
+    inspector.move(QCursor::pos());
+    inspector.setModal(true);
+    inspector.Load(&msg);
+    int ret = inspector.exec();
     if (ret != QDialog::Accepted)
       return selectedPort;
 
-    selectedPort = inspector->GetPort();
+    selectedPort = inspector.GetPort();
     QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
   }
   return selectedPort;
@@ -736,7 +740,7 @@ void CMLConnectionMaker::Update()
         // get origin of parent part visuals
         math::Vector3 parentOrigin = connect->parent->GetWorldPose().pos;
 
-        // get progom of child part visuals
+        // get origin of child part visuals
         math::Vector3 childOrigin = connect->child->GetWorldPose().pos;
 
         // set orientation of connect hotspot

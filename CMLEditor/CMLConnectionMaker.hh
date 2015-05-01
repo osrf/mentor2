@@ -113,6 +113,12 @@ namespace gazebo
       public: void CreateConnectionFromSDF(sdf::ElementPtr _connectionElem,
           const std::string &_modelName = "");
 
+      /// \brief Enable the mouse and key event handlers.
+      public: void EnableEventHandlers();
+
+      /// \brief Disable the mouse and key event handlers.
+      public: void DisableEventHandlers();
+
       /// \brief Insert the connection sdf element to the model's plugin sdf.
       /// \param[in] _connection Connection data.
       private: void InsertConnectionElement(ConnectionData *_connection);

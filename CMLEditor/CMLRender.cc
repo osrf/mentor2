@@ -115,10 +115,12 @@ void CMLRender::OnModelEditorMode(bool _enabled)
   if (_enabled)
   {
     this->EnableEventHandlers();
+    CMLConnectionMaker::Instance()->EnableEventHandlers();
   }
   else
   {
     this->DisableEventHandlers();
+    CMLConnectionMaker::Instance()->DisableEventHandlers();
   }
 }
 
@@ -160,6 +162,8 @@ bool CMLRender::OnMouseRelease(const common::MouseEvent &_event)
     if (vis)
     {
       rendering::VisualPtr topLevelVis = vis->GetNthAncestor(2);
+      if (!topLevelVis)
+        return false;
       std::string name = topLevelVis->GetName();
 
       Simple_msgs::msgs::SimpleModel msg;
@@ -208,6 +212,8 @@ bool CMLRender::OnMouseDoubleClick(const common::MouseEvent &_event)
   if (vis)
   {
     rendering::VisualPtr topLevelVis = vis->GetNthAncestor(2);
+    if (!topLevelVis)
+      return false;
     std::string name = topLevelVis->GetName();
 
     Simple_msgs::msgs::SimpleModel msg;
