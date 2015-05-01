@@ -101,6 +101,22 @@ namespace gazebo
       /// \brief Stop the process of creating connection.
       public: void Stop();
 
+      /// \brief Queue a connection to be created.
+      /// \param[in] _connectionElem Connection SDF element.
+      /// \param[in] _modelName Name of the model that contains this connection.
+      public: void CreateConnection(sdf::ElementPtr _connectionElem,
+          const std::string &_modelName = "");
+
+      /// \brief Parse and create connections from sdf.
+      /// \param[in] _connectionElem Connection SDF element.
+      /// \param[in] _modelName Name of the model that contains this connection.
+      public: void CreateConnectionFromSDF(sdf::ElementPtr _connectionElem,
+          const std::string &_modelName = "");
+
+      /// \brief Insert the connection sdf element to the model's plugin sdf.
+      /// \param[in] _connection Connection data.
+      private: void InsertConnectionElement(ConnectionData *_connection);
+
       /// \brief Mouse event filter callback when mouse button is pressed.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
@@ -170,6 +186,9 @@ namespace gazebo
           connectionMaterials;
 
       private: common::MouseEvent mouseEvent;
+
+      private: std::list<std::pair<sdf::ElementPtr, std::string> >
+          connectionsToAdd;
 
       /// \brief This is a singleton class.
       private: friend class SingletonT<CMLConnectionMaker>;

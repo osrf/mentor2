@@ -42,8 +42,8 @@ CMLConnectionMaker::CMLConnectionMaker()
   this->connectType = CMLConnectionMaker::CONNECT_NONE;
   this->connectCounter = 0;
 
-  this->connectionMaterials[CONNECT_MECHANICAL] = "Gazebo/Blue";
-  this->connectionMaterials[CONNECT_ELECTRICAL] = "Gazebo/Yellow";
+  this->connectionMaterials[CONNECT_MECHANICAL] = "Gazebo/White";
+  this->connectionMaterials[CONNECT_ELECTRICAL] = "Gazebo/Black";
 
   MouseEventHandler::Instance()->AddReleaseFilter("cml_connection",
       boost::bind(&CMLConnectionMaker::OnMouseRelease, this, _1));
@@ -259,7 +259,8 @@ bool CMLConnectionMaker::OnMouseRelease(const common::MouseEvent &_event)
 
         this->newConnectionCreated = true;
 
-        // Create connection SDF
+        this->InsertConnectionElement(this->mouseConnection);
+        /*// Create connection SDF
         sdf::ElementPtr connectionElem(new sdf::Element);
         connectionElem->SetName("connection");
 
@@ -302,13 +303,64 @@ bool CMLConnectionMaker::OnMouseRelease(const common::MouseEvent &_event)
         gazebo::gui::ModelEditor *modelEditor = dynamic_cast<
             gazebo::gui::ModelEditor *>(mainWindow->GetEditor("model"));
         modelEditor->AppendPluginElement("simple_connections",
-            "libSimpleConnectionsPlugin.so", connectionElem);
+            "libSimpleConnectionsPlugin.so", connectionElem);*/
       }
     }
 
     return true;
   }
   return false;
+}
+
+/////////////////////////////////////////////////
+void CMLConnectionMaker::InsertConnectionElement(ConnectionData *_connection)
+{
+  // Create connection SDF
+  sdf::ElementPtr connectionElem(new sdf::Element);
+  connectionElem->SetName("connection");
+
+  sdf::ElementPtr sourceElem(new sdf::Element);
+  sourceElem->SetName("source");
+
+  std::string leafName = _connection->parent->GetName();
+  size_t pIdx = leafName.find_last_of("::");
+  if (pIdx != std::string::npos)
+    leafName = leafName.substr(pIdx+1);
+
+  sourceElem->AddValue("string", leafName, "_none_", "source");
+  connectionElem->InsertElement(sourceElem);
+
+  sdf::ElementPtr sourcePortElem(new sdf::Element);
+  sourcePortElem->SetName("source_port");
+  sourcePortElem->AddValue("string", _connection->parentPort,
+      "_none_", "sourcePort");
+  connectionElem->InsertElement(sourcePortElem);
+
+  sdf::ElementPtr targetElem(new sdf::Element);
+  targetElem->SetName("target");
+
+  leafName = _connection->child->GetName();
+  pIdx = leafName.find_last_of("::");
+  if (pIdx != std::string::npos)
+    leafName = leafName.substr(pIdx+1);
+
+  targetElem->AddValue("string", leafName, "_none_", "target");
+  connectionElem->InsertElement(targetElem);
+
+  sdf::ElementPtr targetPortElem(new sdf::Element);
+  targetPortElem->SetName("target_port");
+  targetPortElem->AddValue("string", _connection->childPort,
+      "_none_", "targetPort");
+  connectionElem->InsertElement(targetPortElem);
+
+  // Append to model SDF
+  gazebo::gui::MainWindow *mainWindow = gui::get_main_window();
+  gazebo::gui::ModelEditor *modelEditor = dynamic_cast<
+      gazebo::gui::ModelEditor *>(mainWindow->GetEditor("model"));
+
+  modelEditor->AppendPluginElement("simple_connections",
+      "libSimpleConnectionsPlugin.so", connectionElem);
+  std::cerr << " done append" << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -367,11 +419,68 @@ ConnectionData *CMLConnectionMaker::CreateConnection(
   connectionData->child = _child;
   connectionData->line = connectLine;
   connectionData->type = this->connectType;
-
   connectionData->line->setMaterial(
       this->connectionMaterials[connectionData->type]);
-
   return connectionData;
+}
+
+
+/*/////////////////////////////////////////////////
+void CMLConnectionMaker::CreateConnection(
+    sdf::ElementPtr _connectionElem, const std::string &_modelPreviewName)
+{
+  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+  std::pair<sdf::ElementPtr, std::string> pair(_connectionElem,
+      _modelPreviewName);
+  this->connectionsToAdd.push_back(pair);
+}*/
+
+/////////////////////////////////////////////////
+void CMLConnectionMaker::CreateConnectionFromSDF(
+    sdf::ElementPtr _connectionElem, const std::string &_modelName)
+{
+  std::string source = _connectionElem->Get<std::string>("source");
+  std::string target = _connectionElem->Get<std::string>("target");
+  std::string sourcePort = _connectionElem->Get<std::string>("source_port");
+  std::string targetPort = _connectionElem->Get<std::string>("target_port");
+
+ // source
+  std::string sourceName = _modelName + "::" + source;
+  rendering::VisualPtr sourceVis =
+      gui::get_active_camera()->GetScene()->GetVisual(sourceName);
+  if (!sourceVis)
+  {
+    std::string unscopedName =
+        source.substr(source.find("::")+2);
+    sourceVis = gui::get_active_camera()->GetScene()->GetVisual(
+        _modelName + "::" + unscopedName);
+  }
+  // target
+  std::string targetName = _modelName + "::" + target;
+  rendering::VisualPtr targetVis =
+      gui::get_active_camera()->GetScene()->GetVisual(targetName);
+  if (!targetVis)
+  {
+    std::string unscopedName =
+        target.substr(target.find("::")+2);
+    targetVis = gui::get_active_camera()->GetScene()->GetVisual(
+        _modelName + "::" + unscopedName);
+  }
+
+  if (!sourceVis || !targetVis)
+  {
+    std::cerr << "No source or target visual found" << std::endl;
+    return;
+  }
+
+  this->connectType = CONNECT_ELECTRICAL;
+  ConnectionData *connection = this->CreateConnection(sourceVis, targetVis);
+  connection->parentPort = sourcePort;
+  connection->childPort = targetPort;
+  this->connectType = CONNECT_NONE;
+
+  this->CreateHotSpot(connection);
+  this->InsertConnectionElement(connection);
 }
 
 /////////////////////////////////////////////////
@@ -598,6 +707,13 @@ void CMLConnectionMaker::Update()
     this->newConnectionCreated = false;
   }
 
+  /*while (!this->connectionsToAdd.empty())
+  {
+    std::pair<sdf::ElementPtr, std::string > p = this->connectionsToAdd.front();
+    this->connectionsToAdd.pop_front();
+    this->CreateConnectionFromSDF(p.first, p.second);
+  }*/
+
   // update connect line and hotspot position.
   for (auto it : connects)
   {
@@ -627,7 +743,7 @@ void CMLConnectionMaker::Update()
         math::Vector3 dPos = (childOrigin - parentOrigin);
         math::Vector3 center = dPos * 0.5;
         double length = std::max(dPos.GetLength(), 0.001);
-        connect->hotspot->SetScale(math::Vector3(0.008, 0.008, length));
+        connect->hotspot->SetScale(math::Vector3(0.003, 0.003, length));
         connect->hotspot->SetWorldPosition(parentOrigin + center);
         math::Vector3 u = dPos.Normalize();
         math::Vector3 v = math::Vector3::UnitZ;
@@ -650,6 +766,7 @@ CMLConnectionMaker::ConnectType CMLConnectionMaker::GetState() const
 {
   return this->connectType;
 }
+
 /*
 /////////////////////////////////////////////////
 unsigned int CMLConnectionMaker::GetConnectionCount()

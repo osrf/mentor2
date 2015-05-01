@@ -20,6 +20,7 @@
 
 #include <gazebo/gui/gui.hh>
 #include <gazebo/gui/qt.h>
+#include <gazebo/gui/model/ModelEditorEvents.hh>
 #include <gazebo/gui/model/ModelEditor.hh>
 
 #include "CMLManager.hh"
@@ -60,6 +61,10 @@ CMLRender::CMLRender()
   this->connections.push_back(
       CMLEvents::ConnectConnectionCreated(
         boost::bind(&CMLRender::OnConnectionCreated, this, _1, _2, _3, _4)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectEditModel(
+      boost::bind(&CMLRender::OnEditModel, this, _1, _2, _3)));
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
@@ -303,4 +308,37 @@ void CMLRender::OnOpenInspector()
 {
   CMLManager::Instance()->ShowInspector(this->inspectName);
   this->inspectName = "";
+}
+
+
+/////////////////////////////////////////////////
+void CMLRender::OnEditModel(const std::string &/*_modelName*/,
+    const std::string &_modelPreviewName,
+    const std::string &_sdfData)
+{
+//  std::cerr << "on edit  model " << _modelName << " " <<
+//    _modelPreviewName << " " << _sdfData << std::endl;
+  // Parse the string into sdf
+  sdf::SDF sdfParsed;
+  sdfParsed.SetFromString(_sdfData);
+
+  if (sdfParsed.Root()->HasElement("model"))
+  {
+    sdf::ElementPtr modelElem = sdfParsed.Root()->GetElement("model");
+    if (modelElem->HasElement("plugin"))
+    {
+      sdf::ElementPtr pluginElem = modelElem->GetElement("plugin");
+      if (pluginElem->HasElement("connection"))
+      {
+        sdf::ElementPtr connectionElem = pluginElem->GetElement("connection");
+        while (connectionElem)
+        {
+          CMLConnectionMaker::Instance()->CreateConnectionFromSDF(
+              connectionElem, _modelPreviewName);
+          connectionElem = connectionElem->GetNextElement("connection");
+        }
+      }
+    }
+  }
+
 }
