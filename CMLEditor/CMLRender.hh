@@ -86,6 +86,15 @@ namespace gazebo
       /// \param[in] _msg The request message.
       private: void OnRequest(ConstRequestPtr &_msg);
 
+      /// \brief Callback when an existing model is to be edited in the  model
+      /// editor.
+      /// \param[in] _modelName Name of model to be edited.
+      /// \param[in] _modelPreviewName Name of the preview model visual created
+      /// in the editor
+      /// \param[in] _sdfData SDF string describing the model.
+      private: void OnEditModel(const std::string &_modelName,
+          const std::string &_modelPreviewName, const std::string &_sdfData);
+
       /// \brief Qt Callback to open component inspector
       private slots: void OnOpenInspector();
 
