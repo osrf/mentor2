@@ -28,43 +28,11 @@
 
 #include "CMLManager.hh"
 #include "CMLEvents.hh"
+#include "CMLPropertyManager.hh"
 #include "CMLEditor.hh"
 
 using namespace gazebo;
 using namespace gui;
-
-/////////////////////////////////////////////////
-boost::any ConvertVariant(Simple_msgs::msgs::Variant _variant)
-{
-  switch (_variant.type())
-  {
-    case Simple_msgs::msgs::Variant::UINT32:
-    {
-      return _variant.v_uint32();
-    }
-    case Simple_msgs::msgs::Variant::INT32:
-    {
-      return _variant.v_int32();
-    }
-    case Simple_msgs::msgs::Variant::DOUBLE:
-    {
-      return _variant.v_double();
-    }
-    case Simple_msgs::msgs::Variant::STRING:
-    {
-      return _variant.v_string();
-    }
-    case Simple_msgs::msgs::Variant::BOOL:
-    {
-      return _variant.v_bool();
-    }
-    default:
-    {
-      return _variant.v_string();
-    }
-  }
-  return _variant.v_string();
-}
 
 /////////////////////////////////////////////////
 CMLEditor::CMLEditor(MainWindow *_mainWindow)
@@ -244,7 +212,7 @@ void CMLEditor::Parse(sdf::ElementPtr _sdf, const std::string &_name)
   std::map<std::string, Simple_msgs::msgs::Variant>::iterator pIt;
   for (pIt = properties.begin() ; pIt != properties.end(); ++pIt)
   {
-    boost::any value = ConvertVariant(pIt->second);
+    boost::any value = CMLPropertyManager::ConvertVariant(pIt->second);
     std::string valueStr;
     try
     {
@@ -295,12 +263,23 @@ void CMLEditor::Parse(sdf::ElementPtr _sdf, const std::string &_name)
 /////////////////////////////////////////////////
 void CMLEditor::OnNestedModelInserted(const std::string &_name)
 {
-  if (this->insertName.empty())
+  sdf::ElementPtr entitySDF = this->modelEditor->GetEntitySDF(_name);
+  if (entitySDF)
+  {
+    if (entitySDF->HasElement("plugin"))
+    {
+      this->Parse(entitySDF->GetElement("plugin"), _name);
+      return;
+    }
+  }
+
+  /*if (this->insertName.empty())
     return;
 
   for (auto it : this->models)
   {
-    if (_name.find(it.first) != std::string::npos)
+    if (_name.find(it.first) != std::string::npos &&
+        it.second->Root()->GetElement("model")->HasElement("plugin"))
     {
       this->Parse(it.second->Root()->GetElement("model")->GetElement("plugin"),
           _name);
@@ -308,7 +287,7 @@ void CMLEditor::OnNestedModelInserted(const std::string &_name)
     }
   }
 
-  this->insertName == "";
+  this->insertName == "";  */
 }
 
 /////////////////////////////////////////////////
@@ -320,17 +299,17 @@ void CMLEditor::OnNestedModelRemoved(const std::string &_name)
 /////////////////////////////////////////////////
 void CMLEditor::SpawnEntity()
 {
-  this->insertName == "";
+//  this->insertName == "";
   QPushButton *button =
      qobject_cast<QPushButton *>(QObject::sender());
   if (!button)
     return;
 
   QVariant type = button->property("type");
-  this->insertName = type.toString().toStdString();
+//  this->insertName = type.toString().toStdString();
 
   std::map<std::string, sdf::SDFPtr>::iterator it =
-      this->models.find(this->insertName);
+      this->models.find(type.toString().toStdString());
   if (it == this->models.end())
     return;
 
