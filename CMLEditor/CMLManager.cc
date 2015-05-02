@@ -125,7 +125,7 @@ void CMLManager::OnRequest(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 void CMLManager::OnResponse(ConstResponsePtr &_msg)
 {
-  std::cerr << " on response " << std::endl;
+  // std::cerr << " on response " << std::endl;
 
   if (!this->requestMsg || _msg->id() != this->requestMsg->id())
     return;
@@ -140,8 +140,8 @@ void CMLManager::OnResponse(ConstResponsePtr &_msg)
 /////////////////////////////////////////////////
 void CMLManager::OnSimpleModel(ConstSimpleModelPtr &_msg)
 {
-  std::cerr << " on simple model " << _msg->name()
-    << " " << _msg->schematic_type() << std::endl;
+  // std::cerr << " on simple model " << _msg->name()
+  //  << " " << _msg->schematic_type() << std::endl;
 
   // TODO ~/simple/model/info doesn't get messages so this doesn't get called.
   boost::recursive_mutex::scoped_lock lock(*this->modelInfoMutex);
@@ -151,7 +151,7 @@ void CMLManager::OnSimpleModel(ConstSimpleModelPtr &_msg)
 /////////////////////////////////////////////////
 void CMLManager::AddSimpleModel(Simple_msgs::msgs::SimpleModel _msg)
 {
-  std::cerr << " add simple model " << _msg.name() << std::endl;
+  // std::cerr << " add simple model " << _msg.name() << std::endl;
 
   boost::recursive_mutex::scoped_lock lock(*this->modelInfoMutex);
   this->modelInfo[_msg.name()] = _msg;
@@ -160,7 +160,7 @@ void CMLManager::AddSimpleModel(Simple_msgs::msgs::SimpleModel _msg)
 /////////////////////////////////////////////////
 void CMLManager::RemoveSimpleModel(const std::string &_name)
 {
-  std::cerr << " remove simple model " << _name << std::endl;
+  // std::cerr << " remove simple model " << _name << std::endl;
 
   boost::recursive_mutex::scoped_lock lock(*this->modelInfoMutex);
 

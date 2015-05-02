@@ -19,7 +19,11 @@
 
 
 #include <map>
+#include <boost/any.hpp>
+
 #include <gazebo/gui/qt.h>
+
+#include "SimpleModel.pb.h"
 
 namespace gazebo
 {
@@ -42,6 +46,10 @@ namespace gazebo
       /// \brief A map of component name to its inspector.
       public: std::map<std::string, CMLComponentInspector *>
           componentInspectors;
+
+      /// \brief Convert simple msg variant to a value
+      public: static boost::any ConvertVariant(
+          Simple_msgs::msgs::Variant _variant);
 
       /// \brief Callback when component properties have changed.
       public slots: void OnComponentProperyChanged();

@@ -17,6 +17,9 @@
 
 #include <iostream>
 
+#include <gazebo/gui/gui.hh>
+#include <gazebo/gui/model/ModelEditor.hh>
+
 #include "SimpleModel.pb.h"
 #include "CMLComponentInspector.hh"
 #include "CMLManager.hh"
@@ -45,6 +48,85 @@ void CMLPropertyManager::OnComponentProperyChanged()
 
 
   CMLManager::Instance()->UpdateModelInfo(msg.name(), msg);
-  //std::cerr << " msg " << msg.DebugString() << std::endl;
+  // std::cerr << " msg " << msg.DebugString() << std::endl;
 
+  ModelEditor *modelEditor =
+        dynamic_cast<ModelEditor *>(gui::get_main_window()->GetEditor("model"));
+  if (modelEditor)
+  {
+    sdf::ElementPtr entitySDF = modelEditor->GetEntitySDF(msg.name());
+    if (entitySDF && entitySDF->HasElement("plugin"))
+    {
+      sdf::ElementPtr pluginElem = entitySDF->GetElement("plugin");
+      if (pluginElem->HasElement("properties"))
+      {
+        sdf::ElementPtr propertiesElem = pluginElem->GetElement("properties");
+        for (unsigned int i = 0; i < msg.key_size(); ++i)
+        {
+          Simple_msgs::msgs::Variant valueMsg = msg.value(i);
+          std::string key = msg.key(i);
+
+          if (propertiesElem->HasElement(key))
+          {
+            boost::any value = ConvertVariant(valueMsg);
+            std::string valueStr;
+            try
+            {
+              valueStr = boost::any_cast<std::string>(value);
+            }
+            catch (const boost::bad_any_cast &)
+            {
+              try
+              {
+                std::stringstream ss;
+                ss << boost::any_cast<double>(value);
+                valueStr = ss.str();
+              }
+              catch (const boost::bad_any_cast &)
+              {
+                std::stringstream ss;
+                ss << boost::any_cast<bool>(value);
+                valueStr = ss.str();
+              }
+            }
+            propertiesElem->GetElement(key)->Set(valueStr);
+          }
+        }
+      }
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+boost::any CMLPropertyManager::ConvertVariant(
+    Simple_msgs::msgs::Variant _variant)
+{
+  switch (_variant.type())
+  {
+    case Simple_msgs::msgs::Variant::UINT32:
+    {
+      return _variant.v_uint32();
+    }
+    case Simple_msgs::msgs::Variant::INT32:
+    {
+      return _variant.v_int32();
+    }
+    case Simple_msgs::msgs::Variant::DOUBLE:
+    {
+      return _variant.v_double();
+    }
+    case Simple_msgs::msgs::Variant::STRING:
+    {
+      return _variant.v_string();
+    }
+    case Simple_msgs::msgs::Variant::BOOL:
+    {
+      return _variant.v_bool();
+    }
+    default:
+    {
+      return _variant.v_string();
+    }
+  }
+  return _variant.v_string();
 }

@@ -29,6 +29,7 @@ GZ_REGISTER_MODEL_PLUGIN(GearboxPlugin)
 /////////////////////////////////////////////////
 GearboxPlugin::GearboxPlugin()
 {
+  this->schematicType = "gearbox";
   this->gearRatio = 1.0;
   this->efficiency = 1.0;
   this->parentLinkName = "";
