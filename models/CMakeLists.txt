@@ -6,9 +6,13 @@ set (dirs
   car
   chassis
   concrete_slab
+  concrete_slab_small
   motor
   motor_box
   power_switch
+  ramp
+  vehicle
+  vehicle_no_motor
   wheel_ramps
   AA_battery
 )
