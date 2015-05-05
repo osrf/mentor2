@@ -18,5 +18,5 @@ echo "MENTOR2 world [$1]"
 
 
 gzserver --verbose -s libRestWebPlugin.so -u  $1 &
-gzclient --verbose -g libRestUiPlugin.so menu="Mentor2" title="Leaderboard" label="Login" url="https://localhost:3000" &
 
+gzclient --verbose -g libCMLEditorPlugin.so -g libRestUiPlugin.so menu="Mentor2" title="Leaderboard" label="Login" url="https://localhost:3000" &
