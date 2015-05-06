@@ -13,7 +13,6 @@
       <uri>model://ground_plane</uri>
     </include>
 
-
     <model name="vehicle">
       <model name="chassis">
         <pose>0 0 0.0132 0 0 0</pose>
@@ -202,9 +201,9 @@
             <type>electrical</type>
           </port>
           <properties>
-            <voltage>1.5</voltage>   <!-- Volts -->
-           <capacity>0.30</capacity> <!-- Amp-hours  -->
-            <current>0.1</current>   <!-- Amps -->
+            <voltage>1.5</voltage>
+           <capacity>0.30</capacity>
+            <current>0.1</current>
           </properties>
         </plugin>
       </model>
@@ -215,15 +214,6 @@
         <link name="link">
           <pose>0.0 0 0.0 0 0 0</pose>
           <self_collide>false</self_collide>
-<!--          <collision name="collision">
-            <pose>0 0 0.0 0 0 0</pose>
-            <geometry>
-              <mesh>
-                <uri>model://motor/meshes/motor.dae</uri>
-                <scale>0.001 0.001 0.001</scale>
-              </mesh>
-            </geometry>
-          </collision>-->
           <visual name="visual">
             <pose>0 0 0.0 0 0 0</pose>
             <geometry>
@@ -499,8 +489,6 @@
         </connection>
       </plugin>
     </model>
-
-
 
     <!-- a series of visuals for the regions  -->
     <include>

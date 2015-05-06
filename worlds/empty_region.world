@@ -1,0 +1,141 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <!-- a series of visuals for the regions  -->
+    <include>
+      <pose>0 0.5 0 0 0 0</pose>
+      <uri>model://concrete_slab_small</uri>
+    </include>
+    <include>
+      <pose>0 1.0 0 0 0 0</pose>
+      <uri>model://concrete_slab_small</uri>
+    </include>
+
+      <include>
+      <pose>0 1.5 0 0 0 0</pose>
+      <uri>model://concrete_slab_small</uri>
+    </include>
+
+    <include>
+      <pose>0 2.0 0 0 0 0</pose>
+      <uri>model://concrete_slab_small</uri>
+    </include>
+
+    <!-- background objects to make it less boring -->
+    <!--
+     <include>
+      <pose>0 3.5 0 0 0 0</pose>
+      <uri>model://jersey_barrier</uri>
+    </include>
+     <include>
+      <pose>5 3.5 0 0 0 0</pose>
+      <uri>model://jersey_barrier</uri>
+    </include>
+    <include>
+      <pose>10 3.5 0 0 0 0</pose>
+      <uri>model://jersey_barrier</uri>
+    </include>
+    <include>
+      <pose>15 3.5 0 0 0 0</pose>
+      <uri>model://jersey_barrier</uri>
+    </include>
+
+    <include>
+      <pose>17.5 3 0 0 0 0</pose>
+      <uri>model://construction_cone</uri>
+    </include>
+
+    <include>
+      <pose>17.5 -3 0 0 0 0</pose>
+      <uri>model://construction_cone</uri>
+    </include>
+    -->
+
+
+    <plugin name="SimEvents" filename="libSimEventsPlugin.so">
+      <session></session>
+
+      <region>
+        <name>slab_0</name>
+        <volume>
+          <min>-0.5 0.5  0</min>
+          <max>0.5 1.0 10</max>
+        </volume>
+      </region>
+
+      <region>
+        <name>slab_1</name>
+        <volume>
+          <min>-0.5 1.0  0</min>
+          <max>0.5 1.5 10</max>
+        </volume>
+      </region>
+
+      <region>
+        <name>slab_2</name>
+        <volume>
+          <min>-0.5 1.5  0</min>
+          <max>0.5 2.0 10</max>
+        </volume>
+      </region>
+
+      <region>
+        <name>slab_3</name>
+        <volume>
+          <min>-0.5 2.0  0</min>
+          <max>0.5 2.5 10</max>
+        </volume>
+      </region>
+
+      <event>
+        <name>state</name>
+        <type>sim_state</type>
+      </event>
+
+      <!-- bounding box inclusion event -->
+      <event>
+        <name>on_slab_0</name>
+        <type>inclusion</type>
+        <model>vehicle</model>
+        <region>slab_0</region>
+      </event>
+
+     <!-- bounding box inclusion event -->
+      <event>
+        <name>on_slab_1</name>
+        <type>inclusion</type>
+        <model>vehicle</model>
+        <region>slab_1</region>
+      </event>
+
+      <!-- bounding box inclusion event -->
+      <event>
+        <name>on_slab_2</name>
+        <type>inclusion</type>
+        <model>vehicle</model>
+        <region>slab_2</region>
+      </event>
+
+      <!-- bounding box inclusion event -->
+      <event>
+        <name>on_slab_3</name>
+        <type>inclusion</type>
+        <model>vehicle</model>
+        <region>slab_3</region>
+      </event>
+
+
+    </plugin>
+
+
+  </world>
+</sdf>
