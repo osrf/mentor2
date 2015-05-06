@@ -597,7 +597,7 @@
       <event>
         <name>on_slab_0</name>
         <type>inclusion</type>
-        <model>car</model>
+        <model>vehicle</model>
         <region>slab_0</region>
       </event>
 
@@ -605,7 +605,7 @@
       <event>
         <name>on_slab_1</name>
         <type>inclusion</type>
-        <model>car</model>
+        <model>vehicle</model>
         <region>slab_1</region>
       </event>
 
@@ -613,7 +613,7 @@
       <event>
         <name>on_slab_2</name>
         <type>inclusion</type>
-        <model>car</model>
+        <model>vehicle</model>
         <region>slab_2</region>
       </event>
 
@@ -621,7 +621,7 @@
       <event>
         <name>on_slab_3</name>
         <type>inclusion</type>
-        <model>car</model>
+        <model>vehicle</model>
         <region>slab_3</region>
       </event>
 

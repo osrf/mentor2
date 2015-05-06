@@ -266,6 +266,13 @@ bool CMLConnectionMaker::OnMouseRelease(const common::MouseEvent &_event)
         this->newConnectionCreated = true;
 
         this->InsertConnectionElement(this->mouseConnection);
+
+        gui::CMLEvents::connectionCreated(
+            this->mouseConnection->parent->GetName(),
+            this->mouseConnection->parentPort,
+            this->mouseConnection->child->GetName(),
+            this->mouseConnection->childPort);
+
         /*// Create connection SDF
         sdf::ElementPtr connectionElem(new sdf::Element);
         connectionElem->SetName("connection");
@@ -366,7 +373,6 @@ void CMLConnectionMaker::InsertConnectionElement(ConnectionData *_connection)
 
   modelEditor->AppendPluginElement("simple_connections",
       "libSimpleConnectionsPlugin.so", connectionElem);
-  std::cerr << " done append" << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -488,6 +494,11 @@ void CMLConnectionMaker::CreateConnectionFromSDF(
 
   this->CreateHotSpot(connection);
   this->InsertConnectionElement(connection);
+  gui::CMLEvents::connectionCreated(
+      connection->parent->GetName(),
+      connection->parentPort,
+      connection->child->GetName(),
+      connection->childPort);
 }
 
 /////////////////////////////////////////////////

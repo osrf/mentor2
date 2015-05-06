@@ -75,7 +75,7 @@ CMLRender::CMLRender()
 
   this->restPub =
       this->node->Advertise<Event_msgs::msgs::RestPost>(
-      "/gazebo/event/rest_post");
+      "/gazebo/rest/rest_post");
 
   this->requestSub = this->node->Subscribe("~/request",
     &CMLRender::OnRequest, this);
@@ -151,7 +151,6 @@ void CMLRender::OnRequest(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 bool CMLRender::OnMouseRelease(const common::MouseEvent &_event)
 {
-  std::cerr << "cml render OnMouseRelease " << std::endl;
   // Get the active camera and scene.
   rendering::UserCameraPtr camera = gui::get_active_camera();
   rendering::ScenePtr scene = camera->GetScene();
@@ -172,7 +171,7 @@ bool CMLRender::OnMouseRelease(const common::MouseEvent &_event)
 
       if (!msg.name().empty())
       {
-        std::cerr << " got name " << name << " " << msg.name() << std::endl;
+
         this->inspectName = msg.name();
 
         QMenu menu;
@@ -278,8 +277,7 @@ void CMLRender::OnConnectionCreated(const std::string &_parent,
   restMsg.set_route("/events/new");
 
   std::string postStr;
-  postStr = "{";
-  postStr += "\"type\": \"connection\",";
+  postStr = "\"type\": \"connection\",";
   postStr += "\"name\": \"simple_connection\",";
   postStr += "\"data\": {";
   postStr += "\"parent\": \"" + _parent +"\",";
@@ -287,11 +285,15 @@ void CMLRender::OnConnectionCreated(const std::string &_parent,
   postStr += "\"child\": \"" + _child +"\",";
   postStr += "\"child_port\": \"" + _childPort +"\"";
   postStr += "}";
-  postStr += "}";
   restMsg.set_json(postStr);
   this->restPub->Publish(restMsg);
 
   //CMLConnectionMaker::Instance()->Start();
+
+  // workaround to create a connection in schematic view
+  std::string id = _parent + "::" + _parentPort + "_" +
+      _child + "::" + _childPort;
+  gui::model::Events::jointInserted(id, id, _parent, _child);
 }
 
 /////////////////////////////////////////////////

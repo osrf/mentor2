@@ -2,10 +2,10 @@
 
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
-$DIR/stop.sh
+$DIR/stop.bash
 
 
-./stop.bash
+#./stop.bash
 
 echo "Did you source?:  <your setup path>/share/simplegdk/setup.sh"
 echo "Did you source?:  <your setup path>/share/gazebo/setup.sh"
