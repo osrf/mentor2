@@ -232,7 +232,7 @@
             <type>electrical</type>
           </port>
           <properties>
-            <voltage>1.5</voltage>
+            <voltage>6</voltage>
            <capacity>0.30</capacity>
             <current>0.1</current>
           </properties>
@@ -413,7 +413,7 @@
 
       </model>
 
-      <model name="motor_box">
+      <model name="gearbox">
         <pose>0 0.013 0.0285 0 0 0</pose>
         <link name="link">
           <inertial>
@@ -439,7 +439,7 @@
             <pose>0 0 0.0 1.57079632679 0 1.57079632679</pose>
             <geometry>
               <mesh>
-                <uri>model://motor_box/meshes/motor_box.dae</uri>
+                <uri>model://gearbox/meshes/gearbox.dae</uri>
                 <scale>0.001 0.001 0.001</scale>
               </mesh>
             </geometry>
@@ -473,9 +473,9 @@
         </axis>
       </joint>
 
-      <joint name="chassis_motor_box_joint" type="revolute">
+      <joint name="chassis_gearbox_joint" type="revolute">
         <parent>vehicle::chassis::link</parent>
-        <child>vehicle::motor_box::link</child>
+        <child>vehicle::gearbox::link</child>
         <axis>
           <xyz>0 0 1</xyz>
           <limit>
@@ -518,6 +518,30 @@
       <joint name="chassis_weight_joint" type="revolute">
         <parent>vehicle::chassis::link</parent>
         <child>vehicle::link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>0</lower>
+            <upper>0</upper>
+          </limit>
+        </axis>
+      </joint>
+
+      <joint name="gearbox_axle_joint" type="revolute">
+        <parent>vehicle::gearbox::link</parent>
+        <child>vehicle::axle_wheels::link</child>
+        <axis>
+          <xyz>1 0 0</xyz>
+          <limit>
+            <lower>-1000000000000000</lower>
+            <upper>1000000000000000</upper>
+          </limit>
+        </axis>
+      </joint>
+
+      <joint name="gearbox_motor_joint" type="revolute">
+        <parent>vehicle::gearbox::link</parent>
+        <child>vehicle::motor::link</child>
         <axis>
           <xyz>0 0 1</xyz>
           <limit>

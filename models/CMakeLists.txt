@@ -7,8 +7,8 @@ set (dirs
   chassis
   concrete_slab
   concrete_slab_small
+  gearbox
   motor
-  motor_box
   power_switch
   ramp
   vehicle

@@ -1,37 +1,43 @@
 <?xml version="1.0" ?>
 <sdf version="1.5">
-
   <model name="gearbox">
-    <pose>0.0 0.0 0.075 0 0 0</pose>
-    <link name="gearbox_link">
-      <collision name="gearbox_collision">
+    <pose>0 0.013 0.0285 0 0 0</pose>
+    <link name="link">
+      <inertial>
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>0.0001</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.0001</iyy>
+          <iyz>0</iyz>
+          <izz>0.0001</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <pose>0 0.0 0.013 1.57079632679 0 1.57079632679</pose>
         <geometry>
           <box>
-            <size>0.15 0.15 0.15</size>
+            <size>0.06 0.001 0.04</size>
           </box>
         </geometry>
       </collision>
-      <visual name="gearbox_visual">
+      <visual name="visual">
+        <pose>0 0 0.0 1.57079632679 0 1.57079632679</pose>
         <geometry>
-          <box>
-            <size>0.15 0.15 0.15</size>
-          </box>
+          <mesh>
+            <uri>model://gearbox/meshes/gearbox.dae</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
         </geometry>
         <material>
           <script>
-            <name>Gazebo/Red</name>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
           </script>
         </material>
       </visual>
     </link>
+  </model>
 
-    <plugin filename="libGearboxPlugin.so" name="gearbox">
-      <properties>
-        <parent>motor::motor_shaft_link</parent>
-        <child>car::axle</child>
-        <gear_ratio>1.0</gear_ratio>
-      </properties>
-    </plugin>
-
-    </model>
 </sdf>
