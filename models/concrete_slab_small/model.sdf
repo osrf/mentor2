@@ -4,7 +4,7 @@
     <static>true</static>
 
     <link name="slab">
-      <pose>0 0 0.01 0 0 0</pose>
+      <pose>0 0 0.0001 0 0 0</pose>
       <collision name="collision">
         <geometry>
           <plane>

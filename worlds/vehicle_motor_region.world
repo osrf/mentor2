@@ -14,6 +14,37 @@
     </include>
 
     <model name="vehicle">
+      <link name="link">
+        <pose>0.0 0.070 0.024 0 0 0</pose>
+        <inertial>
+          <mass>0.1</mass>
+          <inertia>
+            <ixx>0.0001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.0001</iyy>
+            <iyz>0</iyz>
+            <izz>0.0001</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <pose>0.0 0.0 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.02 0.01 0.02</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <pose>0 0 0.0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.02 0.01 0.02</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+
       <model name="chassis">
         <pose>0 0 0.0132 0 0 0</pose>
         <link name="link">
@@ -212,6 +243,17 @@
       <model name="motor">
         <pose>0 0.013 0.0285 0 0 0</pose>
         <link name="link">
+          <inertial>
+            <mass>0.1</mass>
+            <inertia>
+              <ixx>0.0001</ixx>
+              <ixy>0</ixy>
+              <ixz>0</ixz>
+              <iyy>0.0001</iyy>
+              <iyz>0</iyz>
+              <izz>0.0001</izz>
+            </inertia>
+          </inertial>
           <pose>0.0 0 0.0 0 0 0</pose>
           <self_collide>false</self_collide>
           <visual name="visual">
@@ -296,14 +338,14 @@
               </cylinder>
             </geometry>
           </collision>
-          <visual name="debug_visual">
+<!--          <visual name="debug_visual">
             <pose>0.0 0 0.0 0 1.57079632679 0</pose>
             <geometry>
               <box>
                 <size>0.01 0.02 0.03</size>
               </box>
             </geometry>
-          </visual>
+          </visual>-->
 
           <visual name="visual">
             <pose>0.0 0 0.0 0 1.57079632679 0</pose>
@@ -386,10 +428,10 @@
             </inertia>
           </inertial>
           <collision name="collision">
-            <pose>0 0.0 0.013 1.57079632679 0 1.57079632679</pose>
+            <pose>0 0.0 0.012 1.57079632679 0 1.57079632679</pose>
             <geometry>
               <box>
-                <size>0.06 0.001 0.04</size>
+                <size>0.05 0.001 0.04</size>
               </box>
             </geometry>
           </collision>
@@ -413,8 +455,8 @@
           <properties>
             <parent>vehicle::motor::motor_shaft_link</parent>
             <child>vehicle::axle_wheels::link</child>
-            <gear_ratio>0.05</gear_ratio>
-            <efficiency>0.95</efficiency>
+            <gear_ratio>0.5</gear_ratio>
+            <efficiency>1.0</efficiency>
           </properties>
         </plugin>
       </model>
@@ -470,6 +512,19 @@
       <joint name="chassis_caster_joint" type="ball">
         <parent>vehicle::chassis::link</parent>
         <child>vehicle::caster_wheel::link</child>
+      </joint>
+
+
+      <joint name="chassis_weight_joint" type="revolute">
+        <parent>vehicle::chassis::link</parent>
+        <child>vehicle::link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>0</lower>
+            <upper>0</upper>
+          </limit>
+        </axis>
       </joint>
 
 
