@@ -187,7 +187,7 @@ void GearboxPlugin::UpdateImpl(double _timeSinceLastUpdate)
   sdf::initFile("joint.sdf", jointSDF);
   jointSDF->GetElement("parent")->Set(this->parentLinkName);
   jointSDF->GetElement("child")->Set(this->childLinkName);
-  jointSDF->GetElement("gearbox_ratio")->Set(1.0/this->gearRatio);
+  jointSDF->GetElement("gearbox_ratio")->Set(this->gearRatio);
   jointSDF->GetElement("gearbox_reference_body")->Set(
       this->parent->GetLink()->GetName());
   jointSDF->GetElement("axis")->GetElement("xyz")->Set(
