@@ -184,8 +184,8 @@ namespace gazebo
     /// Must only be called from the World::ProcessMessages function.
     private: void ProcessRequestMsgs();
 
-    /// \brief Publish simple model info on a separate thread. Blocks until
-    /// there is at least a subscriber.
+    /// \brief A thread that blocks and wait until there is at least a
+    /// simple connection subscriber
     private: void InitThread();
 
     /// \brief Process incoming messages.
