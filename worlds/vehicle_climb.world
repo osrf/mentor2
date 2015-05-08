@@ -453,9 +453,9 @@
         </link>
         <plugin filename="libGearboxPlugin.so" name="gearbox">
           <properties>
-            <parent>vehicle::motor::motor_shaft_link</parent>
-            <child>vehicle::axle_wheels::link</child>
-            <gear_ratio>0.5</gear_ratio>
+            <parent>vehicle::axle_wheels::link</parent>
+            <child>vehicle::motor::motor_shaft_link</child>
+            <gear_ratio>25</gear_ratio>
             <efficiency>1.0</efficiency>
           </properties>
         </plugin>
