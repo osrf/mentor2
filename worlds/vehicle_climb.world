@@ -684,6 +684,12 @@
         <type>sim_state</type>
       </event>
 
+      <event>
+        <name>existence</name>
+        <type>existence</type>
+        <!-- no model  is specified -->
+      </event>
+
       <!-- bounding box inclusion event -->
       <event>
         <name>on_slab_0</name>
