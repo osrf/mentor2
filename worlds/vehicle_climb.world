@@ -455,7 +455,7 @@
           <properties>
             <parent>vehicle::axle_wheels::link</parent>
             <child>vehicle::motor::motor_shaft_link</child>
-            <gear_ratio>25</gear_ratio>
+            <gear_ratio>1.0</gear_ratio>
             <efficiency>1.0</efficiency>
           </properties>
         </plugin>
