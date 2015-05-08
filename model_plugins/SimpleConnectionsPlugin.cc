@@ -29,6 +29,7 @@ GZ_REGISTER_MODEL_PLUGIN(SimpleConnectionsPlugin)
 /////////////////////////////////////////////////
 SimpleConnectionsPlugin::SimpleConnectionsPlugin()
 {
+  this->pubReady = false;
 }
 
 /////////////////////////////////////////////////
@@ -62,6 +63,16 @@ void SimpleConnectionsPlugin::Init()
   this->connectionPub =
       this->node->Advertise<Simple_msgs::msgs::SimpleConnection>(
       "~/simple/connection");
+
+  this->initThread = new boost::thread(
+      boost::bind(&SimpleConnectionsPlugin::InitThread, this));
+}
+
+/////////////////////////////////////////////////
+void SimpleConnectionsPlugin::InitThread()
+{
+  this->connectionPub->WaitForConnection();
+  this->pubReady = true;
 }
 
 /////////////////////////////////////////////////
@@ -80,6 +91,9 @@ void SimpleConnectionsPlugin::PublishConnections(const std::string &_parent,
 /////////////////////////////////////////////////
 void SimpleConnectionsPlugin::Update()
 {
+  if (!this->pubReady)
+    return;
+
   if (!this->connectionsInit)
   {
     if (this->sdf->HasElement("connection"))

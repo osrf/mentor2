@@ -54,6 +54,10 @@ namespace gazebo
         const std::string &_parentPort, const std::string &_child,
         const std::string &_childPort);
 
+    /// \brief Publish simple model info on a separate thread. Blocks until
+    /// there is at least a subscriber.
+    private: void InitThread();
+
     /// \brief Update the simple connections plugin
     private: void Update();
 
@@ -74,6 +78,12 @@ namespace gazebo
 
     /// \brief Pointer to parent model.
     private: physics::ModelPtr parent;
+
+    /// \brief A thread that publishes a simple model info on init.
+    private: boost::thread *initThread;
+
+    /// \brief Flag to see if the publisher is ready.
+    private: bool pubReady;
   };
 }
 
