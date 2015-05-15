@@ -49,6 +49,10 @@ GearboxPlugin::~GearboxPlugin()
 /////////////////////////////////////////////////
 void GearboxPlugin::LoadImpl(sdf::ElementPtr _sdf)
 {
+  this->gearRatio = this->GetProperty<double>("gear_ratio");
+  this->parentLinkName = this->GetProperty<std::string>("parent");
+  this->childLinkName = this->GetProperty<std::string>("child");
+  this->efficiency = this->GetProperty<double>("efficiency");
 }
 
 /////////////////////////////////////////////////
@@ -58,18 +62,75 @@ void GearboxPlugin::Init()
 }
 
 /////////////////////////////////////////////////
+void GearboxPlugin::Reset()
+{
+  if (this->gearboxJoint)
+  {
+    this->gearboxJoint->Detach();
+    this->gearboxJoint.reset();
+    std::cerr << " gearbox reset " << std::endl;
+  }
+
+  if (this->parentLinkJoint)
+  {
+  }
+
+  if (this->childLinkJoint)
+  {
+  }
+}
+
+/////////////////////////////////////////////////
 void GearboxPlugin::UpdateImpl(double _timeSinceLastUpdate)
 {
 
   if (this->gearboxJoint)
+  {
+    if (this->parentLinkJoint && this->childLinkJoint)
+    {
+      physics::JointWrench parentWrench =
+          this->parentLinkJoint->GetForceTorque(0u);
+      physics::JointWrench childWrench =
+          this->childLinkJoint->GetForceTorque(0u);
+
+      /// rotate into appropriate link frame
+      math::Vector3 rotatedAxis =
+          this->childLinkJoint->GetChild()->GetWorldPose().rot.GetInverse() *
+          this->childLinkJoint->GetGlobalAxis(0);
+
+      // project torque vector onto joint axis
+      double torque = rotatedAxis.Dot(childWrench.body2Torque);
+
+      // double torque = childWrench.body2Torque.GetLength();
+
+/*      std::cerr << "child body1Torque " <<  childWrench.body1Torque
+          << std::endl;
+      std::cerr << "child body2Torque " << childWrench.body2Torque
+          << std::endl;
+      std::cerr << "parent body1Torque "  << parentWrench.body1Torque
+          << std::endl;
+      std::cerr << "parent body2Torque "  << parentWrench.body2Torque
+          << std::endl;*/
+
+//      std::cerr << "projected torque: " << childWrench.body2Torque <<
+//            " vs " << torque << " vs " <<
+//            childWrench.body2Torque.GetLength() << std::endl;
+//      std::cerr << "rotated axis: " << rotatedAxis << std::endl;
+//      std::cerr << "projected torque: " << torque << std::endl;
+
+      // TODO override torque for now.
+      torque = parentWrench.body2Torque.GetLength();
+//      std::cerr << "torque " << torque << std::endl;
+
+      this->childLinkJoint->SetParam("friction", 0,
+          (1-this->efficiency)*fabs(torque));
+
+    }
     return;
+  }
+
   // GearboxPlugin: Dynamically creates a gearbox joint between two links
 
-
-  this->gearRatio = this->GetProperty<double>("gear_ratio");
-  this->parentLinkName = this->GetProperty<std::string>("parent");
-  this->childLinkName = this->GetProperty<std::string>("child");
-  this->efficiency = this->GetProperty<double>("efficiency");
 
   std::string rootModelName;
   physics::BasePtr entity = this->parent;
@@ -96,12 +157,12 @@ void GearboxPlugin::UpdateImpl(double _timeSinceLastUpdate)
 
 
   physics::WorldPtr world = this->parent->GetWorld();
-  physics::LinkPtr parentLink = boost::dynamic_pointer_cast<physics::Link>(
+  this->parentLink = boost::dynamic_pointer_cast<physics::Link>(
     world->GetByName(this->parentLinkName));
-  physics::LinkPtr childLink = boost::dynamic_pointer_cast<physics::Link>(
+  this->childLink = boost::dynamic_pointer_cast<physics::Link>(
     world->GetByName(this->childLinkName));
 
-  if (!parentLink || !childLink)
+  if (!this->parentLink || !this->childLink)
     return;
 
   // auto determine gearbox axes
@@ -110,7 +171,7 @@ void GearboxPlugin::UpdateImpl(double _timeSinceLastUpdate)
 
   // parent link axis
   math::Vector3 parentLinkAxis = math::Vector3::UnitY;
-  physics::ModelPtr parentLinkModel = parentLink->GetModel();
+  physics::ModelPtr parentLinkModel = this->parentLink->GetModel();
   bool foundParentLinkAxis = false;
   while (parentLinkModel)
   {
@@ -127,6 +188,8 @@ void GearboxPlugin::UpdateImpl(double _timeSinceLastUpdate)
         {
           parentLinkAxis = axisTransform * joint->GetGlobalAxis(0);
           foundParentLinkAxis = true;
+          this->parentLinkJoint = joint;
+          this->parentLinkJoint->SetProvideFeedback(true);
           break;
 
         }
@@ -144,7 +207,7 @@ void GearboxPlugin::UpdateImpl(double _timeSinceLastUpdate)
 
   // child link axis
   math::Vector3 childLinkAxis = math::Vector3::UnitY;
-  physics::ModelPtr childLinkModel = childLink->GetModel();
+  physics::ModelPtr childLinkModel = this->childLink->GetModel();
   bool foundChildLinkAxis = false;
   while (childLinkModel)
   {
@@ -161,6 +224,8 @@ void GearboxPlugin::UpdateImpl(double _timeSinceLastUpdate)
         {
           childLinkAxis = axisTransform * joint->GetGlobalAxis(0);
           foundChildLinkAxis = true;
+          this->childLinkJoint = joint;
+          this->childLinkJoint->SetProvideFeedback(true);
           break;
         }
       }
@@ -176,8 +241,8 @@ void GearboxPlugin::UpdateImpl(double _timeSinceLastUpdate)
   }
 
 
-  parentLink->SetAutoDisable(false);
-  childLink->SetAutoDisable(false);
+  this->parentLink->SetAutoDisable(false);
+  this->childLink->SetAutoDisable(false);
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   this->gearboxJoint = physics->CreateJoint("gearbox", this->parent);
   this->gearboxJoint->SetModel(this->parent);
@@ -190,22 +255,17 @@ void GearboxPlugin::UpdateImpl(double _timeSinceLastUpdate)
   jointSDF->GetElement("gearbox_ratio")->Set(this->gearRatio);
   jointSDF->GetElement("gearbox_reference_body")->Set(
       this->parent->GetLink()->GetName());
-  jointSDF->GetElement("axis")->GetElement("xyz")->Set(
-      parentLinkAxis);
-  jointSDF->GetElement("axis2")->GetElement("xyz")->Set(
-      childLinkAxis);
+
+
+  sdf::ElementPtr axis1Elem = jointSDF->GetElement("axis");
+  axis1Elem->GetElement("xyz")->Set(parentLinkAxis);
+  sdf::ElementPtr axis2Elem = jointSDF->GetElement("axis2");
+  axis2Elem->GetElement("xyz")->Set(childLinkAxis);
 
   std::cerr << "gear ratio " << this->gearRatio << std::endl;
   std::cerr << "efficiency " << this->efficiency << std::endl;
 
   this->gearboxJoint->Load(jointSDF);
-
-/*    physics::GearboxJoint *gbJoint =
-      dynamic_cast<physics::GearboxJoint *>(this->gearboxJoint.get());
-
-  if (gbJoint)
-    gbJoint->SetGearboxRatio(this->gearRatio);*/
-
   this->gearboxJoint->Init();
 
 /*        physics::GearboxJoint *gbJoint =

@@ -41,6 +41,9 @@ namespace gazebo
     /// \brief Initialize the plugin.
     public: virtual void Init();
 
+    /// \brief Reset the plugin.
+    public: virtual void Reset();
+
     /// Documentation Inherited
     protected: virtual void UpdateImpl(double _timeSinceLastUpdate);
 
@@ -66,8 +69,20 @@ namespace gazebo
     /// \brief Child link name.
     private: std::string childLinkName;
 
+    /// \brief Pointer to the parent link.
+    private: physics::LinkPtr parentLink;
+
+    /// \brief Pointer to the child link.
+    private: physics::LinkPtr childLink;
+
     /// \brief Gearbox axis
     private: math::Vector3 gearboxAxis;
+
+    /// \brief Pointer to the parent link's joint.
+    private: physics::JointPtr parentLinkJoint;
+
+    /// \brief Pointer to the child link's joint.
+    private: physics::JointPtr childLinkJoint;
   };
 }
 

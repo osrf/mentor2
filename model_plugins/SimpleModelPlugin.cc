@@ -79,7 +79,10 @@ void SimpleModelPlugin::Update()
   double t = world->GetSimTime().Double();
   double timeSinceLastUpdate = t - this->timeOfLastUpdate;
 
-  this->UpdateImpl(timeSinceLastUpdate);
+  if (timeSinceLastUpdate < 0)
+    this->Reset();
+  else
+    this->UpdateImpl(timeSinceLastUpdate);
 
   this->timeOfLastUpdate = t;
 }

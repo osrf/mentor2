@@ -28,6 +28,7 @@ PowerSourcePlugin::PowerSourcePlugin()
 {
   this->schematicType = "power";
   this->voltage = 0;
+  this->timeAccum = 0;
 }
 
 
@@ -41,6 +42,10 @@ PowerSourcePlugin::~PowerSourcePlugin()
 void PowerSourcePlugin::LoadImpl(sdf::ElementPtr _sdf)
 {
   this->discharging = true;
+  this->capacity = this->GetProperty<double>("capacity");
+  this->voltage = this->GetProperty<double>("voltage");
+  this->current = this->GetProperty<double>("current");
+  this->Reset();
 }
 
 
@@ -50,6 +55,13 @@ void PowerSourcePlugin::Init()
   SimpleModelPlugin::Init();
 }
 
+/////////////////////////////////////////////////
+void PowerSourcePlugin::Reset()
+{
+  this->remainingCapacity = this->capacity;
+  this->currentVoltage = this->voltage;
+  this->timeAccum = 0;
+}
 
 /////////////////////////////////////////////////
 void PowerSourcePlugin::UpdateImpl(double _timeSinceLastUpdate)
@@ -67,29 +79,39 @@ void PowerSourcePlugin::UpdateImpl(double _timeSinceLastUpdate)
     return;
   }
 
-  this->capacity = this->GetProperty<double>("capacity");
-  this->voltage = this->GetProperty<double>("voltage");
-  this->current = this->GetProperty<double>("current");
-
-  if(this->discharging && this->capacity > 0.0)
+  if (this->remainingCapacity > 0.0)
   {
-    double ampHours = this->current * timeSlice / 3600.0;
-    this->capacity -= ampHours;
-    if(this->capacity < 0.0) this->capacity = 0;
-    static int loop = 10;
-    loop --;
-    if (loop <0)
+    if(this->discharging)
     {
-      loop = 10;
-      //std::cout << "battery capacity " << this->capacity << " [-" << ampHours<< "]" << std::endl;
+      double ampHours = this->current * timeSlice / 3600.0;
+      this->remainingCapacity -= ampHours;
+      double minVoltage = this->voltage*0.75;
+      double voltageRange = this->voltage - minVoltage;
+      this->currentVoltage = minVoltage +
+          (this->remainingCapacity / this->capacity) * voltageRange;
+      if (this->remainingCapacity < 0.0)
+      {
+        this->remainingCapacity = 0;
+        this->currentVoltage = 0;
+      }
+
+      static int loop = 10;
+      loop --;
+      if (loop <0)
+      {
+        loop = 10;
+        std::cout << "battery capacity " << this->remainingCapacity
+            /*<< " [-" << ampHours<< "]"*/ << std::endl;
+        std::cout << "battery voltage " << this->currentVoltage
+            << std::endl;
+      }
     }
   }
 
   if (!this->portPubs.empty())
-  {
-    Simple_msgs::msgs::Variant msg;
+  {    Simple_msgs::msgs::Variant msg;
     msg.set_type(Simple_msgs::msgs::Variant::DOUBLE);
-    msg.set_v_double(this->voltage);
+    msg.set_v_double(this->currentVoltage);
 
     if (this->portPubs.find("positive") != this->portPubs.end() &&
         this->portPubs.find("negative") != this->portPubs.end())
