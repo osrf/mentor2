@@ -45,6 +45,9 @@
       <direction>0.2 0.2 -0.9</direction>
     </light>
 
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
     <model name="vehicle">
       <pose>0 0 0.011 0 0 0</pose>
       <link name="link">
@@ -371,14 +374,14 @@
               </cylinder>
             </geometry>
           </collision>
-<!--          <visual name="debug_visual">
+          <visual name="debug_visual">
             <pose>0.0 0 0.0 0 1.57079632679 0</pose>
             <geometry>
               <box>
                 <size>0.01 0.02 0.03</size>
               </box>
             </geometry>
-          </visual>-->
+          </visual>
 
           <visual name="visual">
             <pose>0.0 0 0.0 0 1.57079632679 0</pose>
@@ -628,8 +631,6 @@
     </include>
 
 
-    <!-- a series of visuals for the regions  -->
-
     <plugin name="SimEvents" filename="libSimEventsPlugin.so">
       <session></session>
 
@@ -710,23 +711,13 @@
     </plugin>
 
 
-    <include>
+<!--    <include>
       <uri>model://vrc_driving_terrain</uri>
-    </include>
+    </include>-->
     <include>
       <uri>model://construction_barrel</uri>
       <name>barrel_1</name>
       <pose>30 9.0 0 0 0 0</pose>
-    </include>
-    <include>
-      <uri>model://construction_barrel</uri>
-      <name>barrel_2</name>
-      <pose>60 11.2 0 0 0 0</pose>
-    </include>
-    <include>
-      <uri>model://construction_barrel</uri>
-      <name>barrel_3</name>
-      <pose>108 15 0 0 0 0</pose>
     </include>
     <include>
       <uri>model://speed_limit_sign</uri>
@@ -735,38 +726,63 @@
       <pose>15 5 0 0 0 1.5707</pose>
     </include>
     <include>
-      <uri>model://speed_limit_sign</uri>
-      <name>speed_sign_2</name>
-      <static>true</static>
-      <pose>70 15 0 0 0 1.5707</pose>
-    </include>
-    <include>
-      <uri>model://speed_limit_sign</uri>
-      <name>speed_sign_3</name>
-      <static>true</static>
-      <pose>121 23 0 0 0 2.356</pose>
-    </include>
-    <include>
-      <uri>model://speed_limit_sign</uri>
-      <name>speed_sign_4</name>
-      <static>true</static>
-      <pose>155 68 0 0 0 3.1415</pose>
-    </include>
-    <include>
-      <uri>model://speed_limit_sign</uri>
-      <name>speed_sign_5</name>
-      <static>true</static>
-      <pose>175 95 0 0 0 1.5707</pose>
-    </include>
-    <include>
       <uri>model://house_1</uri>
+      <name>house_1</name>
+      <static>true</static>
       <pose>12 19.5 0 0 0 0</pose>
     </include>
     <include>
-      <uri>model://house_1</uri>
-      <name>house_1_b</name>
-      <pose>129.5 46 0 0 0 1.5707</pose>
+      <uri>model://house_3</uri>
+      <name>house_3</name>
+      <static>true</static>
+      <pose>26 17.5 0 0 0 0</pose>
     </include>
+    <include>
+      <uri>model://fast_food</uri>
+      <name>fast_food</name>
+      <static>true</static>
+      <pose>20 2.34 0 0 0 3.14</pose>
+    </include>
+
+    <include>
+      <uri>model://gas_station</uri>
+      <name>gas_station</name>
+      <static>true</static>
+      <pose>39 37 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://dumpster</uri>
+      <name>dumpster</name>
+      <static>true</static>
+      <pose>12 3.4 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://jersey_barrier</uri>
+      <name>jersery_barrier_1</name>
+      <static>true</static>
+      <pose>1.7 14.14 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://jersey_barrier</uri>
+      <name>jersey_barrier_2</name>
+      <static>true</static>
+      <pose>-2.5 14.14 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://jersey_barrier</uri>
+      <name>jersery_barrier_3</name>
+      <static>true</static>
+      <pose>6.5 5.4 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://jersey_barrier</uri>
+      <name>jersery_barrier_3</name>
+      <static>true</static>
+      <pose>11.0 5.4 0 0 0 0</pose>
+    </include>
+
+
+
     <include>
       <uri>model://mailbox</uri>
       <name>mailbox_0</name>
@@ -784,67 +800,10 @@
       <pose>30 2 0 0 0 0</pose>
     </include>
     <include>
-      <uri>model://house_2</uri>
-      <name>house_2_b</name>
-      <pose>77 18 0 0 0 0</pose>
-    </include>
-    <include>
-      <uri>model://house_2</uri>
-      <name>house_2_c</name>
-      <pose>158 91 0 0 0 0</pose>
-    </include>
-    <include>
-      <uri>model://house_3</uri>
-      <pose>54 17 0 0 0 0</pose>
-    </include>
-    <include>
-      <uri>model://house_3</uri>
-      <name>house_3_b</name>
-      <pose>111 26 0 0 0 .78539</pose>
-    </include>
-    <include>
-      <uri>model://house_3</uri>
-      <name>house_3_c</name>
-      <pose>170 106 0 0 0 0</pose>
-    </include>
-    <include>
-      <uri>model://mailbox</uri>
-      <name>mailbox_2</name>
-      <static>true</static>
-      <pose>59 14.45 0 0 0 0</pose>
-    </include>
-    <include>
-      <uri>model://fast_food</uri>
-      <static>true</static>
-      <pose>95 17.0 0 0 0 0</pose>
-    </include>
-    <include>
-      <uri>model://dumpster</uri>
-      <static>true</static>
-      <pose>143 51.5 0 0 0 0</pose>
-    </include>
-    <include>
-      <uri>model://gas_station</uri>
-      <static>true</static>
-      <pose>135 84.8 0 0 0 0</pose>
-    </include>
-    <include>
       <uri>model://lamp_post</uri>
       <name>lamp_post_1</name>
       <static>true</static>
       <pose>24 14 0 0 0 0</pose>
-    </include>
-    <include>
-      <uri>model://lamp_post</uri>
-      <name>lamp_post_2</name>
-      <static>true</static>
-      <pose>54 14 0 0 0 0</pose>
-    </include>
-    <include>
-      <uri>model://lamp_post</uri>
-      <name>lamp_post_3</name>
-      <static>true</static>
-      <pose>84 14 0 0 0 0</pose>
     </include>
     <include>
       <uri>model://lamp_post</uri>
@@ -858,82 +817,13 @@
       <static>true</static>
       <pose>44 6 0 0 0 3.1415</pose>
     </include>
-    <include>
-      <uri>model://lamp_post</uri>
-      <name>lamp_post_6</name>
-      <static>true</static>
-      <pose>74 6 0 0 0 3.1415</pose>
-    </include>
-    <include>
-      <uri>model://lamp_post</uri>
-      <name>lamp_post_7</name>
-      <static>true</static>
-      <pose>148 104 0 0 0 0</pose>
-    </include>
-    <include>
-      <uri>model://lamp_post</uri>
-      <name>lamp_post_8</name>
-      <static>true</static>
-      <pose>178 104 0 0 0 0</pose>
-    </include>
-    <include>
-      <uri>model://lamp_post</uri>
-      <name>lamp_post_10</name>
-      <static>true</static>
-      <pose>158 96 0 0 0 3.1415</pose>
-    </include>
-    <include>
-      <uri>model://lamp_post</uri>
-      <name>lamp_post_11</name>
-      <static>true</static>
-      <pose>188 96 0 0 0 3.1415</pose>
-    </include>
-    <include>
-      <uri>model://lamp_post</uri>
-      <name>lamp_post_12</name>
-      <static>true</static>
-      <pose>102 18 0 0 0 .785</pose>
-    </include>
-    <include>
-      <uri>model://lamp_post</uri>
-      <name>lamp_post_13</name>
-      <static>true</static>
-      <pose>123 29 0 0 0 .785</pose>
-    </include>
-    <include>
-      <uri>model://lamp_post</uri>
-      <name>lamp_post_14</name>
-      <static>true</static>
-      <pose>144 50 0 0 0 .785</pose>
-    </include>
-    <include>
-      <uri>model://lamp_post</uri>
-      <name>lamp_post_15</name>
-      <static>true</static>
-      <pose>99 6 0 0 0 3.1415</pose>
-    </include>
-    <include>
-      <uri>model://lamp_post</uri>
-      <name>lamp_post_16</name>
-      <static>true</static>
-      <pose>120 14.5 0 0 0 -2.35</pose>
-    </include>
-    <include>
-      <uri>model://lamp_post</uri>
-      <name>lamp_post_17</name>
-      <static>true</static>
-      <pose>141 35.5 0 0 0 -2.35</pose>
-    </include>
     <road name="main_street">
       <width>5</width>
       <point>0 0 0.01</point>
       <point>0 10 0.01</point>
       <point>10 10 0.01</point>
       <point>20 10 0.01</point>
-      <point>100 10 0.01</point>
-      <point>150 50 0.01</point>
-      <point>150 100 0.01</point>
-      <point>200 100 0.01</point>
+      <point>50 10 0.01</point>
     </road>
     <model name="road_boxes">
       <static>true</static>
