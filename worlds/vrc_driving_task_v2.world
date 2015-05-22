@@ -703,9 +703,9 @@
     </plugin>
 
 
-<!--    <include>
+    <include>
       <uri>model://vrc_driving_terrain</uri>
-    </include>-->
+    </include>
     <include>
       <uri>model://construction_barrel</uri>
       <name>barrel_1</name>
