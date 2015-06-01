@@ -37,9 +37,6 @@
       <direction>0.2 0.2 -0.9</direction>
     </light>
 
-    <include>
-      <uri>model://ground_plane</uri>
-    </include>
     <model name="vehicle">
       <pose>0 0 0.011 0 0 0</pose>
       <link name="link">
