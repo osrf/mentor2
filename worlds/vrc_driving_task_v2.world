@@ -701,12 +701,13 @@
 
 
     <include>
-      <uri>model://vrc_driving_terrain</uri>
+      <uri>model://vrc_driving_terrain_v2</uri>
     </include>
     <include>
       <uri>model://construction_barrel</uri>
       <name>barrel_1</name>
       <pose>30 9.0 0 0 0 0</pose>
+      <static>true</static>
     </include>
     <include>
       <uri>model://speed_limit_sign</uri>
@@ -720,12 +721,7 @@
       <static>true</static>
       <pose>12 19.5 0 0 0 0</pose>
     </include>
-    <include>
-      <uri>model://house_3</uri>
-      <name>house_3</name>
-      <static>true</static>
-      <pose>26 17.5 0 0 0 0</pose>
-    </include>
+
     <include>
       <uri>model://fast_food</uri>
       <name>fast_food</name>
@@ -733,12 +729,6 @@
       <pose>20 2.34 0 0 0 3.14</pose>
     </include>
 
-    <include>
-      <uri>model://gas_station</uri>
-      <name>gas_station</name>
-      <static>true</static>
-      <pose>39 37 0 0 0 0</pose>
-    </include>
     <include>
       <uri>model://dumpster</uri>
       <name>dumpster</name>
@@ -785,10 +775,6 @@
       <pose>24.5 6.45 0 0 0 0</pose>
     </include>
     <include>
-      <uri>model://house_2</uri>
-      <pose>30 2 0 0 0 0</pose>
-    </include>
-    <include>
       <uri>model://lamp_post</uri>
       <name>lamp_post_1</name>
       <static>true</static>
@@ -800,19 +786,14 @@
       <static>true</static>
       <pose>14 6 0 0 0 3.1415</pose>
     </include>
-    <include>
-      <uri>model://lamp_post</uri>
-      <name>lamp_post_5</name>
-      <static>true</static>
-      <pose>44 6 0 0 0 3.1415</pose>
-    </include>
+
     <road name="main_street">
       <width>5</width>
       <point>0 0 0.01</point>
       <point>0 10 0.01</point>
       <point>10 10 0.01</point>
       <point>20 10 0.01</point>
-      <point>50 10 0.01</point>
+      <point>40 10 0.01</point>
     </road>
     <model name="road_boxes">
       <static>true</static>

@@ -14,6 +14,7 @@ set (dirs
   vehicle
   vehicle_no_motor
   vrc_driving_terrain
+  vrc_driving_terrain_v2
   wheel_ramps
   AA_battery
 )
