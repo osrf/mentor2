@@ -148,7 +148,7 @@ bool CMLConnectionMaker::OnMousePress(const common::MouseEvent &_event)
 {
   this->mouseEvent = _event;
 
-  if (_event.button != common::MouseEvent::LEFT)
+  if (_event.Button() != common::MouseEvent::LEFT)
     return false;
 
   if (this->connectType != CMLConnectionMaker::CONNECT_NONE)
@@ -157,7 +157,7 @@ bool CMLConnectionMaker::OnMousePress(const common::MouseEvent &_event)
   // intercept mouse press events when user clicks on the connect hotspot visual
   rendering::UserCameraPtr camera = gui::get_active_camera();
   rendering::ScenePtr scene = camera->GetScene();
-  rendering::VisualPtr vis = camera->GetVisual(_event.pos);
+  rendering::VisualPtr vis = camera->GetVisual(_event.Pos());
   if (vis)
   {
     if (this->connects.find(vis->GetName()) != this->connects.end())
@@ -179,7 +179,7 @@ bool CMLConnectionMaker::OnMouseRelease(const common::MouseEvent &_event)
   {
     rendering::UserCameraPtr camera = gui::get_active_camera();
     rendering::ScenePtr scene = camera->GetScene();
-    rendering::VisualPtr vis = camera->GetVisual(_event.pos);
+    rendering::VisualPtr vis = camera->GetVisual(_event.Pos());
     if (vis)
     {
       if (this->selectedConnection)
@@ -190,14 +190,14 @@ bool CMLConnectionMaker::OnMouseRelease(const common::MouseEvent &_event)
       if (this->connects.find(vis->GetName()) != this->connects.end())
       {
         // trigger connect inspector on right click
-        if (_event.button == common::MouseEvent::RIGHT)
+        if (_event.Button() == common::MouseEvent::RIGHT)
         {
           /*this->inspectVis = vis;
           QMenu menu;
           menu.addAction(this->inspectAct);
           menu.exec(QCursor::pos());*/
         }
-        else if (_event.button == common::MouseEvent::LEFT)
+        else if (_event.Button() == common::MouseEvent::LEFT)
         {
           // turn off model selection so we don't end up with
           // both connection visual and model selected at the same time
@@ -582,7 +582,7 @@ bool CMLConnectionMaker::OnMouseMove(const common::MouseEvent &_event)
 {
   this->mouseEvent = _event;
 
-  if (_event.dragging)
+  if (_event.Dragging())
     return false;
 
   // de-highlight previously highlighted visual
@@ -596,7 +596,7 @@ bool CMLConnectionMaker::OnMouseMove(const common::MouseEvent &_event)
   rendering::ScenePtr scene = camera->GetScene();
 
   // Highlight visual on hover
-  rendering::VisualPtr vis = camera->GetVisual(_event.pos);
+  rendering::VisualPtr vis = camera->GetVisual(_event.Pos());
 
   if (!vis)
     return true;
@@ -644,7 +644,7 @@ bool CMLConnectionMaker::OnMouseMove(const common::MouseEvent &_event)
              vis->GetRootVisual()->IsPlane())
     {
       math::Vector3 pt;
-      camera->GetWorldPointOnPlane(_event.pos.x, _event.pos.y,
+      camera->GetWorldPointOnPlane(_event.Pos().X(), _event.Pos().Y(),
           math::Plane(math::Vector3(0, 0, 1)), pt);
 
       currentPos = vis->GetRootVisual()->GetWorldPose().pos - parentPos + pt;

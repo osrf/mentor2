@@ -104,7 +104,7 @@ CMLRender::~CMLRender()
 /*/////////////////////////////////////////////////
 bool CMLRender::OnMousePress(const common::MouseEvent &_event)
 {
-  if (_event.button != common::MouseEvent::LEFT)
+  if (_event.Button() != common::MouseEvent::LEFT)
     return false;
 
   return false;
@@ -154,9 +154,9 @@ bool CMLRender::OnMouseRelease(const common::MouseEvent &_event)
   // Get the active camera and scene.
   rendering::UserCameraPtr camera = gui::get_active_camera();
   rendering::ScenePtr scene = camera->GetScene();
-  rendering::VisualPtr vis = camera->GetVisual(_event.pos);
+  rendering::VisualPtr vis = camera->GetVisual(_event.Pos());
 
-  if (_event.button == common::MouseEvent::RIGHT)
+  if (_event.Button() == common::MouseEvent::RIGHT)
   {
     if (vis)
     {
@@ -207,7 +207,7 @@ bool CMLRender::OnMouseDoubleClick(const common::MouseEvent &_event)
   // Get the active camera and scene.
   rendering::UserCameraPtr camera = gui::get_active_camera();
   rendering::ScenePtr scene = camera->GetScene();
-  rendering::VisualPtr vis = camera->GetVisual(_event.pos);
+  rendering::VisualPtr vis = camera->GetVisual(_event.Pos());
 
   if (vis)
   {
@@ -233,14 +233,14 @@ bool CMLRender::OnMouseDoubleClick(const common::MouseEvent &_event)
 /////////////////////////////////////////////////
 bool CMLRender::OnMouseMove(const common::MouseEvent &_event)
 {
-  if (_event.dragging)
+  if (_event.Dragging())
     return false;
 
   // Get the active camera and scene.
   rendering::UserCameraPtr camera = gui::get_active_camera();
   rendering::ScenePtr scene = camera->GetScene();
 
-  rendering::VisualPtr vis = camera->GetVisual(_event.pos);
+  rendering::VisualPtr vis = camera->GetVisual(_event.Pos());
 
   return false;
 }
