@@ -1,0 +1,43 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <model name="caster_wheel">
+    <pose>0 0 0 0 0 0</pose>
+    <link name="link">
+      <!-- Physics -->
+      <collision name="collision">
+        <pose>0 0 0.0 0 0 0</pose>
+        <geometry>
+          <sphere>
+            <radius>0.0057</radius>
+          </sphere>
+        </geometry>
+      </collision>
+      <inertial>
+        <mass>0.1</mass>
+        <pose>0 0 0 0 0 0</pose>
+        <inertia>
+          <ixx>1e-3</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1e-3</iyy>
+          <iyz>0</iyz>
+          <izz>1e-3</izz>
+        </inertia>
+      </inertial>
+      <visual name="visual">
+        <pose>0.0 0 0.0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://caster_wheel/meshes/caster_wheel.dae</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

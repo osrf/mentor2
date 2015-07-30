@@ -2,8 +2,6 @@
 <sdf version="1.5">
 
     <model name="vehicle">
-
-      <pose>0.0 0.00 0.0 0 0 0</pose>
       <link name="link">
         <pose>0.0 0.070 0.024 0 0 0</pose>
         <inertial>
@@ -35,7 +33,7 @@
         </visual>
       </link>
 
-      <model name="chassis">
+      <model name="chassis_v2">
         <pose>0 0 0.0132 0 0 0</pose>
         <link name="link">
           <inertial>
@@ -61,7 +59,7 @@
             <pose>0 0 0.0 1.57079632679 0 0</pose>
             <geometry>
               <mesh>
-                <uri>model://chassis/meshes/chassis.dae</uri>
+                <uri>model://chassis_v2/meshes/chassis_v2.dae</uri>
                 <scale>0.001 0.001 0.001</scale>
               </mesh>
             </geometry>
@@ -135,10 +133,20 @@
       </model>
 
       <model name="caster_wheel">
-        <pose>0 -0.06 0.0058 0 0 0</pose>
+        <pose>0 -0.09 0.0058 0 0 0</pose>
         <link name="link">
+          <!-- Physics -->
+          <collision name="collision">
+            <pose>0 0 0.0 0 0 0</pose>
+            <geometry>
+              <sphere>
+                <radius>0.0057</radius>
+              </sphere>
+            </geometry>
+          </collision>
           <inertial>
             <mass>0.1</mass>
+            <pose>0 0 0 0 0 0</pose>
             <inertia>
               <ixx>0.0001</ixx>
               <ixy>0</ixy>
@@ -148,17 +156,14 @@
               <izz>0.0001</izz>
             </inertia>
           </inertial>
-          <collision name="collision">
-            <pose>0 0 0.0 0 0 0</pose>
-            <geometry>
-              <sphere>
-                <radius>0.0057</radius>
-              </sphere>
-            </geometry>
-          </collision>
-
           <visual name="visual">
-            <pose>0 0 0.0 0 0 0</pose>
+<!--            <pose>0.0 0 0.0026 0 0 1.57</pose>
+            <geometry>
+              <mesh>
+                <uri>model://caster_wheel/meshes/caster_wheel.dae</uri>
+                <scale>0.001 0.001 0.001</scale>
+              </mesh>
+            </geometry>-->
             <geometry>
               <sphere>
                 <radius>0.0057</radius>
@@ -166,7 +171,6 @@
             </geometry>
             <material>
               <script>
-                <uri>file://media/materials/scripts/gazebo.material</uri>
                 <name>Gazebo/Grey</name>
               </script>
             </material>
@@ -174,59 +178,59 @@
         </link>
       </model>
 
-      <model name="battery_pack">
-        <pose>0 -0.057 0.025 0 0 0</pose>
-        <link name="link">
-          <inertial>
-            <mass>0.1</mass>
-            <inertia>
-              <ixx>0.0001</ixx>
-              <ixy>0</ixy>
-              <ixz>0</ixz>
-              <iyy>0.0001</iyy>
-              <iyz>0</iyz>
-              <izz>0.0001</izz>
-            </inertia>
-          </inertial>
-          <collision name="collision">
-            <pose>0 0 0.000 1.57079632679 0 0</pose>
-            <geometry>
-              <box>
-                <size>0.065 0.018 0.07</size>
-              </box>
-            </geometry>
-          </collision>
-          <visual name="visual">
-            <pose>0 0 0.003 1.57079632679 0 0</pose>
-            <geometry>
-              <mesh>
-                <uri>model://battery_pack/meshes/battery_pack.dae</uri>
-                <scale>0.001 0.001 0.001</scale>
-              </mesh>
-            </geometry>
-            <material>
-              <script>
-                <uri>file://media/materials/scripts/gazebo.material</uri>
-                <name>Gazebo/Grey</name>
-              </script>
-            </material>
-          </visual>
-        </link>
-        <plugin filename="libPowerSourcePlugin.so" name="battery">
-          <port>
-            <name>positive</name>
-            <type>electrical</type>
-          </port>
-          <port>
-            <name>negative</name>
-            <type>electrical</type>
-          </port>
-          <properties>
-            <voltage>6</voltage>
-           <capacity>0.30</capacity>
-            <current>0.1</current>
-          </properties>
-        </plugin>
+      <model name="battery_9v">
+        <pose>0 -0.057 0.025 0 0 -1.57</pose>
+          <link name="link">
+            <inertial>
+              <mass>0.1</mass>
+              <inertia>
+                <ixx>0.0001</ixx>
+                <ixy>0</ixy>
+                <ixz>0</ixz>
+                <iyy>0.0001</iyy>
+                <iyz>0</iyz>
+                <izz>0.0001</izz>
+              </inertia>
+            </inertial>
+            <collision name="collision">
+              <pose>0 0 0.0 0 0 0</pose>
+              <geometry>
+                <box>
+                  <size>0.027 0.055 0.017</size>
+                </box>
+              </geometry>
+            </collision>
+            <visual name="visual">
+              <pose>0 0 0.0 0 0 0</pose>
+              <geometry>
+                <mesh>
+                  <uri>model://battery_9v/meshes/battery_9v.dae</uri>
+                  <scale>0.001 0.001 0.001</scale>
+                </mesh>
+              </geometry>
+              <material>
+                <script>
+                  <uri>file://media/materials/scripts/gazebo.material</uri>
+                  <name>Gazebo/Grey</name>
+                </script>
+              </material>
+            </visual>
+          </link>
+          <plugin filename="libPowerSourcePlugin.so" name="battery">
+            <port>
+              <name>positive</name>
+              <type>electrical</type>
+            </port>
+            <port>
+              <name>negative</name>
+              <type>electrical</type>
+            </port>
+            <properties>
+              <voltage>1.5</voltage>   <!-- Volts -->
+             <capacity>0.30</capacity> <!-- Amp-hours  -->
+              <current>0.1</current>   <!-- Amps -->
+            </properties>
+          </plugin>
       </model>
 
 
@@ -443,17 +447,17 @@
         </link>
         <plugin filename="libGearboxPlugin.so" name="gearbox">
           <properties>
-            <parent>vehicle::motor::motor_shaft_link</parent>
-            <child>vehicle::axle_wheels::link</child>
+            <parent>vehicle::axle_wheels::link</parent>
+            <child>vehicle::motor::motor_shaft_link</child>
             <gear_ratio>1.0</gear_ratio>
             <efficiency>0.95</efficiency>
           </properties>
         </plugin>
       </model>
 
-      <joint name="chassis_battery_pack_joint" type="revolute">
-        <parent>vehicle::chassis::link</parent>
-        <child>vehicle::battery_pack::link</child>
+      <joint name="chassis_v2_battery_9v_joint" type="revolute">
+        <parent>vehicle::chassis_v2::link</parent>
+        <child>vehicle::battery_9v::link</child>
         <axis>
           <xyz>0 0 1</xyz>
           <limit>
@@ -463,8 +467,8 @@
         </axis>
       </joint>
 
-      <joint name="chassis_gearbox_joint" type="revolute">
-        <parent>vehicle::chassis::link</parent>
+      <joint name="chassis_v2_gearbox_joint" type="revolute">
+        <parent>vehicle::chassis_v2::link</parent>
         <child>vehicle::gearbox::link</child>
         <axis>
           <xyz>0 0 1</xyz>
@@ -475,8 +479,8 @@
         </axis>
       </joint>
 
-      <joint name="chassis_motor_joint" type="revolute">
-        <parent>vehicle::chassis::link</parent>
+      <joint name="chassis_v2_motor_joint" type="revolute">
+        <parent>vehicle::chassis_v2::link</parent>
         <child>vehicle::motor::link</child>
         <axis>
           <xyz>0 0 1</xyz>
@@ -487,8 +491,8 @@
         </axis>
       </joint>
 
-      <joint name="chassis_axle_joint" type="revolute">
-        <parent>vehicle::chassis::link</parent>
+      <joint name="chassis_v2_axle_joint" type="revolute">
+        <parent>vehicle::chassis_v2::link</parent>
         <child>vehicle::axle_wheels::link</child>
         <axis>
           <xyz>1 0 0</xyz>
@@ -499,14 +503,14 @@
         </axis>
       </joint>
 
-      <joint name="chassis_caster_joint" type="ball">
-        <parent>vehicle::chassis::link</parent>
+      <joint name="chassis_v2_caster_joint" type="ball">
+        <parent>vehicle::chassis_v2::link</parent>
         <child>vehicle::caster_wheel::link</child>
       </joint>
 
 
-      <joint name="chassis_weight_joint" type="revolute">
-        <parent>vehicle::chassis::link</parent>
+      <joint name="chassis_v2_weight_joint" type="revolute">
+        <parent>vehicle::chassis_v2::link</parent>
         <child>vehicle::link</child>
         <axis>
           <xyz>0 0 1</xyz>
@@ -541,10 +545,9 @@
         </axis>
       </joint>
 
-
       <plugin name="simple_connections" filename="libSimpleConnectionsPlugin.so">
         <connection>
-          <source>battery_pack</source>
+          <source>battery_9v</source>
           <source_port>positive</source_port>
           <target>motor</target>
           <target_port>connector0</target_port>
@@ -553,10 +556,11 @@
         <connection>
           <source>motor</source>
           <source_port>connector1</source_port>
-          <target>battery_pack</target>
+          <target>battery_9v</target>
           <target_port>negative</target_port>
         </connection>
       </plugin>
     </model>
+
 
 </sdf>

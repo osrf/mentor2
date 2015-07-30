@@ -1,10 +1,13 @@
 set (dirs
   axle_wheels
   battery_holder
+  battery_9v
   battery_pack
   bucket_wheel
   car
+  caster_wheel
   chassis
+  chassis_v2
   concrete_slab
   concrete_slab_small
   gearbox

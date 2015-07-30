@@ -1,0 +1,57 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <model name="battery_9v">
+    <pose>0 0.0 0.0085 0 0 0</pose>
+    <link name="link">
+      <inertial>
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>0.0001</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.0001</iyy>
+          <iyz>0</iyz>
+          <izz>0.0001</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <pose>0 0 0.0 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.027 0.055 0.017</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <pose>0 0 0.0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://battery_9v/meshes/battery_9v.dae</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+    <plugin filename="libPowerSourcePlugin.so" name="battery">
+      <port>
+        <name>positive</name>
+        <type>electrical</type>
+      </port>
+      <port>
+        <name>negative</name>
+        <type>electrical</type>
+      </port>
+      <properties>
+        <voltage>1.5</voltage>   <!-- Volts -->
+       <capacity>0.30</capacity> <!-- Amp-hours  -->
+        <current>0.1</current>   <!-- Amps -->
+      </properties>
+    </plugin>
+  </model>
+</sdf>
