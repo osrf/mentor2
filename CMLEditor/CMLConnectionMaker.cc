@@ -235,10 +235,6 @@ bool CMLConnectionMaker::OnMouseRelease(const common::MouseEvent &_event)
         this->selectedVis = this->hoverVis;
         this->hoverVis.reset();
 
-/*        rendering::VisualPtr entityVis = this->selectedVis->GetNthAncestor(3);
-        if (!entity || !this->IsComponent(entity))
-          entityVis = this->selectedVis->GetNthAncestor(2);*/
-
         // Create connection data with selected visual as parent
         // the child will be set on the second mouse release.
         this->mouseConnection = this->CreateConnection(this->selectedVis,
@@ -603,28 +599,14 @@ bool CMLConnectionMaker::OnMouseMove(const common::MouseEvent &_event)
   if (!vis)
     return true;
 
-  // Check if the visual contains one of the components' names and is not a
-  // hotspot.
-  rendering::VisualPtr modelVis = vis->GetNthAncestor(2);
-  bool isComponent = this->IsComponent(modelVis->GetName());
+  // Get lowest level visual that is a component model.
+  rendering::VisualPtr componentVis = this->GetLowestLevelComponentVisual(vis);
 
-  // Get the top level visual
-  if (isComponent && modelVis != this->selectedVis)
+  // check is not the currently selected one
+  if (componentVis && componentVis != this->selectedVis)
   {
-    rendering::VisualPtr componentVis = modelVis;
-    rendering::VisualPtr childVis = vis->GetNthAncestor(3);
-
-    if (childVis && this->IsComponent(childVis->GetName()))
-    {
-      std::cerr << "child vis " <<  childVis->GetName() << std::endl;
-      componentVis = childVis;
-    }
-
     this->hoverVis = componentVis;
     this->hoverVis->SetEmissive(common::Color(0.5, 0.5, 0.5));
-
-//    Simple_msgs::msgs::SimpleModel msg =
-//        CMLManager::Instance()->GetModelInfo(entityVis->GetName());
   }
   else
   {
@@ -821,4 +803,26 @@ bool CMLConnectionMaker::IsComponent(const std::string &_name)
     isComponent = true;
   }
   return isComponent;
+}
+
+/////////////////////////////////////////////////
+rendering::VisualPtr CMLConnectionMaker::GetLowestLevelComponentVisual(
+    rendering::VisualPtr _visual)
+{
+  unsigned int depth = 2;
+  rendering::VisualPtr modelVis;
+  while (depth < _visual->GetDepth())
+  {
+    rendering::VisualPtr childVis = _visual->GetNthAncestor(depth);
+    if (!childVis)
+      break;
+
+    std::string name = childVis->GetName();
+    Simple_msgs::msgs::SimpleModel msg;
+    msg = CMLManager::Instance()->GetModelInfo(name);
+    if (!msg.name().empty())
+      modelVis = childVis;
+    depth++;
+  }
+  return modelVis;
 }

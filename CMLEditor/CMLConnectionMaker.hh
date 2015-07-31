@@ -152,8 +152,15 @@ namespace gazebo
       private: std::string SelectPort();
 
       /// \brief Check if a visual is a component
+      /// \param[in] _name Visual name
       /// return True if the visual is a component.
       private: bool IsComponent(const std::string &_name);
+
+      /// \brief Get lowest level visual that represents a component
+      /// \param[in] _visual Leaf visual.
+      /// return Visual of type component.
+      private: rendering::VisualPtr GetLowestLevelComponentVisual(
+          rendering::VisualPtr _visual);
 
       /// \brief Qt signal when the connection creation process has ended.
       //Q_SIGNALS: void ConnectionAdded();

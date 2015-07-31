@@ -211,19 +211,27 @@ bool CMLRender::OnMouseDoubleClick(const common::MouseEvent &_event)
 
   if (vis)
   {
-    rendering::VisualPtr topLevelVis = vis->GetNthAncestor(2);
-    if (!topLevelVis)
-      return false;
-    std::string name = topLevelVis->GetName();
-
-    Simple_msgs::msgs::SimpleModel msg;
-    msg = CMLManager::Instance()->GetModelInfo(name);
-
-    if (!msg.name().empty())
+    unsigned int depth = 2;
+    rendering::VisualPtr modelVis;
+    while (depth < vis->GetDepth())
     {
-      CMLManager::Instance()->ShowInspector(name);
-      return true;
+      rendering::VisualPtr childVis = vis->GetNthAncestor(depth);
+      if (!childVis)
+        break;
+
+      std::string name = childVis->GetName();
+      Simple_msgs::msgs::SimpleModel msg;
+      msg = CMLManager::Instance()->GetModelInfo(name);
+      if (msg.key_size() > 0)
+        modelVis = childVis;
+      depth++;
     }
+
+    if (!modelVis)
+      return false;
+
+    CMLManager::Instance()->ShowInspector(modelVis->GetName());
+    return true;
   }
 
   return false;
