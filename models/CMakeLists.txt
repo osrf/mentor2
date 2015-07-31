@@ -12,6 +12,7 @@ set (dirs
   concrete_slab_small
   gearbox
   motor
+  motor_gearbox
   power_switch
   ramp
   vehicle
