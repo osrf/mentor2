@@ -140,30 +140,50 @@ void GearboxPlugin::UpdateImpl(double _timeSinceLastUpdate)
     entity = entity->GetParent();
   }
 
-  size_t pos = this->parentLinkName.find("::");
-  if (pos != std::string::npos &&
-      this->parentLinkName.substr(0, pos) != entity->GetName())
-  {
-    this->parentLinkName = entity->GetName() +
-        this->parentLinkName.substr(pos);
-  }
-  pos = this->childLinkName.find("::");
-  if (pos != std::string::npos &&
-      this->childLinkName.substr(0, pos) != entity->GetName())
-  {
-    this->childLinkName = entity->GetName() +
-        this->childLinkName.substr(pos);
-  }
-
-
+  // try find parent and child links
   physics::WorldPtr world = this->parent->GetWorld();
+  std::string parentScopedName =
+      entity->GetName() + "::" + this->parentLinkName;
+  std::string childScopedName =
+      entity->GetName() + "::" + this->childLinkName;
   this->parentLink = boost::dynamic_pointer_cast<physics::Link>(
-    world->GetByName(this->parentLinkName));
+    world->GetByName(parentScopedName));
   this->childLink = boost::dynamic_pointer_cast<physics::Link>(
-    world->GetByName(this->childLinkName));
+    world->GetByName(childScopedName));
+
+  if (this->parentLink && this->childLink)
+  {
+    this->parentLinkName = parentScopedName;
+    this->childLinkName = childScopedName;
+  }
+  else
+  {
+    // try harder
+    size_t pos = this->parentLinkName.find("::");
+    if (pos != std::string::npos &&
+        this->parentLinkName.substr(0, pos) != entity->GetName())
+    {
+      this->parentLinkName = entity->GetName() +
+          this->parentLinkName.substr(pos);
+    }
+    pos = this->childLinkName.find("::");
+    if (pos != std::string::npos &&
+        this->childLinkName.substr(0, pos) != entity->GetName())
+    {
+      this->childLinkName = entity->GetName() +
+          this->childLinkName.substr(pos);
+    }
+    this->parentLink = boost::dynamic_pointer_cast<physics::Link>(
+      world->GetByName(this->parentLinkName));
+    this->childLink = boost::dynamic_pointer_cast<physics::Link>(
+      world->GetByName(this->childLinkName));
+  }
 
   if (!this->parentLink || !this->childLink)
+  {
+    gzerr << "Gearbox plugin: unable to find parent or child link" << std::endl;
     return;
+  }
 
   // auto determine gearbox axes
   math::Quaternion axisTransform =
