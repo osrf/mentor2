@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=MENTOR2_Chapter4
+Comment=Run Chapter4
+Exec=bash -ci '"$(dirname "$1")"/run.bash "$(dirname "$1")"/../worlds/chapter4.world' dummy %k
+Icon=
+Terminal=true
+Type=Application
