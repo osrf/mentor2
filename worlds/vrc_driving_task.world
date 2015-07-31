@@ -262,8 +262,8 @@
               <type>electrical</type>
             </port>
             <properties>
-              <voltage>1.5</voltage>   <!-- Volts -->
-             <capacity>0.30</capacity> <!-- Amp-hours  -->
+              <voltage>9</voltage>   <!-- Volts -->
+             <capacity>0.60</capacity> <!-- Amp-hours  -->
               <current>0.1</current>   <!-- Amps -->
             </properties>
           </plugin>

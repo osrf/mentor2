@@ -602,20 +602,23 @@ bool CMLConnectionMaker::OnMouseMove(const common::MouseEvent &_event)
     return true;
 
   // Check if the visual contains one of the components' names and is not a
-  // hotspot. FIXME: this is a hack
-  bool isComponent = false;
-  if ((vis->GetName().find("AA_battery") != std::string::npos ||
-       vis->GetName().find("motor") != std::string::npos ||
-       vis->GetName().find("switch") != std::string::npos) &&
-       vis->GetName().find("_HOTSPOT_") == std::string::npos)
-  {
-    isComponent = true;
-  }
+  // hotspot.
+  rendering::VisualPtr modelVis = vis->GetNthAncestor(2);
+  bool isComponent = this->IsComponent(modelVis->GetName());
 
   // Get the top level visual
-  if (isComponent && vis->GetNthAncestor(2) != this->selectedVis)
+  if (isComponent && modelVis != this->selectedVis)
   {
-    this->hoverVis = vis->GetNthAncestor(2);
+    rendering::VisualPtr componentVis = modelVis;
+    rendering::VisualPtr childVis = vis->GetNthAncestor(3);
+
+    if (childVis && this->IsComponent(childVis->GetName()))
+    {
+      std::cerr << "child vis " <<  childVis->GetName() << std::endl;
+      componentVis = childVis;
+    }
+
+    this->hoverVis = componentVis;
     this->hoverVis->SetEmissive(common::Color(0.5, 0.5, 0.5));
 
 //    Simple_msgs::msgs::SimpleModel msg =
@@ -796,4 +799,24 @@ unsigned int CMLConnectionMaker::GetConnectionCount()
 void CMLConnectionMaker::OnFinish()
 {
   this->Reset();
+}
+
+/////////////////////////////////////////////////
+bool CMLConnectionMaker::IsComponent(const std::string &_name)
+{
+  // FIXME: this is a hack
+  std::string leafName = _name;
+  size_t pIdx = leafName.find_last_of("::");
+  if (pIdx != std::string::npos)
+    leafName = leafName.substr(pIdx+1);
+
+  bool isComponent = false;
+  if ((leafName.find("AA_battery") != std::string::npos ||
+       leafName.find("motor") != std::string::npos ||
+       leafName.find("switch") != std::string::npos) &&
+       leafName.find("_HOTSPOT_") == std::string::npos)
+  {
+    isComponent = true;
+  }
+  return isComponent;
 }

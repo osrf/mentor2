@@ -89,10 +89,18 @@ CMLEditor::CMLEditor(MainWindow *_mainWindow)
   connect(switchButton, SIGNAL(clicked()), this,
       SLOT(SpawnEntity()));
 
+  QPushButton *motorGearboxButton = new QPushButton(tr("Motor with Gearbox"));
+  motorGearboxButton->setCheckable(false);
+  motorGearboxButton->setChecked(false);
+  motorGearboxButton->setProperty("type", QVariant("motor_gearbox"));
+  connect(motorGearboxButton, SIGNAL(clicked()), this,
+      SLOT(SpawnEntity()));
+
 
   this->modelEditor->AddItemToPalette(motorButton, "Components");
   this->modelEditor->AddItemToPalette(batteryButton, "Components");
   this->modelEditor->AddItemToPalette(switchButton, "Components");
+  this->modelEditor->AddItemToPalette(motorGearboxButton, "Components");
 
 
   this->connections.push_back(gui::model::Events::ConnectNestedModelInserted(
@@ -123,6 +131,7 @@ void CMLEditor::LoadModels()
   names.push_back("power_switch");
 //  models.push_back("gearbox");
   names.push_back("AA_battery");
+  names.push_back("motor_gearbox");
 
   for (unsigned int i = 0; i < names.size(); ++i)
   {
@@ -314,4 +323,6 @@ void CMLEditor::SpawnEntity()
     return;
 
   this->modelEditor->SpawnEntity(it->second->Root()->GetElement("model"));
+
+//  std::cerr << "spawn entity " << it->second->Root()->GetElement("model")->ToString("") << std::endl;
 }

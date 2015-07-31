@@ -4,7 +4,7 @@
     <pose>0 0.0 0.0085 0 0 0</pose>
     <link name="link">
       <inertial>
-        <mass>0.1</mass>
+        <mass>0.05</mass>
         <inertia>
           <ixx>0.0001</ixx>
           <ixy>0</ixy>
@@ -48,8 +48,8 @@
         <type>electrical</type>
       </port>
       <properties>
-        <voltage>1.5</voltage>   <!-- Volts -->
-       <capacity>0.30</capacity> <!-- Amp-hours  -->
+        <voltage>9</voltage>   <!-- Volts -->
+       <capacity>0.60</capacity> <!-- Amp-hours  -->
         <current>0.1</current>   <!-- Amps -->
       </properties>
     </plugin>

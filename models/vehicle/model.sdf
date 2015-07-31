@@ -226,8 +226,8 @@
               <type>electrical</type>
             </port>
             <properties>
-              <voltage>1.5</voltage>   <!-- Volts -->
-             <capacity>0.30</capacity> <!-- Amp-hours  -->
+              <voltage>9</voltage>   <!-- Volts -->
+             <capacity>0.60</capacity> <!-- Amp-hours  -->
               <current>0.1</current>   <!-- Amps -->
             </properties>
           </plugin>
@@ -332,14 +332,14 @@
               </cylinder>
             </geometry>
           </collision>
-<!--          <visual name="debug_visual">
+          <visual name="debug_visual">
             <pose>0.0 0 0.0 0 1.57079632679 0</pose>
             <geometry>
               <box>
                 <size>0.01 0.02 0.03</size>
               </box>
             </geometry>
-          </visual>-->
+          </visual>
 
           <visual name="visual">
             <pose>0.0 0 0.0 0 1.57079632679 0</pose>

@@ -125,11 +125,13 @@ void MotorPlugin::UpdateImpl(double _timeSinceLastUpdate)
   double internalCurrent = internalVoltage / this->motorResistance;
   double torque = internalCurrent * this->torqueConstant;
 
-//  std::cerr << " voltage " << voltage << ", torque " << torque
+//   std::cerr << " voltage " << voltage << ", torque " << torque
 //      << ", shaftRotationSpeed " << shaftRotationSpeed << std::endl;
 
   if (this->joint)
+  {
     this->joint->SetForce(0, torque);
+  }
 
   Simple_msgs::msgs::Variant torqueMsg;
   torqueMsg.set_type(Simple_msgs::msgs::Variant::DOUBLE);

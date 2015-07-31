@@ -151,6 +151,10 @@ namespace gazebo
       /// return Name of port selected, empty string otherwise.
       private: std::string SelectPort();
 
+      /// \brief Check if a visual is a component
+      /// return True if the visual is a component.
+      private: bool IsComponent(const std::string &_name);
+
       /// \brief Qt signal when the connection creation process has ended.
       //Q_SIGNALS: void ConnectionAdded();
 
