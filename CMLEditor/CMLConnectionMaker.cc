@@ -235,12 +235,13 @@ bool CMLConnectionMaker::OnMouseRelease(const common::MouseEvent &_event)
         this->selectedVis = this->hoverVis;
         this->hoverVis.reset();
 
-        rendering::VisualPtr entityVis =
-            this->selectedVis->GetNthAncestor(2);
+/*        rendering::VisualPtr entityVis = this->selectedVis->GetNthAncestor(3);
+        if (!entity || !this->IsComponent(entity))
+          entityVis = this->selectedVis->GetNthAncestor(2);*/
 
         // Create connection data with selected visual as parent
         // the child will be set on the second mouse release.
-        this->mouseConnection = this->CreateConnection(entityVis,
+        this->mouseConnection = this->CreateConnection(this->selectedVis,
             rendering::VisualPtr());
         this->mouseConnection->parentPort = port;
       }
@@ -335,12 +336,13 @@ void CMLConnectionMaker::InsertConnectionElement(ConnectionData *_connection)
   sdf::ElementPtr sourceElem(new sdf::Element);
   sourceElem->SetName("source");
 
-  std::string leafName = _connection->parent->GetName();
-  size_t pIdx = leafName.find_last_of("::");
+//  std::string leafName = _connection->parent->GetName();
+  std::string scopedName = _connection->parent->GetName();
+  size_t pIdx = scopedName.find("::");
   if (pIdx != std::string::npos)
-    leafName = leafName.substr(pIdx+1);
+    scopedName = scopedName.substr(pIdx+2);
 
-  sourceElem->AddValue("string", leafName, "_none_", "source");
+  sourceElem->AddValue("string", scopedName, "_none_", "source");
   connectionElem->InsertElement(sourceElem);
 
   sdf::ElementPtr sourcePortElem(new sdf::Element);
@@ -352,12 +354,12 @@ void CMLConnectionMaker::InsertConnectionElement(ConnectionData *_connection)
   sdf::ElementPtr targetElem(new sdf::Element);
   targetElem->SetName("target");
 
-  leafName = _connection->child->GetName();
-  pIdx = leafName.find_last_of("::");
+  scopedName = _connection->child->GetName();
+  pIdx = scopedName.find("::");
   if (pIdx != std::string::npos)
-    leafName = leafName.substr(pIdx+1);
+    scopedName = scopedName.substr(pIdx+2);
 
-  targetElem->AddValue("string", leafName, "_none_", "target");
+  targetElem->AddValue("string", scopedName, "_none_", "target");
   connectionElem->InsertElement(targetElem);
 
   sdf::ElementPtr targetPortElem(new sdf::Element);
