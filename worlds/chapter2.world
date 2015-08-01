@@ -11,6 +11,7 @@
     </include>
 
 
+
     <plugin name="SimEvents" filename="libSimEventsPlugin.so">
       <session></session>
 
@@ -52,42 +53,17 @@
       </event>
 
       <event>
-        <name>existence</name>
-        <type>existence</type>
-        <!-- no model  is specified -->
+        <name>joint_velocity</name>
+        <type>joint</type>
+        <model>motor</model>
+        <joint>motor_shaft_joint</joint>
+        <range>
+          <type>velocity</type>
+          <min>0.5</min>
+          <max>1000000</max>
+        </range>
       </event>
 
-      <!-- bounding box inclusion event -->
-      <event>
-        <name>on_slab_0</name>
-        <type>inclusion</type>
-        <model>vehicle</model>
-        <region>slab_0</region>
-      </event>
-
-     <!-- bounding box inclusion event -->
-      <event>
-        <name>on_slab_1</name>
-        <type>inclusion</type>
-        <model>vehicle</model>
-        <region>slab_1</region>
-      </event>
-
-      <!-- bounding box inclusion event -->
-      <event>
-        <name>on_slab_2</name>
-        <type>inclusion</type>
-        <model>vehicle</model>
-        <region>slab_2</region>
-      </event>
-
-      <!-- bounding box inclusion event -->
-      <event>
-        <name>on_slab_3</name>
-        <type>inclusion</type>
-        <model>vehicle</model>
-        <region>slab_3</region>
-      </event>
     </plugin>
 
 

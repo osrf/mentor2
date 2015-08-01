@@ -129,6 +129,9 @@ namespace gazebo
 
       /// \brief Name of component to be inspected.
       private: std::string inspectName;
+
+      /// \brief Is this render interface active or not.
+      private: bool active;
     };
   }
 }

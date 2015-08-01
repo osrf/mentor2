@@ -45,7 +45,7 @@ SwitchPlugin::~SwitchPlugin()
 /////////////////////////////////////////////////
 void SwitchPlugin::LoadImpl(sdf::ElementPtr _sdf)
 {
-  this->closed  = this->GetProperty<bool>("closed");
+  this->closed = this->GetProperty<bool>("closed");
 
   if (_sdf->HasElement("switch_joint"))
   {
@@ -140,9 +140,12 @@ void SwitchPlugin::UpdateImpl(double _timeSinceLastUpdate)
 
   // closed value changed externally (most likely by user)
   bool newClosed = this->GetProperty<bool>("closed");
+
   if (this->closed != newClosed)
   {
     this->closed = newClosed;
+    this->SetProperty<bool>("closed", this->closed);
+
     if (this->closed)
       this->switchCmd = this->switchLow;
     else
@@ -161,7 +164,7 @@ void SwitchPlugin::UpdateImpl(double _timeSinceLastUpdate)
       this->closed = false;
       this->switchCmd = this->switchHigh;
       this->fnrSwitchTime = curTime;
-      std::cerr << "switch set to false" << std::endl;
+      // std::cerr << "switch set to false" << std::endl;
 
     }
     else if (this->switchCmd > (this->switchHigh - switchCmdEps) &&
@@ -172,7 +175,7 @@ void SwitchPlugin::UpdateImpl(double _timeSinceLastUpdate)
       this->closed = true;
       this->switchCmd = this->switchLow;
       this->fnrSwitchTime = curTime;
-      std::cerr << "switch set to true" << std::endl;
+      // std::cerr << "switch set to true" << std::endl;
     }
   }
 

@@ -78,7 +78,7 @@ namespace gazebo
               return result;
             }
 
-    /// \brief Get a value of a property by key
+    /// \brief Set a value of a property by key
     /// \param[in] _key String key
     /// \return The value of the property
     public: template<typename T>
@@ -94,28 +94,33 @@ namespace gazebo
                 Simple_msgs::msgs::Variant valueMsg = this->properties[_key];
                 if (typeid(unsigned int) == typeid(_value))
                 {
-                  valueMsg.set_v_uint32(_value);
+                  unsigned int value =
+                      boost::lexical_cast<unsigned int>(_value);
+                  valueMsg.set_v_uint32(value);
                   valueMsg.set_type(Simple_msgs::msgs::Variant::UINT32);
                 }
                 else if (typeid(int) == typeid(_value))
                 {
-                  valueMsg.set_v_int32(_value);
+                  int value = boost::lexical_cast<int>(value);
+                  valueMsg.set_v_int32(value);
                   valueMsg.set_type(Simple_msgs::msgs::Variant::INT32);
                 }
                 else if (typeid(bool) == typeid(_value))
                 {
-                  valueMsg.set_v_bool(_value);
+                  bool value = boost::lexical_cast<bool>(_value);
+                  valueMsg.set_v_bool(value);
                   valueMsg.set_type(Simple_msgs::msgs::Variant::BOOL);
                 }
                 else if (typeid(double) == typeid(_value))
                 {
-                  valueMsg.set_v_double(_value);
+                  double value = boost::lexical_cast<double>(_value);
+                  valueMsg.set_v_double(value);
                   valueMsg.set_type(Simple_msgs::msgs::Variant::DOUBLE);
                 }
                 else if (typeid(std::string) == typeid(_value))
                 {
-                  valueMsg.set_v_string(
-                      boost::lexical_cast<std::string>(_value));
+                  std::string value = boost::lexical_cast<std::string>(_value);
+                  valueMsg.set_v_string(value);
                   valueMsg.set_type(Simple_msgs::msgs::Variant::STRING);
                 }
                 /*else if (typeid(Simple_msgs::msgs::Variant) == typeid(_value))
@@ -130,12 +135,18 @@ namespace gazebo
                   this->simpleModelPub->Publish(simpleModelMsg);
                 }
               }
+
+              if (this->sdfElements.find(_key) != this->sdfElements.end())
+              {
+                sdf::ElementPtr elem = this->sdfElements[_key];
+                elem->Set<T>(_value);
+              }
             }
 
     /// \brief Set the value of a property by key
     /// \param[in] _key String key
     /// \param[in] The value of the property
-    public: void SetProperty(const std::string &_key,
+    public: void SetPropertyVariant(const std::string &_key,
         const Simple_msgs::msgs::Variant &_value);
     //public: void SetProperty(const std::string &_key, const boost::any &_value);
 
@@ -218,6 +229,9 @@ namespace gazebo
 
     /// \brief A list of properties associated with this model.
     protected: std::map<std::string, Simple_msgs::msgs::Variant> properties;
+
+        /// \brief A list of properties associated with this model.
+    protected: std::map<std::string, sdf::ElementPtr> sdfElements;
 
     /// \brief Pointer to the parent model.
     protected: physics::ModelPtr parent;

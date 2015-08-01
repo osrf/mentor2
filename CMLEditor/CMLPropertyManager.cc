@@ -84,9 +84,8 @@ void CMLPropertyManager::OnComponentProperyChanged()
               }
               catch (const boost::bad_any_cast &)
               {
-                std::stringstream ss;
-                ss << boost::any_cast<bool>(value);
-                valueStr = ss.str();
+                bool boolValue = boost::any_cast<bool>(value);
+                valueStr = boolValue ? "true" : "false";
               }
             }
             propertiesElem->GetElement(key)->Set(valueStr);

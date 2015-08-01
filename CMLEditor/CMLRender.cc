@@ -53,6 +53,7 @@ CMLRender::CMLRender()
 /*  this->connections.push_back(
       event::Events::ConnectPreRender(
         boost::bind(&CMLRender::Update, this)));*/
+  this->active = false;
 
   this->connections.push_back(
       CMLEvents::ConnectCreateConnection(
@@ -127,6 +128,7 @@ void CMLRender::OnModelEditorMode(bool _enabled)
 /////////////////////////////////////////////////
 void CMLRender::EnableEventHandlers()
 {
+  this->active = true;
   // Add an event filter, which allows the CMLRender to capture mouse events.
   MouseEventHandler::Instance()->AddReleaseFilter("CML_Render",
       boost::bind(&CMLRender::OnMouseRelease, this, _1));
@@ -137,6 +139,7 @@ void CMLRender::EnableEventHandlers()
 /////////////////////////////////////////////////
 void CMLRender::DisableEventHandlers()
 {
+  this->active = false;
   MouseEventHandler::Instance()->RemoveReleaseFilter("CML_Render");
   MouseEventHandler::Instance()->RemoveDoubleClickFilter("CML_Render");
 }
@@ -151,6 +154,9 @@ void CMLRender::OnRequest(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 bool CMLRender::OnMouseRelease(const common::MouseEvent &_event)
 {
+  if (!this->active)
+    return false;
+
   // Get the active camera and scene.
   rendering::UserCameraPtr camera = gui::get_active_camera();
   rendering::ScenePtr scene = camera->GetScene();
@@ -204,6 +210,9 @@ bool CMLRender::OnMouseRelease(const common::MouseEvent &_event)
 /////////////////////////////////////////////////
 bool CMLRender::OnMouseDoubleClick(const common::MouseEvent &_event)
 {
+  if (!this->active)
+    return false;
+
   // Get the active camera and scene.
   rendering::UserCameraPtr camera = gui::get_active_camera();
   rendering::ScenePtr scene = camera->GetScene();

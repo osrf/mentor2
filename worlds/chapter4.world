@@ -736,6 +736,18 @@
       </event>
 
 
+      <event>
+        <name>joint_velocity</name>
+        <type>joint</type>
+        <model>motor</model>
+        <joint>motor_shaft_joint</joint>
+        <range>
+          <type>velocity</type>
+          <min>0.5</min>
+          <max>1000000</max>
+        </range>
+      </event>
+
     </plugin>
 
 

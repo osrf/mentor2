@@ -104,8 +104,8 @@
     </link>
 
     <joint name="button_joint" type="revolute">
-      <parent>body</parent>
-      <child>button</child>
+      <parent>power_switch::body</parent>
+      <child>power_switch::button</child>
       <axis>
         <xyz>0.0 1.0 0.0</xyz>
         <limit>
@@ -125,8 +125,8 @@
     </joint>
 
     <joint name="stand_joint" type="revolute">
-      <parent>body</parent>
-      <child>stand</child>
+      <parent>power_switch::body</parent>
+      <child>power_switch::stand</child>
       <axis>
         <xyz>0.0 0.0 1.0</xyz>
         <limit>
@@ -147,7 +147,7 @@
         <type>electrical</type>
       </port>
       <properties>
-        <closed>false</closed>
+        <closed>true</closed>
       </properties>
       <switch_joint>button_joint</switch_joint>
     </plugin>
