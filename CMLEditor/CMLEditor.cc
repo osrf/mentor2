@@ -205,6 +205,18 @@ void CMLEditor::Parse(sdf::ElementPtr _sdf, const std::string &_name)
           valueVariant.set_v_string(value);
         }
       }
+
+      /// FIXME hack
+      if (key == "closed")
+      {
+        valueVariant.set_type(Simple_msgs::msgs::Variant::BOOL);
+        if (value == "true" || value == "1")
+          valueVariant.set_v_bool(true);
+        else
+          valueVariant.set_v_bool(false);
+        //valueVariant.set_v_bool(boost::lexical_cast<bool>(value));
+      }
+
       properties[key] = valueVariant;
       childElem = childElem->GetNextElement("");
     }

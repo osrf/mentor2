@@ -147,7 +147,11 @@ void SimpleModelPlugin::Load(sdf::ElementPtr _sdf)
       if (key == "closed")
       {
         valueVariant.set_type(Simple_msgs::msgs::Variant::BOOL);
-        valueVariant.set_v_bool(boost::lexical_cast<bool>(value));
+        if (value == "true" || value == "1")
+          valueVariant.set_v_bool(true);
+        else
+          valueVariant.set_v_bool(false);
+        //valueVariant.set_v_bool(boost::lexical_cast<bool>(value));
       }
 
       this->properties[key] = valueVariant;
