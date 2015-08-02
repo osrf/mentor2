@@ -27,4 +27,4 @@ make -j 4 install
 
 
 echo "===== Done ====="
-sleep 5
+$SHELL
