@@ -7,7 +7,6 @@
         <inertial>
           <pose>0 0 1.0 0 0 0</pose>
           <mass>10.0</mass>
-
         </inertial>
 
         <collision name="collision">

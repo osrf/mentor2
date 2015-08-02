@@ -9,7 +9,7 @@
       <link name="link">
         <pose>0.0 0 0.0 0 0 0</pose>
         <inertial>
-          <mass>10</mass>
+          <mass>3</mass>
           <inertia>
             <ixx>0.01</ixx>
             <ixy>0</ixy>
@@ -18,6 +18,7 @@
             <iyz>0</iyz>
             <izz>0.01</izz>
           </inertia>
+        </inertial>
         </inertial>
         <self_collide>false</self_collide>
         <collision name="collision">
@@ -90,17 +91,17 @@
         <pose>0.002 0 0.0 0 0 0</pose>
         <self_collide>false</self_collide>
         <gravity>false</gravity>
-        <inertial>
-          <mass>0.1</mass>
-          <inertia>
-            <ixx>0.0001</ixx>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyy>0.0001</iyy>
-            <iyz>0</iyz>
-            <izz>0.0001</izz>
-          </inertia>
-        </inertial>
+          <inertial>
+            <mass>0.05</mass>
+            <inertia>
+              <ixx>0.0001</ixx>
+              <ixy>0</ixy>
+              <ixz>0</ixz>
+              <iyy>0.0001</iyy>
+              <iyz>0</iyz>
+              <izz>0.0003</izz>
+            </inertia>
+          </inertial>
         <collision name="collision">
           <pose>0.0 0 0.0 0 1.57079632679 0</pose>
           <geometry>
@@ -145,6 +146,10 @@
             <lower>-1000000</lower>
             <upper>1000000</upper>
           </limit>
+          <dynamics>
+            <friction>0.000001</friction>
+            <damping>0.000001</damping>
+          </dynamics>
         </axis>
       </joint>
 
@@ -277,8 +282,8 @@
       </link>
       <plugin filename="libGearboxPlugin.so" name="gearbox">
         <properties>
-          <child>motor_gearbox::axle_wheels::link</child>
-          <parent>motor_gearbox::motor::motor_shaft_link</parent>
+          <parent>motor_gearbox::axle_wheels::link</parent>
+          <child>motor_gearbox::motor::motor_shaft_link</child>
           <gear_ratio>1.0</gear_ratio>
           <efficiency>0.95</efficiency>
         </properties>
@@ -308,9 +313,6 @@
         </limit>
       </axis>
     </joint>
-
-
   </model>
-
 
 </sdf>

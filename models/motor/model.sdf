@@ -5,6 +5,18 @@
     <link name="link">
       <pose>0.0 0 0.0 0 0 1.57079632679</pose>
       <self_collide>false</self_collide>
+      <inertial>
+        <mass>3</mass>
+        <inertia>
+          <ixx>0.01</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.01</iyy>
+          <iyz>0</iyz>
+          <izz>0.01</izz>
+        </inertia>
+      </inertial>
+
       <collision name="collision">
         <pose>0 0 0.0 0 0 0</pose>
         <geometry>
@@ -61,6 +73,17 @@
       <pose>0.0 0 0.0 0 0 0</pose>
       <self_collide>false</self_collide>
       <gravity>false</gravity>
+      <inertial>
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>0.001</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.001</iyy>
+          <iyz>0</iyz>
+          <izz>0.001</izz>
+        </inertia>
+      </inertial>
       <collision name="collision">
         <pose>0.0 0 0.0 1.57079632679 0 0</pose>
         <geometry>
@@ -91,6 +114,17 @@
       <pose>0.0 0 0.0 0 0 0</pose>
       <self_collide>false</self_collide>
       <gravity>false</gravity>
+      <inertial>
+        <mass>0.05</mass>
+        <inertia>
+          <ixx>0.0001</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.0001</iyy>
+          <iyz>0</iyz>
+          <izz>0.0003</izz>
+        </inertia>
+      </inertial>
       <visual name='debug_vis'>
         <pose>0.0 0.12 0.0 0 0.0 0.0</pose>
         <geometry>
@@ -134,6 +168,10 @@
           <lower>-1000000</lower>
           <upper>1000000</upper>
         </limit>
+        <dynamics>
+          <friction>0.000001</friction>
+          <damping>0.000001</damping>
+        </dynamics>
       </axis>
     </joint>
 

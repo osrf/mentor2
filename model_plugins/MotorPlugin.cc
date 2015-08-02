@@ -32,7 +32,7 @@ MotorPlugin::MotorPlugin()
   this->backEmf = 0.0064;
   this->motorResistance = 5;
   this->torqueConstant = 0.0064;
-  //this->torqueConstant = 596;
+  //this->torqueConstant = 0.64;
 }
 
 /////////////////////////////////////////////////
