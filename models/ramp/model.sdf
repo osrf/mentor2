@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <sdf version="1.5">
     <model name="ramp">
-      <pose>0 0 0.25 0 0 0</pose>
+      <pose>0 0 0.75 0 0 0</pose>
       <link name="link">
         <pose>0 0 0 1.57 0 1.57</pose>
         <inertial>
@@ -12,11 +12,11 @@
         <collision name="collision">
           <geometry>
             <polyline>
-              <point>-1.25 -0.25</point>
-              <point>-1.25 0.25</point>
-              <point>-0.75 0.25</point>
-              <point>0.75 -0.25</point>
-              <point>-1.25 -0.25</point>
+              <point>-1.25 -0.75</point>
+              <point>-1.25 0.75</point>
+              <point>-0.75 0.75</point>
+              <point>0.75 -0.75</point>
+              <point>-1.25 -0.75</point>
               <height>2</height>
             </polyline>
           </geometry>
@@ -25,11 +25,11 @@
         <visual name="visual">
           <geometry>
             <polyline>
-              <point>-1.25 -0.25</point>
-              <point>-1.25 0.25</point>
-              <point>-0.75 0.25</point>
-              <point>0.75 -0.25</point>
-              <point>-1.25 -0.25</point>
+              <point>-1.25 -0.75</point>
+              <point>-1.25 0.75</point>
+              <point>-0.75 0.75</point>
+              <point>0.75 -0.75</point>
+              <point>-1.25 -0.75</point>
               <height>2</height>
             </polyline>
           </geometry>
