@@ -3,7 +3,7 @@
 
     <model name="vehicle">
       <link name="link">
-        <pose>0.0 0.070 0.024 0 0 0</pose>
+        <pose>0.0 0.060 0.034 0 0 0</pose>
         <inertial>
           <mass>0.1</mass>
           <inertia>
@@ -48,7 +48,7 @@
             </inertia>
           </inertial>
           <collision name="collision">
-            <pose>0.0005 -0.00065 0 1.57079632679 0 0</pose>
+            <pose>0.000 -0.0300 0 1.57079632679 0 0</pose>
             <geometry>
               <box>
                 <size>0.051 0.0035 0.153</size>
@@ -356,6 +356,9 @@
               </script>
             </material>
           </visual>
+          <velocity_decay>
+            <angular>0.0001</angular>
+          </velocity_decay>
         </link>
 
         <joint name="motor_shaft_joint" type="revolute">
@@ -367,6 +370,10 @@
               <lower>-1000000</lower>
               <upper>1000000</upper>
             </limit>
+            <dynamics>
+              <friction>0.000001</friction>
+              <damping>0.0001</damping>
+            </dynamics>
           </axis>
         </joint>
 
