@@ -166,41 +166,47 @@ bool CMLRender::OnMouseRelease(const common::MouseEvent &_event)
   {
     if (vis)
     {
-      rendering::VisualPtr topLevelVis = vis->GetNthAncestor(2);
-      if (!topLevelVis)
+      unsigned int depth = 2;
+      rendering::VisualPtr modelVis;
+      while (depth < vis->GetDepth())
+      {
+        rendering::VisualPtr childVis = vis->GetNthAncestor(depth);
+        if (!childVis)
+          break;
+
+        std::string name = childVis->GetName();
+        Simple_msgs::msgs::SimpleModel msg;
+        msg = CMLManager::Instance()->GetModelInfo(name);
+        if (msg.key_size() > 0)
+          modelVis = childVis;
+        depth++;
+      }
+
+      if (!modelVis)
         return false;
 
-      std::string name = topLevelVis->GetName();
+      this->inspectName = modelVis->GetName();
 
-      Simple_msgs::msgs::SimpleModel msg;
-      msg = CMLManager::Instance()->GetModelInfo(name);
-
-      if (!msg.name().empty())
+      QMenu menu;
+      if (this->inspectAct)
       {
-
-        this->inspectName = msg.name();
-
-        QMenu menu;
-        if (this->inspectAct)
-        {
-          menu.addAction(this->inspectAct);
-        }
-        QAction *deleteAct = new QAction(tr("Delete"), this);
-        connect(deleteAct, SIGNAL(triggered()), this, SLOT(OnDelete()));
-        menu.addAction(deleteAct);
-        menu.exec(QCursor::pos());
+        menu.addAction(this->inspectAct);
+      }
+      QAction *deleteAct = new QAction(tr("Delete"), this);
+      connect(deleteAct, SIGNAL(triggered()), this, SLOT(OnDelete()));
+      menu.addAction(deleteAct);
+      menu.exec(QCursor::pos());
 
 /*        ModelRightMenu *contextMenu = gui::get_context_menu();
-        if (contextMenu)
-        {
-          std::vector<QAction *> menuAction;
-          menuAction.push_back(this->inspectAct);
-          contextMenu->Run(name, QCursor::pos(), menuAction);
-          return true;
-        }
-        else*/
+      if (contextMenu)
+      {
+        std::vector<QAction *> menuAction;
+        menuAction.push_back(this->inspectAct);
+        contextMenu->Run(name, QCursor::pos(), menuAction);
         return true;
       }
+      else*/
+      return true;
     }
   }
 
