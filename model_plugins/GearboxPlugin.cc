@@ -134,29 +134,32 @@ void GearboxPlugin::UpdateImpl(double _timeSinceLastUpdate)
 
   std::string rootModelName;
   physics::BasePtr entity = this->parent;
-  while (entity->GetParent() &&
+/*  while (entity->GetParent() &&
       entity->GetParent()->HasType(physics::Base::MODEL))
   {
     entity = entity->GetParent();
-  }
+  }*/
 
-  // try find parent and child links
   physics::WorldPtr world = this->parent->GetWorld();
-  std::string parentScopedName =
-      entity->GetName() + "::" + this->parentLinkName;
-  std::string childScopedName =
-      entity->GetName() + "::" + this->childLinkName;
-  this->parentLink = boost::dynamic_pointer_cast<physics::Link>(
-    world->GetByName(parentScopedName));
-  this->childLink = boost::dynamic_pointer_cast<physics::Link>(
-    world->GetByName(childScopedName));
-
-  if (this->parentLink && this->childLink)
+  while (!this->parentLink || !this->childLink)
   {
-    this->parentLinkName = parentScopedName;
-    this->childLinkName = childScopedName;
+    // try find parent and child links
+    std::string parentScopedName =
+        entity->GetScopedName() + "::" + this->parentLinkName;
+    std::string childScopedName =
+        entity->GetScopedName() + "::" + this->childLinkName;
+    this->parentLink = boost::dynamic_pointer_cast<physics::Link>(
+      world->GetByName(parentScopedName));
+    this->childLink = boost::dynamic_pointer_cast<physics::Link>(
+      world->GetByName(childScopedName));
+    if (entity->GetParent() &&
+        entity->GetParent()->HasType(physics::Base::MODEL))
+      entity = entity->GetParent();
+    else
+      break;
   }
-  else
+
+  if (!this->parentLink || !this->childLink)
   {
     // try harder
     size_t pos = this->parentLinkName.find("::");

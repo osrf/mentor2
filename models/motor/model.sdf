@@ -163,8 +163,8 @@
     </link>
 
     <joint name="motor_shaft_joint" type="revolute">
-      <parent>motor::motor_core_link</parent>
-      <child>motor::motor_shaft_link</child>
+      <parent>motor_core_link</parent>
+      <child>motor_shaft_link</child>
       <axis>
         <xyz>0 1 0</xyz>
         <limit>
@@ -179,8 +179,8 @@
     </joint>
 
     <joint name="motor_joint" type="revolute">
-      <parent>motor::motor_core_link</parent>
-      <child>motor::link</child>
+      <parent>motor_core_link</parent>
+      <child>link</child>
       <axis>
         <xyz>0 0 1</xyz>
         <limit>

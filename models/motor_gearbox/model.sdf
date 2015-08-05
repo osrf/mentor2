@@ -140,8 +140,8 @@
       </link>
 
       <joint name="motor_shaft_joint" type="revolute">
-        <parent>motor_gearbox::motor::motor_core_link</parent>
-        <child>motor_gearbox::motor::motor_shaft_link</child>
+        <parent>motor_core_link</parent>
+        <child>motor_shaft_link</child>
         <axis>
           <xyz>1 0 0</xyz>
           <limit>
@@ -156,8 +156,8 @@
       </joint>
 
       <joint name="motor_joint" type="revolute">
-        <parent>motor_gearbox::motor::motor_core_link</parent>
-        <child>motor_gearbox::motor::link</child>
+        <parent>motor_core_link</parent>
+        <child>link</child>
         <axis>
           <xyz>0 0 1</xyz>
           <limit>
@@ -284,8 +284,8 @@
       </link>
       <plugin filename="libGearboxPlugin.so" name="gearbox">
         <properties>
-          <parent>motor_gearbox::axle_wheels::link</parent>
-          <child>motor_gearbox::motor::motor_shaft_link</child>
+          <parent>axle_wheels::link</parent>
+          <child>motor::motor_shaft_link</child>
           <gear_ratio>1.0</gear_ratio>
           <efficiency>0.95</efficiency>
         </properties>
@@ -293,8 +293,8 @@
     </model>
 
     <joint name="gearbox_motor_joint" type="revolute">
-      <parent>motor_gearbox::gearbox::link</parent>
-      <child>motor_gearbox::motor::link</child>
+      <parent>gearbox::link</parent>
+      <child>motor::link</child>
       <axis>
         <xyz>1 0 0</xyz>
         <limit>
@@ -305,8 +305,8 @@
     </joint>
 
     <joint name="gearbox_axle_joint" type="revolute">
-      <parent>motor_gearbox::gearbox::link</parent>
-      <child>motor_gearbox::axle_wheels::link</child>
+      <parent>gearbox::link</parent>
+      <child>axle_wheels::link</child>
       <axis>
         <xyz>1 0 0</xyz>
         <limit>

@@ -104,8 +104,8 @@
     </link>
 
     <joint name="button_joint" type="revolute">
-      <parent>power_switch::body</parent>
-      <child>power_switch::button</child>
+      <parent>body</parent>
+      <child>button</child>
       <axis>
         <xyz>0.0 1.0 0.0</xyz>
         <limit>
@@ -125,8 +125,8 @@
     </joint>
 
     <joint name="stand_joint" type="revolute">
-      <parent>power_switch::body</parent>
-      <child>power_switch::stand</child>
+      <parent>body</parent>
+      <child>stand</child>
       <axis>
         <xyz>0.0 0.0 1.0</xyz>
         <limit>

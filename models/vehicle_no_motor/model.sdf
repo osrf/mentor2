@@ -189,8 +189,8 @@
       </model>
 
       <joint name="chassis_v2_battery_9v_joint" type="revolute">
-        <parent>vehicle::chassis_v2::link</parent>
-        <child>vehicle::battery_9v::link</child>
+        <parent>chassis_v2::link</parent>
+        <child>battery_9v::link</child>
         <axis>
           <xyz>0 0 1</xyz>
           <limit>
@@ -201,8 +201,8 @@
       </joint>
 
       <joint name="chassis_v2_axle_joint" type="revolute">
-        <parent>vehicle::chassis_v2::link</parent>
-        <child>vehicle::axle_wheels::link</child>
+        <parent>chassis_v2::link</parent>
+        <child>axle_wheels::link</child>
         <axis>
           <xyz>1 0 0</xyz>
           <limit>
@@ -212,8 +212,8 @@
         </axis>
       </joint>
       <joint name="chassis_v2_caster_joint" type="ball">
-        <parent>vehicle::chassis_v2::link</parent>
-        <child>vehicle::caster_wheel::link</child>
+        <parent>chassis_v2::link</parent>
+        <child>caster_wheel::link</child>
       </joint>
 
 
