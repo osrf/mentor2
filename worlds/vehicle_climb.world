@@ -408,8 +408,8 @@
         </link>
 
         <joint name="motor_shaft_joint" type="revolute">
-          <parent>vehicle::motor::motor_core_link</parent>
-          <child>vehicle::motor::motor_shaft_link</child>
+          <parent>motor_core_link</parent>
+          <child>motor_shaft_link</child>
           <axis>
             <xyz>1 0 0</xyz>
             <limit>
@@ -424,8 +424,8 @@
         </joint>
 
         <joint name="motor_joint" type="revolute">
-          <parent>vehicle::motor::motor_core_link</parent>
-          <child>vehicle::motor::link</child>
+          <parent>motor_core_link</parent>
+          <child>link</child>
           <axis>
             <xyz>0 0 1</xyz>
             <limit>
@@ -500,8 +500,8 @@
         </link>
         <plugin filename="libGearboxPlugin.so" name="gearbox">
           <properties>
-            <parent>vehicle::axle_wheels::link</parent>
-            <child>vehicle::motor::motor_shaft_link</child>
+            <parent>axle_wheels::link</parent>
+            <child>motor::motor_shaft_link</child>
             <gear_ratio>1.0</gear_ratio>
             <efficiency>0.95</efficiency>
           </properties>
@@ -509,8 +509,8 @@
       </model>
 
       <joint name="chassis_v2_battery_9v_joint" type="revolute">
-        <parent>vehicle::chassis_v2::link</parent>
-        <child>vehicle::battery_9v::link</child>
+        <parent>chassis_v2::link</parent>
+        <child>battery_9v::link</child>
         <axis>
           <xyz>0 0 1</xyz>
           <limit>
@@ -521,8 +521,8 @@
       </joint>
 
       <joint name="chassis_v2_gearbox_joint" type="revolute">
-        <parent>vehicle::chassis_v2::link</parent>
-        <child>vehicle::gearbox::link</child>
+        <parent>chassis_v2::link</parent>
+        <child>gearbox::link</child>
         <axis>
           <xyz>0 0 1</xyz>
           <limit>
@@ -533,8 +533,8 @@
       </joint>
 
       <joint name="chassis_v2_motor_joint" type="revolute">
-        <parent>vehicle::chassis_v2::link</parent>
-        <child>vehicle::motor::link</child>
+        <parent>chassis_v2::link</parent>
+        <child>motor::link</child>
         <axis>
           <xyz>0 0 1</xyz>
           <limit>
@@ -545,8 +545,8 @@
       </joint>
 
       <joint name="chassis_v2_axle_joint" type="revolute">
-        <parent>vehicle::chassis_v2::link</parent>
-        <child>vehicle::axle_wheels::link</child>
+        <parent>chassis_v2::link</parent>
+        <child>axle_wheels::link</child>
         <axis>
           <xyz>1 0 0</xyz>
           <limit>
@@ -557,14 +557,14 @@
       </joint>
 
       <joint name="chassis_v2_caster_joint" type="ball">
-        <parent>vehicle::chassis_v2::link</parent>
-        <child>vehicle::caster_wheel::link</child>
+        <parent>chassis_v2::link</parent>
+        <child>caster_wheel::link</child>
       </joint>
 
 
       <joint name="chassis_v2_weight_joint" type="revolute">
-        <parent>vehicle::chassis_v2::link</parent>
-        <child>vehicle::link</child>
+        <parent>chassis_v2::link</parent>
+        <child>link</child>
         <axis>
           <xyz>0 0 1</xyz>
           <limit>
@@ -575,8 +575,8 @@
       </joint>
 
       <joint name="gearbox_axle_joint" type="revolute">
-        <parent>vehicle::gearbox::link</parent>
-        <child>vehicle::axle_wheels::link</child>
+        <parent>gearbox::link</parent>
+        <child>axle_wheels::link</child>
         <axis>
           <xyz>1 0 0</xyz>
           <limit>
@@ -587,8 +587,8 @@
       </joint>
 
       <joint name="gearbox_motor_joint" type="revolute">
-        <parent>vehicle::gearbox::link</parent>
-        <child>vehicle::motor::link</child>
+        <parent>gearbox::link</parent>
+        <child>motor::link</child>
         <axis>
           <xyz>0 0 1</xyz>
           <limit>
