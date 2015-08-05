@@ -15,6 +15,7 @@ set (dirs
   motor_gearbox
   power_switch
   ramp
+  region_event_box
   vehicle
   vehicle_no_motor
   vrc_driving_terrain
