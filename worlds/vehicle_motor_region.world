@@ -15,7 +15,7 @@
 
     <model name="vehicle">
       <link name="link">
-        <pose>0.0 0.070 0.024 0 0 0</pose>
+        <pose>0.0 0.060 0.034 0 0 0</pose>
         <inertial>
           <mass>0.1</mass>
           <inertia>
@@ -60,7 +60,7 @@
             </inertia>
           </inertial>
           <collision name="collision">
-            <pose>0.0005 -0.00065 0 1.57079632679 0 0</pose>
+            <pose>0.000 -0.0300 0 1.57079632679 0 0</pose>
             <geometry>
               <box>
                 <size>0.051 0.0035 0.153</size>
@@ -116,6 +116,23 @@
                 <length>0.02</length>
               </cylinder>
             </geometry>
+            <surface>
+              <friction>
+                <ode>
+                  <mu>1.0</mu>
+                  <mu2>1.0</mu2>
+                  <fdir1>0 1 0</fdir1>
+                  <slip1>0.0</slip1>
+                  <slip2>0.0</slip2>
+                </ode>
+              </friction>
+              <contact>
+                <ode>
+                  <min_depth>0.005</min_depth>
+                  <kp>1e8</kp>
+                </ode>
+              </contact>
+            </surface>
           </collision>
           <collision name="wheel_1_collision">
             <pose>0.0405 0 0.0 0 1.57079632679 0</pose>
@@ -125,6 +142,23 @@
                 <length>0.02</length>
               </cylinder>
             </geometry>
+            <surface>
+              <friction>
+                <ode>
+                  <mu>1.0</mu>
+                  <mu2>1.0</mu2>
+                  <fdir1>0 1 0</fdir1>
+                  <slip1>0.0</slip1>
+                  <slip2>0.0</slip2>
+                </ode>
+              </friction>
+              <contact>
+                <ode>
+                  <min_depth>0.005</min_depth>
+                  <kp>1e8</kp>
+                </ode>
+              </contact>
+            </surface>
           </collision>
           <visual name="visual">
             <pose>0 0 0.0 0 0 0</pose>
@@ -344,14 +378,14 @@
               </cylinder>
             </geometry>
           </collision>
-<!--          <visual name="debug_visual">
+          <visual name="debug_visual">
             <pose>0.0 0 0.0 0 1.57079632679 0</pose>
             <geometry>
               <box>
                 <size>0.01 0.02 0.03</size>
               </box>
             </geometry>
-          </visual>-->
+          </visual>
 
           <visual name="visual">
             <pose>0.0 0 0.0 0 1.57079632679 0</pose>
@@ -368,6 +402,9 @@
               </script>
             </material>
           </visual>
+          <velocity_decay>
+            <angular>0.0001</angular>
+          </velocity_decay>
         </link>
 
         <joint name="motor_shaft_joint" type="revolute">
@@ -379,6 +416,10 @@
               <lower>-1000000</lower>
               <upper>1000000</upper>
             </limit>
+            <dynamics>
+              <friction>0.000001</friction>
+              <damping>0.0001</damping>
+            </dynamics>
           </axis>
         </joint>
 

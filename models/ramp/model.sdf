@@ -6,25 +6,41 @@
         <pose>0 0 0 1.57 0 1.57</pose>
         <inertial>
           <pose>0 0 1.0 0 0 0</pose>
-          <mass>10.0</mass>
+          <inertia>
+          <ixx>100.0</ixx>
+          <iyy>100.0</iyy>
+          <izz>100.0</izz>
+          </inertia>
+          <mass>100.0</mass>
         </inertial>
 
         <collision name="collision">
           <geometry>
             <polyline>
-<!--              <point>-1.25 -0.75</point>
-              <point>-1.25 0.75</point>
-              <point>-0.75 0.75</point>
-              <point>0.75 -0.75</point>
-              <point>-1.25 -0.75</point>-->
               <point>-1.25 -0.25</point>
+              <point>-1.25 0.25</point>
+              <point>-0.25 0.25</point>
+              <point>-0.0 0.0</point>
+              <point>0.25 -0.15</point>
+              <point>0.75 -0.25</point>
+              <point>-1.25 -0.25</point>
+
+<!--              <point>-1.25 -0.25</point>
               <point>-1.25 0.25</point>
               <point>-0.75 0.25</point>
               <point>0.75 -0.25</point>
-              <point>-1.25 -0.25</point>
+              <point>-1.25 -0.25</point>-->
               <height>2</height>
             </polyline>
           </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1.0</mu>
+                <mu2>1.0</mu2>
+              </ode>
+            </friction>
+          </surface>
         </collision>
 
         <visual name="visual">
@@ -32,7 +48,9 @@
             <polyline>
               <point>-1.25 -0.25</point>
               <point>-1.25 0.25</point>
-              <point>-0.75 0.25</point>
+              <point>-0.25 0.25</point>
+              <point>-0.0 0.0</point>
+              <point>0.25 -0.15</point>
               <point>0.75 -0.25</point>
               <point>-1.25 -0.25</point>
               <height>2</height>

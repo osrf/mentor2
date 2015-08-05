@@ -134,6 +134,9 @@
             </script>
           </material>
         </visual>
+        <velocity_decay>
+          <angular>0.0001</angular>
+        </velocity_decay>
       </link>
 
       <joint name="motor_shaft_joint" type="revolute">
@@ -147,7 +150,7 @@
           </limit>
           <dynamics>
             <friction>0.000001</friction>
-            <damping>0.000001</damping>
+            <damping>0.0001</damping>
           </dynamics>
         </axis>
       </joint>
@@ -200,7 +203,7 @@
             <ixz>0</ixz>
             <iyy>0.0001</iyy>
             <iyz>0</iyz>
-            <izz>0.0001</izz>
+            <izz>0.0003</izz>
           </inertia>
         </inertial>
         <collision name="collision">
@@ -243,14 +246,14 @@
       <pose>0 0.0 0.15 0 0 0</pose>
       <link name="link">
         <inertial>
-          <mass>0.1</mass>
+          <mass>5</mass>
           <inertia>
-            <ixx>0.0001</ixx>
+            <ixx>0.1</ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0001</iyy>
+            <iyy>0.1</iyy>
             <iyz>0</iyz>
-            <izz>0.0001</izz>
+            <izz>0.1</izz>
           </inertia>
         </inertial>
         <collision name="collision">
