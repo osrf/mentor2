@@ -18,6 +18,7 @@
 #include <sdf/sdf.hh>
 #include <gazebo/physics/PhysicsTypes.hh>
 #include <gazebo/physics/Model.hh>
+#include <gazebo/physics/World.hh>
 
 #include "SimpleConnectionsPlugin.hh"
 
@@ -45,6 +46,33 @@ void SimpleConnectionsPlugin::Load(physics::ModelPtr _model,
   GZ_ASSERT(this->parent, "Parent model is NULL");
 
   this->sdf = _sdf;
+
+  if (this->sdf->HasElement("connection"))
+  {
+    std::string modelName = this->parent->GetScopedName();
+    sdf::ElementPtr connectionElem = this->sdf->GetElement("connection");
+    while (connectionElem)
+    {
+      std::string source = connectionElem->Get<std::string>("source");
+      std::string sourcePort =
+          connectionElem->Get<std::string>("source_port");
+
+      std::string target = connectionElem->Get<std::string>("target");
+      std::string targetPort =
+          connectionElem->Get<std::string>("target_port");
+
+      source = modelName + "::" + source;
+      target = modelName + "::" + target;
+      SimpleConnection data;
+      data.source = source;
+      data.sourcePort = sourcePort;
+      data.target = target;
+      data.targetPort = targetPort;
+      this->connectionData.push_back(data);
+      //this->PublishConnections(source, sourcePort, target, targetPort);
+      connectionElem = connectionElem->GetNextElement("connection");
+    }
+  }
 
   this->connectionsInit = false;
 
@@ -86,6 +114,8 @@ void SimpleConnectionsPlugin::PublishConnections(const std::string &_parent,
   msg.set_parent_port(_parentPort);
   msg.set_child_port(_childPort);
   this->connectionPub->Publish(msg);
+  std::cerr <<  " pub conn " <<_parent << "::" << _parentPort << " ||to || " <<
+      _child << "::" << _childPort << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -96,29 +126,27 @@ void SimpleConnectionsPlugin::Update()
 
   if (!this->connectionsInit)
   {
-    if (this->sdf->HasElement("connection"))
+    auto it = this->connectionData.begin();
+    while (it != this->connectionData.end())
     {
-      std::string modelName = this->parent->GetScopedName();
-      sdf::ElementPtr connectionElem = this->sdf->GetElement("connection");
-      while (connectionElem)
+      SimpleConnection data = *it;
+      if (this->parent->GetWorld()->GetModel(data.source) &&
+          this->parent->GetWorld()->GetModel(data.target))
       {
-        std::string source = connectionElem->Get<std::string>("source");
-        std::string sourcePort =
-            connectionElem->Get<std::string>("source_port");
-
-        std::string target = connectionElem->Get<std::string>("target");
-        std::string targetPort =
-            connectionElem->Get<std::string>("target_port");
-
-        source = modelName + "::" + source;
-        target = modelName + "::" + target;
-        this->PublishConnections(source, sourcePort, target, targetPort);
-        connectionElem = connectionElem->GetNextElement("connection");
+        this->PublishConnections(data.source, data.sourcePort,
+            data.target, data.targetPort);
+        it = this->connectionData.erase(it);
       }
+      else
+          ++it;
     }
-    event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
-    this->updateConnection.reset();
-    this->connectionsInit = true;
+
+    if (this->connectionData.empty())
+    {
+      event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
+      this->updateConnection.reset();
+      this->connectionsInit = true;
+    }
   }
 
 }

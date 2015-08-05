@@ -29,6 +29,14 @@
 
 namespace gazebo
 {
+  class SimpleConnection
+  {
+    public: std::string source;
+    public: std::string sourcePort;
+    public: std::string target;
+    public: std::string targetPort;
+  };
+
   class SimpleConnectionsPlugin : public ModelPlugin
   {
     /// \brief Constructor.
@@ -84,6 +92,9 @@ namespace gazebo
 
     /// \brief Flag to see if the publisher is ready.
     private: bool pubReady;
+
+    /// \brief List of simple connections to be published.
+    private: std::vector<SimpleConnection> connectionData;
   };
 }
 
