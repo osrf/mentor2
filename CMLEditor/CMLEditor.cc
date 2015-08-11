@@ -24,7 +24,9 @@
 #include <gazebo/gui/model/ModelEditorEvents.hh>
 #include <gazebo/gui/model/ModelEditor.hh>
 
+#include "Event.pb.h"
 #include "SimpleModel.pb.h"
+#include "SimpleConnection.pb.h"
 
 #include "CMLManager.hh"
 #include "CMLEvents.hh"
@@ -38,18 +40,14 @@ using namespace gui;
 CMLEditor::CMLEditor(MainWindow *_mainWindow)
   : mainWindow(_mainWindow)
 {
-  // Create the CML editor tab
-//  this->CMLPalette = new CMLEditorPalette(_mainWindow);
-
-  // handle user interaction with the 3d render window
-  this->renderProxy = new gui::CMLRender();
-
   if (!_mainWindow)
   {
     gzerr << "Main window is NULL!" << std::endl;
     return;
   }
 
+  // handle user interaction with the 3d render window
+  this->renderProxy = new gui::CMLRender();
 
   this->modelEditor =
       dynamic_cast<ModelEditor *>(_mainWindow->GetEditor("model"));
@@ -105,12 +103,30 @@ CMLEditor::CMLEditor(MainWindow *_mainWindow)
   this->modelEditor->AddItemToPalette(switchButton, "Components");
   this->modelEditor->AddItemToPalette(motorGearboxButton, "Components");
 
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init();
+
+  this->restPub =
+      this->node->Advertise<Event_msgs::msgs::RestPost>(
+      "/gazebo/rest/rest_post");
 
   this->connections.push_back(gui::model::Events::ConnectNestedModelInserted(
       boost::bind(&CMLEditor::OnNestedModelInserted, this, _1)));
 
   this->connections.push_back(gui::model::Events::ConnectNestedModelRemoved(
       boost::bind(&CMLEditor::OnNestedModelRemoved, this, _1)));
+
+  this->connections.push_back(gui::model::Events::ConnectLinkInserted(
+      boost::bind(&CMLEditor::OnLinkInserted, this, _1)));
+
+  this->connections.push_back(gui::model::Events::ConnectLinkRemoved(
+      boost::bind(&CMLEditor::OnLinkRemoved, this, _1)));
+
+  this->connections.push_back(gui::model::Events::ConnectJointInserted(
+      boost::bind(&CMLEditor::OnJointInserted, this, _1, _2, _3, _4, _5)));
+
+  this->connections.push_back(gui::model::Events::ConnectJointRemoved(
+      boost::bind(&CMLEditor::OnJointRemoved, this, _1)));
 
   this->LoadModels();
 }
@@ -294,44 +310,51 @@ void CMLEditor::OnNestedModelInserted(const std::string &_name)
     if (entitySDF->HasElement("plugin"))
     {
       this->Parse(entitySDF->GetElement("plugin"), _name);
-      return;
     }
   }
 
-  /*if (this->insertName.empty())
-    return;
+  Event_msgs::msgs::RestPost restMsg;
+  restMsg.set_route("/events/new");
 
-  for (auto it : this->models)
-  {
-    if (_name.find(it.first) != std::string::npos &&
-        it.second->Root()->GetElement("model")->HasElement("plugin"))
-    {
-      this->Parse(it.second->Root()->GetElement("model")->GetElement("plugin"),
-          _name);
-      break;
-    }
-  }
-
-  this->insertName == "";  */
+  std::string postStr;
+  postStr = "\"type\": \"existence\",";
+  postStr += "\"name\": \"editor_model_inserted\",";
+  postStr += "\"data\": {";
+  postStr += "\"link\": \"" + _name + "\",";
+  postStr += "\"state\": \"creation\"";
+  postStr += "}";
+  restMsg.set_json(postStr);
+  this->restPub->Publish(restMsg);
 }
 
 /////////////////////////////////////////////////
 void CMLEditor::OnNestedModelRemoved(const std::string &_name)
 {
   CMLManager::Instance()->RemoveSimpleModel(_name);
+
+  Event_msgs::msgs::RestPost restMsg;
+  restMsg.set_route("/events/new");
+
+  std::string postStr;
+  postStr = "\"type\": \"existence\",";
+  postStr += "\"name\": \"editor_model_removed\",";
+  postStr += "\"data\": {";
+  postStr += "\"link\": \"" + _name + "\",";
+  postStr += "\"state\": \"deletion\"";
+  postStr += "}";
+  restMsg.set_json(postStr);
+  this->restPub->Publish(restMsg);
 }
 
 /////////////////////////////////////////////////
 void CMLEditor::SpawnEntity()
 {
-//  this->insertName == "";
   QPushButton *button =
      qobject_cast<QPushButton *>(QObject::sender());
   if (!button)
     return;
 
   QVariant type = button->property("type");
-//  this->insertName = type.toString().toStdString();
 
   std::map<std::string, sdf::SDFPtr>::iterator it =
       this->models.find(type.toString().toStdString());
@@ -339,6 +362,105 @@ void CMLEditor::SpawnEntity()
     return;
 
   this->modelEditor->SpawnEntity(it->second->Root()->GetElement("model"));
+}
 
-//  std::cerr << "spawn entity " << it->second->Root()->GetElement("model")->ToString("") << std::endl;
+
+/////////////////////////////////////////////////
+void CMLEditor::OnLinkInserted(const std::string &_linkId)
+{
+  Event_msgs::msgs::RestPost restMsg;
+  restMsg.set_route("/events/new");
+
+  // remove model preview prefix
+  std::string linkScopedName = _linkId;
+  size_t pIdx = linkScopedName.find("::");
+  if (pIdx != std::string::npos)
+    linkScopedName = linkScopedName.substr(pIdx+2);
+
+  std::string postStr;
+  postStr = "\"type\": \"existence\",";
+  postStr += "\"name\": \"editor_link_inserted\",";
+  postStr += "\"data\": {";
+  postStr += "\"link\": \"" + linkScopedName + "\",";
+  postStr += "\"state\": \"creation\"";
+  postStr += "}";
+  restMsg.set_json(postStr);
+  this->restPub->Publish(restMsg);
+}
+
+/////////////////////////////////////////////////
+void CMLEditor::OnJointInserted(const std::string &_jointId,
+    const std::string &_jointName, const std::string &_type,
+    const std::string &_parentName, const std::string &_childName)
+{
+  Event_msgs::msgs::RestPost restMsg;
+  restMsg.set_route("/events/new");
+
+  // remove model preview prefix
+  std::string parentScopedName = _parentName;
+  size_t pIdx = parentScopedName.find("::");
+  if (pIdx != std::string::npos)
+    parentScopedName = parentScopedName.substr(pIdx+2);
+  std::string childScopedName = _childName;
+  pIdx = childScopedName.find("::");
+  if (pIdx != std::string::npos)
+    childScopedName = childScopedName.substr(pIdx+2);
+
+  std::string postStr;
+  if (_type != "wire")
+  {
+    postStr = "\"type\": \"connection\",";
+    postStr += "\"name\": \"editor_joint_inserted\",";
+    postStr += "\"data\": {";
+    postStr += "\"id\": \"" + _jointName +"\",";
+    postStr += "\"parent\": \"" + parentScopedName +"\",";
+    postStr += "\"child\": \"" + childScopedName +"\",";
+    postStr += "\"type\": \"" + _type +"\"";
+    postStr += "}";
+  }
+
+  restMsg.set_json(postStr);
+  this->restPub->Publish(restMsg);
+
+}
+
+/////////////////////////////////////////////////
+void CMLEditor::OnLinkRemoved(const std::string &_linkId)
+{
+  Event_msgs::msgs::RestPost restMsg;
+  restMsg.set_route("/events/new");
+
+  // remove model preview prefix
+  std::string linkScopedName = _linkId;
+  size_t pIdx = linkScopedName.find("::");
+  if (pIdx != std::string::npos)
+    linkScopedName = linkScopedName.substr(pIdx+2);
+
+  std::string postStr;
+  postStr = "\"type\": \"existence\",";
+  postStr += "\"name\": \"editor_link_removed\",";
+  postStr += "\"data\": {";
+  postStr += "\"link\": \"" + linkScopedName + "\",";
+  postStr += "\"state\": \"deletion\"";
+  postStr += "}";
+  restMsg.set_json(postStr);
+  this->restPub->Publish(restMsg);
+}
+
+/////////////////////////////////////////////////
+void CMLEditor::OnJointRemoved(const std::string &_jointId)
+{
+  Event_msgs::msgs::RestPost restMsg;
+  restMsg.set_route("/events/new");
+
+  std::string postStr;
+  postStr = "\"type\": \"connection\",";
+  postStr += "\"name\": \"editor_joint_removed\",";
+  postStr += "\"data\": {";
+  postStr += "\"id\": \"" + _jointId +"\"";
+  postStr += "}";
+
+
+  restMsg.set_json(postStr);
+  this->restPub->Publish(restMsg);
 }

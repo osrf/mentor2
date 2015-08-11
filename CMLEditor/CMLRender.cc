@@ -299,19 +299,27 @@ void CMLRender::OnConnectionCreated(const std::string &_parent,
   Event_msgs::msgs::RestPost restMsg;
   restMsg.set_route("/events/new");
 
+  // remove model preview prefix
+  std::string parentScopedName = _parent;
+  size_t pIdx = parentScopedName.find("::");
+  if (pIdx != std::string::npos)
+    parentScopedName = parentScopedName.substr(pIdx+2);
+  std::string childScopedName = _child;
+  pIdx = childScopedName.find("::");
+  if (pIdx != std::string::npos)
+    childScopedName = childScopedName.substr(pIdx+2);
+
   std::string postStr;
   postStr = "\"type\": \"connection\",";
   postStr += "\"name\": \"simple_connection\",";
   postStr += "\"data\": {";
-  postStr += "\"parent\": \"" + _parent +"\",";
+  postStr += "\"parent\": \"" + parentScopedName +"\",";
   postStr += "\"parent_port\": \"" + _parentPort +"\",";
-  postStr += "\"child\": \"" + _child +"\",";
+  postStr += "\"child\": \"" + childScopedName +"\",";
   postStr += "\"child_port\": \"" + _childPort +"\"";
   postStr += "}";
   restMsg.set_json(postStr);
   this->restPub->Publish(restMsg);
-
-  //CMLConnectionMaker::Instance()->Start();
 
   // workaround to create a connection in schematic view
   std::string id = _parent + "::" + _parentPort + "_" +

@@ -59,13 +59,33 @@ namespace gazebo
       /// \param[in] _node Name of nested model.
       private: void OnNestedModelRemoved(const std::string &_name);
 
+      /// \brief Callback when a link is inserted.
+      /// \param[in] _linkName Scoped link name.
+      private: void OnLinkInserted(const std::string &_linkId);
+
+      /// \brief Callback when a link is removed.
+      /// \param[in] _linkId Unique link identifying name.
+      private: void OnLinkRemoved(const std::string &_linkId);
+
+      /// \brief Callback when a joint is added.
+      /// \param[in] _jointId Unique joint identifying name.
+      /// \param[in] _jointName Scoped name which can be changed by the user.
+      /// \param[in] _type Type of joint.
+      /// \param[in] _parentName Scoped name of the parent link.
+      /// \param[in] _childName Scoped name of the child link.
+      private: void OnJointInserted(const std::string &_jointId,
+          const std::string &_jointName, const std::string &_type,
+          const std::string &_parentName, const std::string &_childName);
+
+      /// \brief Callback when a joint is removed.
+      /// \param[in] _jointId Unique joint identifier.
+      private: void OnJointRemoved(const std::string &_jointId);
+
       /// \brief Qt callback when an entity is to be spawned
       private slots: void SpawnEntity();
 
       /// \brief Qt callback when an electrical connection is to be created.
       private slots: void OnElectricalConnection();
-
-//      private: gazebo::gui::CMLEditorPalette *CMLPalette;
 
       private: gazebo::gui::MainWindow *mainWindow;
 
@@ -77,7 +97,11 @@ namespace gazebo
 
       private: CMLRender *renderProxy;
 
-//      private: gazebo::gui::CMLEditorWidget *CMLEditorWidget;
+      /// \brief Communication Node
+      private: transport::NodePtr node;
+
+      /// \brief Publish rest posts
+      private: transport::PublisherPtr restPub;
 
       /// \brief A list of gazebo event connects.
       private: std::vector<event::ConnectionPtr> connections;
