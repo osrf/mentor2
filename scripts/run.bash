@@ -31,7 +31,7 @@ echo "GAZEBO PREFIX=$GAZEBO_PREFIX"
 
 gzserver --verbose -s libRestWebPlugin.so -u  $1 &
 
-gzclient --verbose -g libCMLEditorPlugin.so -g libRestUiPlugin.so menu="Mentor2" title="Leaderboard" label="Login" url="http://mentor2-local.srirobotics.com" &
+gzclient --verbose -g libCMLEditorPlugin.so -g libRestUiPlugin.so menu="Mentor2" title="Leaderboard" label="Login" url="https://mentor2.srirobotics.com/gazebo" &
 
 
 sleep 10
