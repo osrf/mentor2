@@ -21,7 +21,6 @@
 #include <gazebo/gui/GuiEvents.hh>
 #include <gazebo/gui/Actions.hh>
 
-#include "CMLRender.hh"
 #include "CMLEditor.hh"
 #include "CMLManager.hh"
 #include "CMLEditorPlugin.hh"
@@ -56,11 +55,8 @@ void CMLEditorPlugin::OnMainWindowReady()
   // gazebo main window
   gui::MainWindow *mainWindow = gui::get_main_window();
 
-  // CML schematic view
+  // CML editor
   gui::CMLEditor *editor = new gui::CMLEditor(mainWindow);
-
-  // handle user interaction with the 3d render window
-  gui::CMLRender *renderProxy = new gui::CMLRender();
 }
 
 // Register this plugin with the simulator

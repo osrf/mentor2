@@ -162,6 +162,12 @@ namespace gazebo
       private: rendering::VisualPtr GetLowestLevelComponentVisual(
           rendering::VisualPtr _visual);
 
+      /// \brief Callback when an entity is selected.
+      /// \param[in] _name Name of entity.
+      /// \param[in] _mode Select mode
+      private: void OnSetSelectedEntity(const std::string &_name,
+          const std::string &_mode);
+
       /// \brief Qt signal when the connection creation process has ended.
       //Q_SIGNALS: void ConnectionAdded();
 

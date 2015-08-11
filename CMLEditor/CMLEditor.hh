@@ -24,14 +24,15 @@
 #include <gazebo/gui/qt.h>
 //#include <gazebo/gui/Editor.hh>
 
+#include "CMLRender.hh"
+
 namespace gazebo
 {
   namespace gui
   {
     class ModelEditor;
     class MainWindow;
-//    class CMLEditorPalette;
-    class CMLEditorWidget;
+    class CMLRender;
 
     /// \class CMLEditor CMLEditor.hh gui/gui.hh
     /// \brief Interface to the CML editor.
@@ -73,6 +74,8 @@ namespace gazebo
       private: std::map<std::string, sdf::SDFPtr> models;
 
       private: ModelEditor *modelEditor;
+
+      private: CMLRender *renderProxy;
 
 //      private: gazebo::gui::CMLEditorWidget *CMLEditorWidget;
 

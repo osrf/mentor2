@@ -21,6 +21,7 @@
 
 #include <gazebo/common/common.hh>
 #include <gazebo/rendering/rendering.hh>
+#include <gazebo/gui/GuiEvents.hh>
 #include <gazebo/gui/model/ModelEditorEvents.hh>
 #include <gazebo/gui/model/ModelEditor.hh>
 #include <gazebo/gui/gui.hh>
@@ -50,8 +51,11 @@ CMLConnectionMaker::CMLConnectionMaker()
         boost::bind(&CMLConnectionMaker::Update, this)));
 
   this->connections.push_back(
-      gui::model::Events::ConnectFinishModel(
+      model::Events::ConnectFinishModel(
       boost::bind(&CMLConnectionMaker::OnFinish, this)));
+
+  this->connections.push_back(event::Events::ConnectSetSelectedEntity(
+       boost::bind(&CMLConnectionMaker::OnSetSelectedEntity, this, _1, _2)));
 
   this->updateMutex = new boost::recursive_mutex();
 }
@@ -605,8 +609,17 @@ bool CMLConnectionMaker::OnMouseMove(const common::MouseEvent &_event)
   // check is not the currently selected one
   if (componentVis && componentVis != this->selectedVis)
   {
-    this->hoverVis = componentVis;
-    this->hoverVis->SetEmissive(common::Color(0.5, 0.5, 0.5));
+    std::string name = componentVis->GetName();
+    Simple_msgs::msgs::SimpleModel msg;
+    msg = CMLManager::Instance()->GetModelInfo(name);
+
+    if (msg.port_size() > 0)
+    {
+      this->hoverVis = componentVis;
+      this->hoverVis->SetEmissive(common::Color(0.5, 0.5, 0.5));
+    }
+    else
+      this->hoverVis.reset();
   }
   else
   {
@@ -825,4 +838,11 @@ rendering::VisualPtr CMLConnectionMaker::GetLowestLevelComponentVisual(
     depth++;
   }
   return modelVis;
+}
+
+/////////////////////////////////////////////////
+void CMLConnectionMaker::OnSetSelectedEntity(const std::string &/*_name*/,
+    const std::string &/*_mode*/)
+{
+  this->Stop();
 }

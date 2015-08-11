@@ -41,6 +41,9 @@ CMLEditor::CMLEditor(MainWindow *_mainWindow)
   // Create the CML editor tab
 //  this->CMLPalette = new CMLEditorPalette(_mainWindow);
 
+  // handle user interaction with the 3d render window
+  this->renderProxy = new gui::CMLRender();
+
   if (!_mainWindow)
   {
     gzerr << "Main window is NULL!" << std::endl;
@@ -115,6 +118,7 @@ CMLEditor::CMLEditor(MainWindow *_mainWindow)
 /////////////////////////////////////////////////
 CMLEditor::~CMLEditor()
 {
+  delete this->renderProxy;
 }
 
 /////////////////////////////////////////////////
