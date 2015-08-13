@@ -1,0 +1,155 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="chapter5">
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <model name="bump_5">
+      <static>true</static>
+      <pose>0 0 0.0 0 0 0</pose>
+      <link name="link">
+        <pose>-0.15 0 0 0 1.57 0</pose>
+        <collision name="collision">
+          <geometry>
+            <polyline>
+              <point>0 0</point>
+              <point>0 0.005</point>
+              <point>-0.00433 0.0025</point>
+              <height>0.3</height>
+            </polyline>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1.0</mu>
+                <mu2>1.0</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <polyline>
+              <point>0 0</point>
+              <point>0 0.005</point>
+              <point>-0.00433 0.0025</point>
+              <height>0.3</height>
+            </polyline>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Wood</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="bump_10">
+      <static>true</static>
+      <pose>0 0.305 0.0 0 0 0</pose>
+      <link name="link">
+        <pose>-0.15 0 0 0 1.57 0</pose>
+        <collision name="collision">
+          <geometry>
+            <polyline>
+              <point>0 0</point>
+              <point>0 0.01</point>
+              <point>-0.00866 0.005</point>
+              <height>0.3</height>
+            </polyline>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1.0</mu>
+                <mu2>1.0</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <polyline>
+              <point>0 0</point>
+              <point>0 0.01</point>
+              <point>-0.00866 0.005</point>
+              <height>0.3</height>
+            </polyline>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Wood</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="bump_20">
+      <static>true</static>
+      <pose>0 0.615 0.0 0 0 0</pose>
+      <link name="link">
+        <pose>-0.15 0 0 0 1.57 0</pose>
+        <collision name="collision">
+          <geometry>
+            <polyline>
+              <point>0 0</point>
+              <point>0 0.02</point>
+              <point>-0.0173205 0.01</point>
+              <height>0.3</height>
+            </polyline>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1.0</mu>
+                <mu2>1.0</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <polyline>
+              <point>0 0</point>
+              <point>0 0.02</point>
+              <point>-0.0173205 0.01</point>
+              <height>0.3</height>
+            </polyline>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Wood</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <plugin name="SimEvents" filename="libSimEventsPlugin.so">
+      <session></session>
+
+      <event>
+        <name>state</name>
+        <type>sim_state</type>
+      </event>
+
+
+    </plugin>
+
+
+  </world>
+</sdf>
