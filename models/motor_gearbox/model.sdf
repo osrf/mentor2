@@ -155,16 +155,9 @@
         </axis>
       </joint>
 
-      <joint name="motor_joint" type="revolute">
+      <joint name="motor_joint" type="fixed">
         <parent>motor_core_link</parent>
         <child>link</child>
-        <axis>
-          <xyz>0 0 1</xyz>
-          <limit>
-            <lower>0</lower>
-            <upper>0</upper>
-          </limit>
-        </axis>
       </joint>
 
       <plugin filename="libMotorPlugin.so" name="motor">
@@ -292,16 +285,9 @@
       </plugin>
     </model>
 
-    <joint name="gearbox_motor_joint" type="revolute">
+    <joint name="gearbox_motor_joint" type="fixed">
       <parent>gearbox::link</parent>
       <child>motor::link</child>
-      <axis>
-        <xyz>1 0 0</xyz>
-        <limit>
-          <lower>0</lower>
-          <upper>0</upper>
-        </limit>
-      </axis>
     </joint>
 
     <joint name="gearbox_axle_joint" type="revolute">

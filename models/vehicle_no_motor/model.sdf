@@ -188,16 +188,9 @@
           </link>
       </model>
 
-      <joint name="chassis_v2_battery_9v_joint" type="revolute">
+      <joint name="chassis_v2_battery_9v_joint" type="fixed">
         <parent>chassis_v2::link</parent>
         <child>battery_9v::link</child>
-        <axis>
-          <xyz>0 0 1</xyz>
-          <limit>
-            <lower>0</lower>
-            <upper>0</upper>
-          </limit>
-        </axis>
       </joint>
 
       <joint name="chassis_v2_axle_joint" type="revolute">

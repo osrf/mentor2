@@ -413,8 +413,8 @@
           <axis>
             <xyz>1 0 0</xyz>
             <limit>
-              <lower>-1000000</lower>
-              <upper>1000000</upper>
+              <lower>-1000000000000000</lower>
+              <upper>1000000000000000</upper>
             </limit>
             <dynamics>
               <friction>0.000001</friction>
@@ -423,16 +423,9 @@
           </axis>
         </joint>
 
-        <joint name="motor_joint" type="revolute">
+        <joint name="motor_joint" type="fixed">
           <parent>motor_core_link</parent>
           <child>link</child>
-          <axis>
-            <xyz>0 0 1</xyz>
-            <limit>
-              <lower>0</lower>
-              <upper>0</upper>
-            </limit>
-          </axis>
         </joint>
 
         <plugin filename="libMotorPlugin.so" name="motor">
@@ -508,40 +501,19 @@
         </plugin>
       </model>
 
-      <joint name="chassis_v2_battery_9v_joint" type="revolute">
+      <joint name="chassis_v2_battery_9v_joint" type="fixed">
         <parent>chassis_v2::link</parent>
         <child>battery_9v::link</child>
-        <axis>
-          <xyz>0 0 1</xyz>
-          <limit>
-            <lower>0</lower>
-            <upper>0</upper>
-          </limit>
-        </axis>
       </joint>
 
-      <joint name="chassis_v2_gearbox_joint" type="revolute">
+      <joint name="chassis_v2_gearbox_joint" type="fixed">
         <parent>chassis_v2::link</parent>
         <child>gearbox::link</child>
-        <axis>
-          <xyz>0 0 1</xyz>
-          <limit>
-            <lower>0</lower>
-            <upper>0</upper>
-          </limit>
-        </axis>
       </joint>
 
-      <joint name="chassis_v2_motor_joint" type="revolute">
+      <joint name="chassis_v2_motor_joint" type="fixed">
         <parent>chassis_v2::link</parent>
         <child>motor::link</child>
-        <axis>
-          <xyz>0 0 1</xyz>
-          <limit>
-            <lower>0</lower>
-            <upper>0</upper>
-          </limit>
-        </axis>
       </joint>
 
       <joint name="chassis_v2_axle_joint" type="revolute">
@@ -562,16 +534,9 @@
       </joint>
 
 
-      <joint name="chassis_v2_weight_joint" type="revolute">
+      <joint name="chassis_v2_weight_joint" type="fixed">
         <parent>chassis_v2::link</parent>
         <child>link</child>
-        <axis>
-          <xyz>0 0 1</xyz>
-          <limit>
-            <lower>0</lower>
-            <upper>0</upper>
-          </limit>
-        </axis>
       </joint>
 
       <joint name="gearbox_axle_joint" type="revolute">
@@ -586,16 +551,9 @@
         </axis>
       </joint>
 
-      <joint name="gearbox_motor_joint" type="revolute">
+      <joint name="gearbox_motor_joint" type="fixed">
         <parent>gearbox::link</parent>
         <child>motor::link</child>
-        <axis>
-          <xyz>0 0 1</xyz>
-          <limit>
-            <lower>0</lower>
-            <upper>0</upper>
-          </limit>
-        </axis>
       </joint>
 
       <plugin name="simple_connections" filename="libSimpleConnectionsPlugin.so">

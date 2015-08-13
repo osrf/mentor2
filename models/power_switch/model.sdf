@@ -124,17 +124,9 @@
       </physics>
     </joint>
 
-    <joint name="stand_joint" type="revolute">
+    <joint name="stand_joint" type="fixed">
       <parent>body</parent>
       <child>stand</child>
-      <axis>
-        <xyz>0.0 0.0 1.0</xyz>
-        <limit>
-          <lower>-0.0</lower>
-          <upper>0.0</upper>
-        </limit>
-        <use_parent_model_frame>true</use_parent_model_frame>
-      </axis>
     </joint>
 
     <plugin filename="libSwitchPlugin.so" name="switch">

@@ -43,16 +43,9 @@
       </visual>
     </link>
 <!--
-    <joint name="world_joint" type="revolute">
+    <joint name="world_joint" type="fixed">
       <parent>world</parent>
       <child>link</child>
-      <axis>
-        <xyz>0 0 1</xyz>
-        <limit>
-          <lower>0</lower>
-          <upper>0</upper>
-        </limit>
-      </axis>
     </joint>
 -->
     <!--
@@ -178,16 +171,9 @@
       </axis>
     </joint>
 
-    <joint name="motor_joint" type="revolute">
+    <joint name="motor_joint" type="fixed">
       <parent>motor_core_link</parent>
       <child>link</child>
-      <axis>
-        <xyz>0 0 1</xyz>
-        <limit>
-          <lower>0</lower>
-          <upper>0</upper>
-        </limit>
-      </axis>
     </joint>
 
     <plugin filename="libMotorPlugin.so" name="motor">
