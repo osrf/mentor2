@@ -67,8 +67,8 @@ void MotorPlugin::Init()
 
   this->shaftLink = this->joint->GetJointLink(0);
 
-  this->torquePub = this->node->Advertise<Simple_msgs::msgs::Variant>(
-      "~/motor/torque");
+//  this->torquePub = this->node->Advertise<Simple_msgs::msgs::Variant>(
+//      "~/motor/torque");
 }
 
 /////////////////////////////////////////////////
@@ -131,6 +131,7 @@ void MotorPlugin::UpdateImpl(double _timeSinceLastUpdate)
   if (this->joint)
   {
     this->joint->SetForce(0, torque);
+    //std::cerr << this->parent->GetName() << " " << torque << std::endl;
   }
 
   Simple_msgs::msgs::Variant torqueMsg;

@@ -41,7 +41,7 @@
       <link name="link">
         <pose>0.0 0.060 0.034 0 0 0</pose>
         <inertial>
-          <mass>0.1</mass>
+          <mass>0.5</mass>
           <inertia>
             <ixx>0.0001</ixx>
             <ixy>0</ixy>
@@ -75,12 +75,12 @@
           <inertial>
             <mass>0.1</mass>
             <inertia>
-              <ixx>0.0001</ixx>
+              <ixx>0.00022</ixx>
               <ixy>0</ixy>
               <ixz>0</ixz>
-              <iyy>0.0001</iyy>
+              <iyy>0.00022</iyy>
               <iyz>0</iyz>
-              <izz>0.0001</izz>
+              <izz>0.00022</izz>
             </inertia>
           </inertial>
           <collision name="collision">
@@ -115,12 +115,12 @@
           <inertial>
             <mass>0.1</mass>
             <inertia>
-              <ixx>0.0001</ixx>
+              <ixx>0.00014390</ixx>
               <ixy>0</ixy>
               <ixz>0</ixz>
-              <iyy>0.0001</iyy>
+              <iyy>0.00014390</iyy>
               <iyz>0</iyz>
-              <izz>0.0001</izz>
+              <izz>0.00014390</izz>
             </inertia>
           </inertial>
           <collision name="axle_collision">
@@ -143,8 +143,8 @@
             <surface>
               <friction>
                 <ode>
-                  <mu>1.0</mu>
-                  <mu2>1.0</mu2>
+                  <mu>0.735</mu>
+                  <mu2>0.735</mu2>
                   <fdir1>0 1 0</fdir1>
                   <slip1>0.0</slip1>
                   <slip2>0.0</slip2>
@@ -169,8 +169,8 @@
             <surface>
               <friction>
                 <ode>
-                  <mu>1.0</mu>
-                  <mu2>1.0</mu2>
+                  <mu>0.735</mu>
+                  <mu2>0.735</mu2>
                   <fdir1>0 1 0</fdir1>
                   <slip1>0.0</slip1>
                   <slip2>0.0</slip2>
@@ -215,7 +215,7 @@
             </geometry>
           </collision>
           <inertial>
-            <mass>0.1</mass>
+            <mass>0.01</mass>
             <pose>0 0 0 0 0 0</pose>
             <inertia>
               <ixx>0.0001</ixx>
@@ -308,7 +308,7 @@
         <pose>0 0.013 0.0285 0 0 0</pose>
         <link name="link">
           <inertial>
-            <mass>0.1</mass>
+            <mass>0.01</mass>
             <inertia>
               <ixx>0.0001</ixx>
               <ixy>0</ixy>
@@ -342,7 +342,7 @@
           <self_collide>false</self_collide>
           <gravity>false</gravity>
           <inertial>
-            <mass>0.1</mass>
+            <mass>0.0001</mass>
             <inertia>
               <ixx>0.0001</ixx>
               <ixy>0</ixy>
@@ -383,14 +383,14 @@
           <self_collide>false</self_collide>
           <gravity>false</gravity>
           <inertial>
-            <mass>0.1</mass>
+            <mass>0.0001</mass>
             <inertia>
-              <ixx>0.0001</ixx>
+              <ixx>0.0000004</ixx>
               <ixy>0</ixy>
               <ixz>0</ixz>
-              <iyy>0.0001</iyy>
+              <iyy>0.0000004</iyy>
               <iyz>0</iyz>
-              <izz>0.0001</izz>
+              <izz>0.0000004</izz>
             </inertia>
           </inertial>
           <collision name="collision">
@@ -427,7 +427,7 @@
             </material>
           </visual>
           <velocity_decay>
-            <angular>0.0001</angular>
+            <angular>0.000001</angular>
           </velocity_decay>
         </link>
 
@@ -441,8 +441,8 @@
               <upper>1000000000000000</upper>
             </limit>
             <dynamics>
-              <friction>0.000001</friction>
-              <damping>0.0001</damping>
+              <friction>0.0001</friction>
+              <damping>0.000001</damping>
             </dynamics>
           </axis>
         </joint>
@@ -468,7 +468,7 @@
 
           <properties>
             <resistance>5</resistance>
-            <back_emf>0.0064</back_emf>
+            <back_emf>0.00356</back_emf>
             <torque_constant>0.0064</torque_constant>
           </properties>
 
@@ -481,7 +481,7 @@
         <pose>0 0.013 0.0285 0 0 0</pose>
         <link name="link">
           <inertial>
-            <mass>0.1</mass>
+            <mass>0.01</mass>
             <inertia>
               <ixx>0.0001</ixx>
               <ixy>0</ixy>
@@ -520,7 +520,7 @@
             <parent>axle_wheels::link</parent>
             <child>motor::motor_shaft_link</child>
             <gear_ratio>1.0</gear_ratio>
-            <efficiency>0.95</efficiency>
+            <efficiency>0.92</efficiency>
           </properties>
         </plugin>
       </model>
