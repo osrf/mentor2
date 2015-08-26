@@ -114,11 +114,12 @@ void MotorPlugin::UpdateImpl(double _timeSinceLastUpdate)
 
 
   double shaftRotationSpeed = 0.1;
-  if (this->shaftLink)
+
+  if (this->joint)
   {
     // in radians per seconds
-    shaftRotationSpeed = this->shaftLink->GetRelativeAngularVel().GetLength();
-    //std::cerr << "shaftRotationSpeed " << shaftRotationSpeed << std::endl;
+    shaftRotationSpeed = this->joint->GetVelocity(0);
+    // std::cerr << "shaftRotationSpeed " << shaftRotationSpeed << std::endl;
   }
   double emfVolt = this->backEmf * shaftRotationSpeed;
   double internalVoltage = voltage - emfVolt;

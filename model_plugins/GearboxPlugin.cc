@@ -83,7 +83,6 @@ void GearboxPlugin::Reset()
 /////////////////////////////////////////////////
 void GearboxPlugin::UpdateImpl(double _timeSinceLastUpdate)
 {
-
   if (this->gearboxJoint)
   {
     if (this->parentLinkJoint && this->childLinkJoint)
