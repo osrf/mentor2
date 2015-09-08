@@ -694,7 +694,7 @@ void CMLConnectionMaker::CreateHotSpot(ConnectionData *_connect)
   Ogre::MovableObject *hotspotObj =
       (Ogre::MovableObject*)(camera->GetScene()->GetManager()->createEntity(
       "__HOTSPOT__" + _connect->visual->GetName(), "unit_cylinder"));
-  hotspotObj->setUserAny(Ogre::Any(hotSpotName));
+  hotspotObj->getUserObjectBindings().setUserAny(Ogre::Any(hotSpotName));
   hotspotVisual->GetSceneNode()->attachObject(hotspotObj);
   hotspotVisual->SetMaterial(this->connectionMaterials[_connect->type]);
   hotspotVisual->SetTransparency(0.5);

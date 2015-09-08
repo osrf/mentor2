@@ -17,6 +17,7 @@
 
 #include <iostream>
 
+#include <gazebo/common/MouseEvent.hh>
 #include <gazebo/gui/gui.hh>
 #include <gazebo/gui/model/ModelEditor.hh>
 
