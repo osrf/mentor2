@@ -17,7 +17,7 @@
 
 #include <iostream>
 
-#include <gazebo/math/Helpers.hh>
+#include <ignition/math/Helpers.hh>
 
 #include "SimpleModel.pb.h"
 #include "CMLComponentInspector.hh"
@@ -80,11 +80,26 @@ void CMLComponentInspector::Load(const Simple_msgs::msgs::SimpleModel *_msg)
 
   for (int i = 0; i < _msg->key_size(); ++i)
   {
-    QLabel *keyLabel = new QLabel(tr(_msg->key(i).c_str()));
-    QWidget *valueWidget = this->GetValueWidget(&_msg->value(i));
-    this->valueWidgets[_msg->key(i)] = valueWidget;
+    QLabel *keyLabel = new QLabel(
+        tr(this->GetLabelFromKey(_msg->key(i)).c_str()));
+    QWidget *valueWidget = this->GetValueWidget(_msg->key(i),
+        &_msg->value(i));
+
+    std::string key = _msg->key(i);
+    this->valueWidgets[key] = valueWidget;
     this->propertyLayout->addWidget(keyLabel, i+1, 0);
     this->propertyLayout->addWidget(valueWidget, i+1, 1);
+
+    QLabel *unitLabel = NULL;
+    std::string unit = this->GetUnitFromKey(key);
+    if (!unit.empty())
+    {
+      unitLabel = new QLabel();
+      unitLabel->setMaximumWidth(40);
+      unitLabel->setMinimumWidth(40);
+      unitLabel->setText(QString::fromStdString(unit));
+      this->propertyLayout->addWidget(unitLabel, i+1, 2);
+    }
   }
 }
 /////////////////////////////////////////////////
@@ -146,7 +161,7 @@ void CMLComponentInspector::UpdateFromMsg(
 }
 
 /////////////////////////////////////////////////
-QWidget *CMLComponentInspector::GetValueWidget(
+QWidget *CMLComponentInspector::GetValueWidget(const std::string &_key,
     const Simple_msgs::msgs::Variant *_msg)
 {
   QWidget *widget = NULL;
@@ -156,7 +171,7 @@ QWidget *CMLComponentInspector::GetValueWidget(
     {
       widget = new QSpinBox();
       QSpinBox *spinBoxWidget = qobject_cast<QSpinBox *>(widget);
-      spinBoxWidget->setRange(GZ_UINT32_MIN, GZ_UINT32_MAX);
+      spinBoxWidget->setRange(IGN_UINT32_MIN, IGN_UINT32_MAX);
       spinBoxWidget->setValue(_msg->v_uint32());
       break;
     }
@@ -164,7 +179,7 @@ QWidget *CMLComponentInspector::GetValueWidget(
     {
       widget = new QSpinBox();
       QSpinBox *spinBoxWidget = qobject_cast<QSpinBox *>(widget);
-      spinBoxWidget->setRange(-GZ_INT32_MAX, GZ_INT32_MAX);
+      spinBoxWidget->setRange(-IGN_INT32_MAX, IGN_INT32_MAX);
       spinBoxWidget->setValue(_msg->v_int32());
       break;
     }
@@ -172,8 +187,11 @@ QWidget *CMLComponentInspector::GetValueWidget(
     {
       widget = new QDoubleSpinBox();
       QDoubleSpinBox *spinBoxWidget = qobject_cast<QDoubleSpinBox *>(widget);
-      spinBoxWidget->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
-      spinBoxWidget->setDecimals(5);
+      double min = -IGN_DBL_MAX;
+      double max = IGN_DBL_MAX;
+      this->GetRangeFromKey(_key, min, max);
+      spinBoxWidget->setRange(min, max);
+      spinBoxWidget->setDecimals(8);
       spinBoxWidget->setValue(_msg->v_double());
       break;
     }
@@ -272,4 +290,34 @@ void CMLComponentInspector::OnOK()
   this->Update();
   emit Applied();
   this->accept();
+}
+
+/////////////////////////////////////////////////
+std::string CMLComponentInspector::GetLabelFromKey(const std::string &_key)
+{
+  if (_key == "efficiency")
+    return _key + " [0, 1]";
+  return _key;
+}
+
+/////////////////////////////////////////////////
+std::string CMLComponentInspector::GetUnitFromKey(const std::string &_key)
+{
+//  if (_key == "efficiency")
+//    return "%";
+  return "";
+}
+
+/////////////////////////////////////////////////
+void CMLComponentInspector::GetRangeFromKey(const std::string &_key,
+    double &_min, double &_max)
+{
+  _min = -IGN_DBL_MAX;
+  _max = IGN_DBL_MAX;
+
+  if (_key == "efficiency")
+  {
+    _min = 0;
+    _max = 1;
+  }
 }

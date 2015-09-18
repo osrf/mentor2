@@ -62,13 +62,33 @@ namespace gazebo
       public: Simple_msgs::msgs::SimpleModel GetSimpleModelMsg();
 
       /// \brief Get the most suitable widget for configuring this property.
+      /// \param[in] _key The key.
       /// \param[in] _msg Variant message containing property type and value.
       /// \return a Qt widget for configuring the property.
-      private: QWidget *GetValueWidget(
+      private: QWidget *GetValueWidget(const std::string &_key,
           const Simple_msgs::msgs::Variant *_msg);
 
       /// \brief Update the internal copy of simple model message from widgets.
       private: void Update();
+
+      /// \brief Returns the label for a given key. For example, the key
+      // "efficiency" returns "efficiency [0, 1]"
+      /// \param[in] _key The key.
+      public: std::string GetLabelFromKey(const std::string &_key);
+
+      /// \brief Returns the unit for a given key. For example, the key
+      /// "efficiency" returns "%".
+      /// \param[in] _key The key.
+      /// \return The unit string.
+      public: std::string GetUnitFromKey(const std::string &_key);
+
+      /// \brief Returns the range for a given key. For example, the key
+      // "efficiency" returns min == 0, max == 1.
+      /// \param[in] _key The key.
+      /// \param[out] _min The minimum value.
+      /// \param[out] _max The maximum value.
+      public: void GetRangeFromKey(const std::string &_key,
+          double &_min, double &_max);
 
       /// \brief Qt signal emitted to indicate that changes should be applied.
       Q_SIGNALS: void Applied();
