@@ -28,6 +28,8 @@
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include <gazebo/gui/qt.h>
+#include <gazebo/common/common.hh>
+#include <gazebo/transport/transport.hh>
 
 namespace gazebo
 {
@@ -37,10 +39,9 @@ namespace gazebo
 
     /// \class CMLConnectionMaker CMLConnectionMaker.hh
     /// \brief Connection maker
-    class CMLConnectionMaker : public SingletonT<CMLConnectionMaker>
-    /*: public QObject*/
+    class CMLConnectionMaker : public QObject, public SingletonT<CMLConnectionMaker>
     {
-      // Q_OBJECT
+      Q_OBJECT
 
       /// \enum Connection types
       /// \brief Unique identifiers for connection types that can be created.
@@ -113,6 +114,11 @@ namespace gazebo
       public: void CreateConnectionFromSDF(sdf::ElementPtr _connectionElem,
           const std::string &_modelName = "");
 
+      /// \brief Create SDF from a connection.
+      /// \param[in] _connection Connection data.
+      /// \return An SDF element.
+      public: sdf::ElementPtr CreateConnectionSDF(ConnectionData *_connection);
+
       /// \brief Enable the mouse and key event handlers.
       public: void EnableEventHandlers();
 
@@ -122,6 +128,10 @@ namespace gazebo
       /// \brief Insert the connection sdf element to the model's plugin sdf.
       /// \param[in] _connection Connection data.
       private: void InsertConnectionElement(ConnectionData *_connection);
+
+      /// \brief Remove the connection sdf element from the model's plugin sdf.
+      /// \param[in] _connection Connection data.
+      private: void RemoveConnectionElement(ConnectionData *_connection);
 
       /// \brief Mouse event filter callback when mouse button is pressed.
       /// \param[in] _event The mouse event.
@@ -142,6 +152,9 @@ namespace gazebo
       /// \param[in] _event The key event.
       /// \return True if the event was handled
       private: bool OnKeyPress(const common::KeyEvent &_event);
+
+      /// \brief Qt Callback when a component is to be deleted.
+      private slots: void OnDelete();
 
       /// \brief Helper method to create hotspot visual for mouse interaction.
       //// \param[in] _connect Create a hotspot from the connect data.
@@ -167,6 +180,13 @@ namespace gazebo
       /// \param[in] _mode Select mode
       private: void OnSetSelectedEntity(const std::string &_name,
           const std::string &_mode);
+
+      /// \brief Callback when a joint is selected.
+      /// \param[in] _name Name of joint.
+      /// \param[in] _selected True if the joint is selected, false if
+      /// deselected.
+      private: void OnSetSelectedJoint(const std::string &_name,
+          const bool _selected);
 
       /// \brief Qt signal when the connection creation process has ended.
       //Q_SIGNALS: void ConnectionAdded();
@@ -209,6 +229,12 @@ namespace gazebo
           connectionMaterials;
 
       private: common::MouseEvent mouseEvent;
+
+      /// \brief Qt action for deleting a connection.
+      private: QAction *deleteAct;
+
+      /// \brief Name of connection to be deleted.
+      private: std::string deleteName;
 
       private: std::list<std::pair<sdf::ElementPtr, std::string> >
           connectionsToAdd;
