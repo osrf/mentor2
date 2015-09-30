@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 enable_testing()
 
-project (simplegdk)
+project (mentor2)
 include(ExternalProject)
 
 set (SIMPLEGDK_MAJOR_VERSION 0)
