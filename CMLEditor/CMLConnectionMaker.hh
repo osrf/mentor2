@@ -125,6 +125,19 @@ namespace gazebo
       /// \brief Disable the mouse and key event handlers.
       public: void DisableEventHandlers();
 
+      /// \brief Creates a name for a connection.
+      /// \param[in] _parent Name of parent part of connection.
+      /// \param[in] _parentPort Name of parent port.
+      /// \param[in] _child Name of child part of connection.
+      /// \param[in] _childPort Name of child port.
+      public: std::string CreateConnectionName(const std::string &_parent,
+          const std::string &_parentPort, const std::string &_child,
+          const std::string &_childPort) const;
+
+      /// \brief Creates a name for a connection.
+      /// \param[in] _connection Connection data.
+      public: std::string CreateConnectionName(const ConnectionData &_connection) const;
+
       /// \brief Insert the connection sdf element to the model's plugin sdf.
       /// \param[in] _connection Connection data.
       private: void InsertConnectionElement(ConnectionData *_connection);
@@ -154,7 +167,11 @@ namespace gazebo
       private: bool OnKeyPress(const common::KeyEvent &_event);
 
       /// \brief Qt Callback when a component is to be deleted.
-      private slots: void OnDelete();
+      private slots: void OnDeleteJoint();
+
+      /// \brief Callback for when a joint is removed.
+      /// \param[in] _id Name of the joint.
+      public: void OnJointRemoved(const std::string &_id);
 
       /// \brief Helper method to create hotspot visual for mouse interaction.
       //// \param[in] _connect Create a hotspot from the connect data.
