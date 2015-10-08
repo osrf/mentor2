@@ -21,12 +21,17 @@
 #include <string>
 #include <vector>
 
+#include <boost/thread/recursive_mutex.hpp>
+
 #include <sdf/sdf.hh>
 
-#include "gazebo/common/MouseEvent.hh"
-#include "gazebo/common/CommonTypes.hh"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/rendering/RenderTypes.hh"
+#include <gazebo/common/SingletonT.hh>
+#include <gazebo/common/MouseEvent.hh>
+#include <gazebo/common/KeyEvent.hh>
+#include <gazebo/common/CommonTypes.hh>
+#include <gazebo/math/Pose.hh>
+#include <gazebo/math/Vector3.hh>
+#include <gazebo/rendering/RenderTypes.hh>
 #include <gazebo/gui/qt.h>
 
 namespace gazebo
@@ -37,10 +42,11 @@ namespace gazebo
 
     /// \class CMLConnectionMaker CMLConnectionMaker.hh
     /// \brief Connection maker
-    class CMLConnectionMaker : public SingletonT<CMLConnectionMaker>
+    class CMLConnectionMaker : public QObject,
+                               public SingletonT<CMLConnectionMaker>
     /*: public QObject*/
     {
-      // Q_OBJECT
+      Q_OBJECT
 
       /// \enum Connection types
       /// \brief Unique identifiers for connection types that can be created.
@@ -119,6 +125,20 @@ namespace gazebo
       /// \brief Disable the mouse and key event handlers.
       public: void DisableEventHandlers();
 
+      /// \brief Deselect all currently selected connection visuals.
+      private: void DeselectAll();
+
+      /// \brief Set the select state of a connection.
+      /// \param[in] _name Name of the connection.
+      /// \param[in] _selected True to select the connection.
+      public: void SetSelected(const std::string &_name, const bool selected);
+
+      /// \brief Set the select state of a connection visual.
+      /// \param[in] _jointVis Pointer to the connection visual.
+      /// \param[in] _selected True to select the connection.
+      public: void SetSelected(rendering::VisualPtr _connectionVis,
+          const bool selected);
+
       /// \brief Insert the connection sdf element to the model's plugin sdf.
       /// \param[in] _connection Connection data.
       private: void InsertConnectionElement(ConnectionData *_connection);
@@ -142,6 +162,14 @@ namespace gazebo
       /// \param[in] _event The key event.
       /// \return True if the event was handled
       private: bool OnKeyPress(const common::KeyEvent &_event);
+
+      /// \brief Callback when a connection is removed
+      /// \param[in] _connectionId Name of the connection.
+      private: void OnShowConnectionContextMenu(
+          const std::string &_connectionId);
+
+      /// \brief Qt Callback when a connection is to be deleted.
+      private slots: void OnDelete();
 
       /// \brief Helper method to create hotspot visual for mouse interaction.
       //// \param[in] _connect Create a hotspot from the connect data.
@@ -167,6 +195,19 @@ namespace gazebo
       /// \param[in] _mode Select mode
       private: void OnSetSelectedEntity(const std::string &_name,
           const std::string &_mode);
+
+      /// \brief Callback when a link is selected.
+      /// \param[in] _name Name of link.
+      /// \param[in] _selected True if the link is selected, false if
+      /// deselected.
+      private: void OnSetSelectedLink(const std::string &_name, bool _selected);
+
+      /// \brief Callback when a connection is selected.
+      /// \param[in] _name Name of joint.
+      /// \param[in] _selected True if the connection is selected, false if
+      /// deselected.
+      private: void OnSetSelectedConnection(const std::string &_name,
+          const bool _selected);
 
       /// \brief Qt signal when the connection creation process has ended.
       //Q_SIGNALS: void ConnectionAdded();
@@ -212,6 +253,12 @@ namespace gazebo
 
       private: std::list<std::pair<sdf::ElementPtr, std::string> >
           connectionsToAdd;
+
+      /// \brief Qt action for deleting a connection.
+      private: QAction *deleteConnectionAction;
+
+      /// \brief Name of connection to be deleted.
+      private: std::string deleteConnectionName;
 
       /// \brief This is a singleton class.
       private: friend class SingletonT<CMLConnectionMaker>;
