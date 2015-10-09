@@ -182,7 +182,7 @@ namespace gazebo
       /// \return True if the event was handled
       private: bool OnKeyPress(const common::KeyEvent &_event);
 
-      /// \brief Callback when a connection is removed
+      /// \brief Callback to show the connection's context menu
       /// \param[in] _connectionId Name of the connection.
       private: void OnShowConnectionContextMenu(
           const std::string &_connectionId);
