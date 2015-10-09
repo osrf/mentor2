@@ -39,7 +39,8 @@ namespace gazebo
 
     /// \class CMLConnectionMaker CMLConnectionMaker.hh
     /// \brief Connection maker
-    class CMLConnectionMaker : public QObject, public SingletonT<CMLConnectionMaker>
+    class CMLConnectionMaker : public QObject,
+                               public SingletonT<CMLConnectionMaker>
     {
       Q_OBJECT
 
@@ -125,6 +126,20 @@ namespace gazebo
       /// \brief Disable the mouse and key event handlers.
       public: void DisableEventHandlers();
 
+      /// \brief Deselect all currently selected connection visuals.
+      public: void DeselectAll();
+
+      /// \brief Set the select state of a connection.
+      /// \param[in] _name Name of the connection.
+      /// \param[in] _selected True to select the connection.
+      public: void SetSelected(const std::string &_name, const bool selected);
+
+      /// \brief Set the select state of a connection visual.
+      /// \param[in] _jointVis Pointer to the connection visual.
+      /// \param[in] _selected True to select the connection.
+      public: void SetSelected(rendering::VisualPtr _connectionVis,
+          const bool selected);
+
       /// \brief Creates a name for a connection.
       /// \param[in] _parent Name of parent part of connection.
       /// \param[in] _parentPort Name of parent port.
@@ -136,7 +151,8 @@ namespace gazebo
 
       /// \brief Creates a name for a connection.
       /// \param[in] _connection Connection data.
-      public: std::string CreateConnectionName(const ConnectionData &_connection) const;
+      public: std::string CreateConnectionName(
+          const ConnectionData &_connection) const;
 
       /// \brief Insert the connection sdf element to the model's plugin sdf.
       /// \param[in] _connection Connection data.
@@ -166,8 +182,13 @@ namespace gazebo
       /// \return True if the event was handled
       private: bool OnKeyPress(const common::KeyEvent &_event);
 
-      /// \brief Qt Callback when a component is to be deleted.
-      private slots: void OnDeleteJoint();
+      /// \brief Callback when a connection is removed
+      /// \param[in] _connectionId Name of the connection.
+      private: void OnShowConnectionContextMenu(
+          const std::string &_connectionId);
+
+      /// \brief Qt Callback when a connection is to be deleted.
+      private slots: void OnDelete();
 
       /// \brief Callback for when a joint is removed.
       /// \param[in] _id Name of the joint.
@@ -198,11 +219,17 @@ namespace gazebo
       private: void OnSetSelectedEntity(const std::string &_name,
           const std::string &_mode);
 
-      /// \brief Callback when a joint is selected.
-      /// \param[in] _name Name of joint.
-      /// \param[in] _selected True if the joint is selected, false if
+      /// \brief Callback when a link is selected.
+      /// \param[in] _name Name of link.
+      /// \param[in] _selected True if the link is selected, false if
       /// deselected.
-      private: void OnSetSelectedJoint(const std::string &_name,
+      private: void OnSetSelectedLink(const std::string &_name, bool _selected);
+
+      /// \brief Callback when a connection is selected.
+      /// \param[in] _name Name of joint.
+      /// \param[in] _selected True if the connection is selected, false if
+      /// deselected.
+      private: void OnSetSelectedConnection(const std::string &_name,
           const bool _selected);
 
       /// \brief Qt signal when the connection creation process has ended.

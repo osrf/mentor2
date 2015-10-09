@@ -59,16 +59,22 @@ CMLConnectionMaker::CMLConnectionMaker()
        boost::bind(&CMLConnectionMaker::OnSetSelectedEntity, this, _1, _2)));
 
   this->connections.push_back(
-      gui::model::Events::ConnectSetSelectedJoint(
-      boost::bind(&CMLConnectionMaker::OnSetSelectedJoint, this, _1, _2)));
+      gui::model::Events::ConnectSetSelectedLink(
+       boost::bind(&CMLConnectionMaker::OnSetSelectedLink, this, _1, _2)));
 
   this->connections.push_back(
-      gui::model::Events::ConnectJointRemoved(
-          boost::bind(&CMLConnectionMaker::OnJointRemoved, this, _1)));
+      gui::model::Events::ConnectSetSelectedJoint(
+      boost::bind(&CMLConnectionMaker::OnSetSelectedConnection, this, _1, _2)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectShowJointContextMenu(
+          boost::bind(&CMLConnectionMaker::OnShowConnectionContextMenu,
+          this, _1)));
 
   this->deleteName = "";
-  this->deleteAct = new QAction(tr("Delete"), this);
-  connect(this->deleteAct, SIGNAL(triggered()), this, SLOT(OnDeleteJoint()));
+  this->deleteAct = new QAction(QString("Delete"), this);
+  connect(this->deleteAct, SIGNAL(triggered()),
+      this, SLOT(OnDelete()));
 
   this->updateMutex = new boost::recursive_mutex();
 }
@@ -119,13 +125,14 @@ void CMLConnectionMaker::DisableEventHandlers()
 }
 
 /////////////////////////////////////////////////
-void CMLConnectionMaker::RemoveConnection(const std::string &_hotSpotName)
+void CMLConnectionMaker::RemoveConnection(const std::string &_connectionName)
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
 
-  if (this->connects.find(_hotSpotName) != this->connects.end())
+  auto it = this->connects.find(_connectionName);
+  if (it != this->connects.end())
   {
-    ConnectionData *connect = this->connects[_hotSpotName];
+    ConnectionData *connect = it->second;
 
     this->RemoveConnectionElement(connect);
 
@@ -139,7 +146,8 @@ void CMLConnectionMaker::RemoveConnection(const std::string &_hotSpotName)
     connect->child.reset();
 
     delete connect;
-    this->connects.erase(_hotSpotName);
+    this->connects.erase(_connectionName);
+    gui::model::Events::jointRemoved(_connectionName);
   }
 }
 
@@ -206,37 +214,32 @@ bool CMLConnectionMaker::OnMouseRelease(const common::MouseEvent &_event)
     rendering::VisualPtr vis = camera->GetVisual(_event.Pos());
     if (vis)
     {
-      if (this->selectedConnection)
-        this->selectedConnection->SetHighlighted(false);
-
-      this->selectedConnection.reset();
-
       // check if mouse pick is not a connection visual
       if (this->connects.find(vis->GetName()) != this->connects.end())
       {
         // trigger connect inspector on right click
         if (_event.Button() == common::MouseEvent::RIGHT)
         {
-          this->inspectVis = vis;
-          this->deleteName = vis->GetName();
-
-          QMenu menu;
-          menu.addAction(this->deleteAct);
-          menu.exec(QCursor::pos());
+          this->OnShowConnectionContextMenu(vis->GetName());
+          return true;
         }
         else if (_event.Button() == common::MouseEvent::LEFT)
         {
           // turn off model selection so we don't end up with
           // both connection visual and model selected at the same time
-          //event::Events::setSelectedEntity("", "normal");
+          event::Events::setSelectedEntity("", "normal");
 
           // this->selectedConnection = vis->GetRootVisual();
           // this->selectedConnection->SetHighlighted(true);
+          this->DeselectAll();
+          this->SetSelected(vis, true);
         }
         // stop event propagation as we don't want users to manipulate the
         // hotspot
         return true;
       }
+      else
+        this->DeselectAll();
       return false;
     }
   }
@@ -348,21 +351,6 @@ bool CMLConnectionMaker::OnMouseRelease(const common::MouseEvent &_event)
     return true;
   }
   return false;
-}
-
-/////////////////////////////////////////////////
-void CMLConnectionMaker::OnDeleteJoint()
-{
-  if (this->connects.find(this->deleteName) != this->connects.end())
-  {
-    ConnectionData *connect = this->connects[this->deleteName];
-    std::string connectionName = this->CreateConnectionName(*connect);
-
-    this->RemoveConnection(this->deleteName);
-    gui::model::Events::jointRemoved(connectionName);
-
-    this->deleteName = "";
-  }
 }
 
 /////////////////////////////////////////////////
@@ -726,6 +714,23 @@ bool CMLConnectionMaker::OnKeyPress(const common::KeyEvent &_event)
 }
 
 /////////////////////////////////////////////////
+void CMLConnectionMaker::OnDelete()
+{
+  this->RemoveConnection(this->deleteName);
+  this->deleteName = "";
+}
+
+/////////////////////////////////////////////////
+void CMLConnectionMaker::OnShowConnectionContextMenu(
+    const std::string &_connectionId)
+{
+  this->deleteName = _connectionId;
+  QMenu menu;
+  menu.addAction(this->deleteAct);
+  menu.exec(QCursor::pos());
+}
+
+/////////////////////////////////////////////////
 void CMLConnectionMaker::CreateHotSpot(ConnectionData *_connect)
 {
   if (!_connect)
@@ -733,7 +738,10 @@ void CMLConnectionMaker::CreateHotSpot(ConnectionData *_connect)
 
   rendering::UserCameraPtr camera = gui::get_active_camera();
 
-  std::string hotSpotName = _connect->visual->GetName() + "_HOTSPOT_";
+  std::string id =
+      CMLConnectionMaker::Instance()->CreateConnectionName(*_connect);
+
+  std::string hotSpotName = id;
 
   rendering::VisualPtr hotspotVisual(
       new rendering::Visual(hotSpotName, camera->GetScene()->GetWorldVisual(),
@@ -765,6 +773,10 @@ void CMLConnectionMaker::CreateHotSpot(ConnectionData *_connect)
   _connect->visual->DeleteDynamicLine(_connect->line);
 
   _connect->dirty = true;
+
+  // Workaround to create a connection in schematic view
+  gui::model::Events::jointInserted(id, id, "wire",
+      _connect->parent->GetName(), _connect->child->GetName());
 }
 
 /////////////////////////////////////////////////
@@ -894,31 +906,63 @@ rendering::VisualPtr CMLConnectionMaker::GetLowestLevelComponentVisual(
 }
 
 /////////////////////////////////////////////////
-void CMLConnectionMaker::OnSetSelectedEntity(const std::string &_name,
-    const std::string &_mode)
+void CMLConnectionMaker::OnSetSelectedEntity(const std::string &/*_name*/,
+    const std::string &/*_mode*/)
 {
   this->Stop();
+  this->DeselectAll();
 }
 
 /////////////////////////////////////////////////
-void CMLConnectionMaker::OnSetSelectedJoint(const std::string &_name,
-    const bool _selected)
+void CMLConnectionMaker::OnSetSelectedLink(const std::string &/*_name*/,
+    bool /*_selected*/)
 {
+  this->DeselectAll();
 }
 
-void CMLConnectionMaker::OnJointRemoved(const std::string &_id)
+/////////////////////////////////////////////////
+void CMLConnectionMaker::OnSetSelectedConnection(const std::string &_name,
+    const bool _selected)
 {
-  for (auto it : this->connects)
+  this->SetSelected(_name, _selected);
+}
+
+
+/////////////////////////////////////////////////
+void CMLConnectionMaker::DeselectAll()
+{
+  if (this->selectedConnection)
   {
-    std::string connectionName = CreateConnectionName(*(it.second));
-    if (_id == connectionName)
-    {
-      this->RemoveConnection(it.first);
-      break;
-    }
+    this->selectedConnection->SetHighlighted(false);
+    model::Events::setSelectedJoint(this->selectedConnection->GetName(), false);
+    this->selectedConnection.reset();
   }
 }
 
+/////////////////////////////////////////////////
+void CMLConnectionMaker::SetSelected(const std::string &_name,
+    const bool _selected)
+{
+  auto it = this->connects.find(_name);
+  if (it == this->connects.end())
+    return;
+
+  this->SetSelected(it->second->hotspot, _selected);
+}
+
+/////////////////////////////////////////////////
+void CMLConnectionMaker::SetSelected(rendering::VisualPtr _connectionVis,
+    const bool _selected)
+{
+  if (!_connectionVis || _connectionVis == this->selectedConnection)
+    return;
+
+  this->selectedConnection = _connectionVis;
+  _connectionVis->SetHighlighted(_selected);
+  model::Events::setSelectedJoint(_connectionVis->GetName(), _selected);
+}
+
+/////////////////////////////////////////////////
 std::string CMLConnectionMaker::CreateConnectionName(
     const std::string &_parent,
     const std::string &_parentPort,
@@ -928,6 +972,7 @@ std::string CMLConnectionMaker::CreateConnectionName(
   return _parent + "::" + _parentPort + "_" + _child + "::" + _childPort;
 }
 
+/////////////////////////////////////////////////
 std::string CMLConnectionMaker::CreateConnectionName(
     const ConnectionData &_connection) const
 {
