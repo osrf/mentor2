@@ -15,21 +15,22 @@
  *
 */
 
-#include <boost/thread/recursive_mutex.hpp>
-#include <string>
-#include <vector>
-
 #include <gazebo/common/common.hh>
 #include <gazebo/rendering/rendering.hh>
-#include <gazebo/gui/GuiEvents.hh>
+
+#include <gazebo/gui/gui.hh>
+#include <gazebo/gui/qt.h>
+
 #include <gazebo/gui/model/ModelEditorEvents.hh>
 #include <gazebo/gui/model/ModelEditor.hh>
-#include <gazebo/gui/gui.hh>
 
-#include "CMLEvents.hh"
 #include "CMLManager.hh"
-#include "CMLPortInspector.hh"
+#include "CMLEvents.hh"
 #include "CMLConnectionMaker.hh"
+
+#include <gazebo/gui/GuiEvents.hh>
+
+#include "CMLPortInspector.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -56,6 +57,18 @@ CMLConnectionMaker::CMLConnectionMaker()
 
   this->connections.push_back(event::Events::ConnectSetSelectedEntity(
        boost::bind(&CMLConnectionMaker::OnSetSelectedEntity, this, _1, _2)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectSetSelectedJoint(
+      boost::bind(&CMLConnectionMaker::OnSetSelectedJoint, this, _1, _2)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectJointRemoved(
+          boost::bind(&CMLConnectionMaker::OnJointRemoved, this, _1)));
+
+  this->deleteName = "";
+  this->deleteAct = new QAction(tr("Delete"), this);
+  connect(this->deleteAct, SIGNAL(triggered()), this, SLOT(OnDeleteJoint()));
 
   this->updateMutex = new boost::recursive_mutex();
 }
@@ -106,21 +119,27 @@ void CMLConnectionMaker::DisableEventHandlers()
 }
 
 /////////////////////////////////////////////////
-void CMLConnectionMaker::RemoveConnection(const std::string &_connectionName)
+void CMLConnectionMaker::RemoveConnection(const std::string &_hotSpotName)
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-  if (this->connects.find(_connectionName) != this->connects.end())
+
+  if (this->connects.find(_hotSpotName) != this->connects.end())
   {
-    ConnectionData *connect = this->connects[_connectionName];
+    ConnectionData *connect = this->connects[_hotSpotName];
+
+    this->RemoveConnectionElement(connect);
+
     rendering::ScenePtr scene = connect->hotspot->GetScene();
     scene->RemoveVisual(connect->hotspot);
     scene->RemoveVisual(connect->visual);
+
     connect->hotspot.reset();
     connect->visual.reset();
     connect->parent.reset();
     connect->child.reset();
+
     delete connect;
-    this->connects.erase(_connectionName);
+    this->connects.erase(_hotSpotName);
   }
 }
 
@@ -162,6 +181,7 @@ bool CMLConnectionMaker::OnMousePress(const common::MouseEvent &_event)
   rendering::UserCameraPtr camera = gui::get_active_camera();
   rendering::ScenePtr scene = camera->GetScene();
   rendering::VisualPtr vis = camera->GetVisual(_event.Pos());
+
   if (vis)
   {
     if (this->connects.find(vis->GetName()) != this->connects.end())
@@ -188,6 +208,7 @@ bool CMLConnectionMaker::OnMouseRelease(const common::MouseEvent &_event)
     {
       if (this->selectedConnection)
         this->selectedConnection->SetHighlighted(false);
+
       this->selectedConnection.reset();
 
       // check if mouse pick is not a connection visual
@@ -196,10 +217,12 @@ bool CMLConnectionMaker::OnMouseRelease(const common::MouseEvent &_event)
         // trigger connect inspector on right click
         if (_event.Button() == common::MouseEvent::RIGHT)
         {
-          /*this->inspectVis = vis;
+          this->inspectVis = vis;
+          this->deleteName = vis->GetName();
+
           QMenu menu;
-          menu.addAction(this->inspectAct);
-          menu.exec(QCursor::pos());*/
+          menu.addAction(this->deleteAct);
+          menu.exec(QCursor::pos());
         }
         else if (_event.Button() == common::MouseEvent::LEFT)
         {
@@ -243,6 +266,7 @@ bool CMLConnectionMaker::OnMouseRelease(const common::MouseEvent &_event)
         // the child will be set on the second mouse release.
         this->mouseConnection = this->CreateConnection(this->selectedVis,
             rendering::VisualPtr());
+
         this->mouseConnection->parentPort = port;
       }
       // Pressed child part
@@ -327,53 +351,49 @@ bool CMLConnectionMaker::OnMouseRelease(const common::MouseEvent &_event)
 }
 
 /////////////////////////////////////////////////
+void CMLConnectionMaker::OnDeleteJoint()
+{
+  if (this->connects.find(this->deleteName) != this->connects.end())
+  {
+    ConnectionData *connect = this->connects[this->deleteName];
+    std::string connectionName = this->CreateConnectionName(*connect);
+
+    this->RemoveConnection(this->deleteName);
+    gui::model::Events::jointRemoved(connectionName);
+
+    this->deleteName = "";
+  }
+}
+
+/////////////////////////////////////////////////
 void CMLConnectionMaker::InsertConnectionElement(ConnectionData *_connection)
 {
-  // Create connection SDF
-  sdf::ElementPtr connectionElem(new sdf::Element);
-  connectionElem->SetName("connection");
-
-  sdf::ElementPtr sourceElem(new sdf::Element);
-  sourceElem->SetName("source");
-
-//  std::string leafName = _connection->parent->GetName();
-  std::string scopedName = _connection->parent->GetName();
-  size_t pIdx = scopedName.find("::");
-  if (pIdx != std::string::npos)
-    scopedName = scopedName.substr(pIdx+2);
-
-  sourceElem->AddValue("string", scopedName, "_none_", "source");
-  connectionElem->InsertElement(sourceElem);
-
-  sdf::ElementPtr sourcePortElem(new sdf::Element);
-  sourcePortElem->SetName("source_port");
-  sourcePortElem->AddValue("string", _connection->parentPort,
-      "_none_", "sourcePort");
-  connectionElem->InsertElement(sourcePortElem);
-
-  sdf::ElementPtr targetElem(new sdf::Element);
-  targetElem->SetName("target");
-
-  scopedName = _connection->child->GetName();
-  pIdx = scopedName.find("::");
-  if (pIdx != std::string::npos)
-    scopedName = scopedName.substr(pIdx+2);
-
-  targetElem->AddValue("string", scopedName, "_none_", "target");
-  connectionElem->InsertElement(targetElem);
-
-  sdf::ElementPtr targetPortElem(new sdf::Element);
-  targetPortElem->SetName("target_port");
-  targetPortElem->AddValue("string", _connection->childPort,
-      "_none_", "targetPort");
-  connectionElem->InsertElement(targetPortElem);
+  // Create SDF for connection
+  sdf::ElementPtr connectionElem = this->CreateConnectionSDF(_connection);
 
   // Append to model SDF
   gazebo::gui::MainWindow *mainWindow = gui::get_main_window();
-  gazebo::gui::ModelEditor *modelEditor = dynamic_cast<
-      gazebo::gui::ModelEditor *>(mainWindow->GetEditor("model"));
+
+  gazebo::gui::ModelEditor *modelEditor =
+      dynamic_cast<gazebo::gui::ModelEditor *>(mainWindow->GetEditor("model"));
 
   modelEditor->AppendPluginElement("simple_connections",
+      "libSimpleConnectionsPlugin.so", connectionElem);
+}
+
+/////////////////////////////////////////////////
+void CMLConnectionMaker::RemoveConnectionElement(ConnectionData *_connection)
+{
+  // Create SDF for connection
+  sdf::ElementPtr connectionElem = this->CreateConnectionSDF(_connection);
+
+  // Append to model SDF
+  gazebo::gui::MainWindow *mainWindow = gui::get_main_window();
+
+  gazebo::gui::ModelEditor *modelEditor =
+      dynamic_cast<gazebo::gui::ModelEditor *>(mainWindow->GetEditor("model"));
+
+  modelEditor->RemovePluginElement("simple_connections",
       "libSimpleConnectionsPlugin.so", connectionElem);
 }
 
@@ -436,17 +456,6 @@ ConnectionData *CMLConnectionMaker::CreateConnection(
   return connectionData;
 }
 
-
-/*/////////////////////////////////////////////////
-void CMLConnectionMaker::CreateConnection(
-    sdf::ElementPtr _connectionElem, const std::string &_modelPreviewName)
-{
-  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-  std::pair<sdf::ElementPtr, std::string> pair(_connectionElem,
-      _modelPreviewName);
-  this->connectionsToAdd.push_back(pair);
-}*/
-
 /////////////////////////////////////////////////
 void CMLConnectionMaker::CreateConnectionFromSDF(
     sdf::ElementPtr _connectionElem, const std::string &_modelName)
@@ -491,16 +500,58 @@ void CMLConnectionMaker::CreateConnectionFromSDF(
   connection->childPort = targetPort;
   this->connectType = CONNECT_NONE;
 
-  std::cerr << " create connection from sdf " <<
-    sourceVis->GetName() << " " << targetVis->GetName() << std::endl;
-
   this->CreateHotSpot(connection);
   this->InsertConnectionElement(connection);
+
   gui::CMLEvents::connectionCreated(
       connection->parent->GetName(),
       connection->parentPort,
       connection->child->GetName(),
       connection->childPort);
+}
+
+/////////////////////////////////////////////////
+sdf::ElementPtr CMLConnectionMaker::CreateConnectionSDF(ConnectionData *_connection)
+{
+  // Create connection SDF
+  sdf::ElementPtr connectionElem(new sdf::Element);
+  connectionElem->SetName("connection");
+
+  sdf::ElementPtr sourceElem(new sdf::Element);
+  sourceElem->SetName("source");
+
+  std::string scopedName = _connection->parent->GetName();
+  size_t pIdx = scopedName.find("::");
+  if (pIdx != std::string::npos)
+	scopedName = scopedName.substr(pIdx+2);
+
+  sourceElem->AddValue("string", scopedName, "_none_", "source");
+  connectionElem->InsertElement(sourceElem);
+
+  sdf::ElementPtr sourcePortElem(new sdf::Element);
+  sourcePortElem->SetName("source_port");
+  sourcePortElem->AddValue("string", _connection->parentPort,
+	  "_none_", "sourcePort");
+  connectionElem->InsertElement(sourcePortElem);
+
+  sdf::ElementPtr targetElem(new sdf::Element);
+  targetElem->SetName("target");
+
+  scopedName = _connection->child->GetName();
+  pIdx = scopedName.find("::");
+  if (pIdx != std::string::npos)
+	scopedName = scopedName.substr(pIdx+2);
+
+  targetElem->AddValue("string", scopedName, "_none_", "target");
+  connectionElem->InsertElement(targetElem);
+
+  sdf::ElementPtr targetPortElem(new sdf::Element);
+  targetPortElem->SetName("target_port");
+  targetPortElem->AddValue("string", _connection->childPort,
+	  "_none_", "targetPort");
+  connectionElem->InsertElement(targetPortElem);
+
+  return connectionElem;
 }
 
 /////////////////////////////////////////////////
@@ -683,6 +734,7 @@ void CMLConnectionMaker::CreateHotSpot(ConnectionData *_connect)
   rendering::UserCameraPtr camera = gui::get_active_camera();
 
   std::string hotSpotName = _connect->visual->GetName() + "_HOTSPOT_";
+
   rendering::VisualPtr hotspotVisual(
       new rendering::Visual(hotSpotName, camera->GetScene()->GetWorldVisual(),
       false));
@@ -691,9 +743,11 @@ void CMLConnectionMaker::CreateHotSpot(ConnectionData *_connect)
 
   // create a cylinder to represent the connect
   hotspotVisual->InsertMesh("unit_cylinder");
+
   Ogre::MovableObject *hotspotObj =
       (Ogre::MovableObject*)(camera->GetScene()->GetManager()->createEntity(
       "__HOTSPOT__" + _connect->visual->GetName(), "unit_cylinder"));
+
   hotspotObj->getUserObjectBindings().setUserAny(Ogre::Any(hotSpotName));
   hotspotVisual->GetSceneNode()->attachObject(hotspotObj);
   hotspotVisual->SetMaterial(this->connectionMaterials[_connect->type]);
@@ -720,7 +774,6 @@ void CMLConnectionMaker::Update()
   if (this->newConnectionCreated)
   {
     this->CreateHotSpot(this->mouseConnection);
-
     this->mouseConnection = NULL;
     this->newConnectionCreated = false;
   }
@@ -841,8 +894,44 @@ rendering::VisualPtr CMLConnectionMaker::GetLowestLevelComponentVisual(
 }
 
 /////////////////////////////////////////////////
-void CMLConnectionMaker::OnSetSelectedEntity(const std::string &/*_name*/,
-    const std::string &/*_mode*/)
+void CMLConnectionMaker::OnSetSelectedEntity(const std::string &_name,
+    const std::string &_mode)
 {
   this->Stop();
+}
+
+/////////////////////////////////////////////////
+void CMLConnectionMaker::OnSetSelectedJoint(const std::string &_name,
+    const bool _selected)
+{
+}
+
+void CMLConnectionMaker::OnJointRemoved(const std::string &_id)
+{
+  for (auto it : this->connects)
+  {
+    std::string connectionName = CreateConnectionName(*(it.second));
+    if (_id == connectionName)
+    {
+      this->RemoveConnection(it.first);
+      break;
+    }
+  }
+}
+
+std::string CMLConnectionMaker::CreateConnectionName(
+    const std::string &_parent,
+    const std::string &_parentPort,
+    const std::string &_child,
+    const std::string &_childPort) const
+{
+  return _parent + "::" + _parentPort + "_" + _child + "::" + _childPort;
+}
+
+std::string CMLConnectionMaker::CreateConnectionName(
+    const ConnectionData &_connection) const
+{
+  return this->CreateConnectionName(
+      _connection.parent->GetName(), _connection.parentPort,
+      _connection.child->GetName(), _connection.childPort);
 }

@@ -278,8 +278,6 @@ void CMLRender::Update()
 void CMLRender::OnCreateConnection(const std::string &_type)
 {
   CMLConnectionMaker::Instance()->AddConnection(_type);
-
-  std::cerr << " create connection! " << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -287,8 +285,6 @@ void CMLRender::OnConnectionCreated(const std::string &_parent,
     const std::string &_parentPort, const std::string &_child,
     const std::string &_childPort)
 {
-  std::cerr << " connection created " << _parent << " " << _child << std::endl;
-
   Simple_msgs::msgs::SimpleConnection msg;
   msg.set_parent(_parent);
   msg.set_child(_child);
@@ -321,9 +317,11 @@ void CMLRender::OnConnectionCreated(const std::string &_parent,
   restMsg.set_json(postStr);
   this->restPub->Publish(restMsg);
 
-  // workaround to create a connection in schematic view
-  std::string id = _parent + "::" + _parentPort + "_" +
-      _child + "::" + _childPort;
+  // Workaround to create a connection in schematic view
+
+  std::string id = CMLConnectionMaker::Instance()->CreateConnectionName(
+      _parent, _parentPort, _child, _childPort);
+
   gui::model::Events::jointInserted(id, id, "wire", _parent, _child);
 }
 

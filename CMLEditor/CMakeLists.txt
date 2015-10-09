@@ -22,6 +22,7 @@ set (qt_headers
   CMLPortInspector.hh
   CMLPropertyManager.hh
   CMLRender.hh
+  CMLConnectionMaker.hh
 )
 
 set (headers
