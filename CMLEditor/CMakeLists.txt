@@ -18,7 +18,6 @@ set (sources
 
 set (qt_headers
   CMLComponentInspector.hh
-  CMLConnectionMaker.hh
   CMLEditor.hh
   CMLPortInspector.hh
   CMLPropertyManager.hh
@@ -26,6 +25,7 @@ set (qt_headers
 )
 
 set (headers
+  CMLConnectionMaker.hh
   CMLEditorPlugin.hh
   CMLEvents.hh
   CMLManager.hh

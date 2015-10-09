@@ -320,6 +320,11 @@ void CMLRender::OnConnectionCreated(const std::string &_parent,
   postStr += "}";
   restMsg.set_json(postStr);
   this->restPub->Publish(restMsg);
+
+  // workaround to create a connection in schematic view
+  std::string id = _parent + "::" + _parentPort + "_" +
+      _child + "::" + _childPort;
+  gui::model::Events::jointInserted(id, id, "wire", _parent, _child);
 }
 
 /////////////////////////////////////////////////
