@@ -35,9 +35,13 @@ if (NOT CMAKE_BUILD_TYPE)
 endif (NOT CMAKE_BUILD_TYPE)
 
 # find gazebo
+find_package(GAZEBO)
+
 include (FindPkgConfig)
 if (PKG_CONFIG_FOUND)
-  pkg_check_modules(GAZEBO gazebo>=3.0.0 REQUIRED)
+  if (NOT GAZEBO_FOUND)
+    pkg_check_modules(GAZEBO gazebo>=3.0.0 REQUIRED)
+  endif ()
   pkg_check_modules(OGRE OGRE)
   pkg_check_modules(OGRE-Terrain OGRE-Terrain)
   #pkg_check_modules(GVC libgvc)
