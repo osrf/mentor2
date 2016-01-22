@@ -15,6 +15,8 @@
  *
 */
 
+#include <sdf/sdf.hh>
+
 #include <gazebo/common/ModelDatabase.hh>
 #include <gazebo/gui/qt.h>
 #include <gazebo/gui/TimePanel.hh>
@@ -50,7 +52,7 @@ CMLEditor::CMLEditor(MainWindow *_mainWindow)
   this->renderProxy = new gui::CMLRender();
 
   this->modelEditor =
-      dynamic_cast<ModelEditor *>(_mainWindow->GetEditor("model"));
+      dynamic_cast<ModelEditor *>(_mainWindow->Editor("model"));
 
   if (!this->modelEditor)
   {

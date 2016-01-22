@@ -325,7 +325,7 @@ void CMLRender::OnDelete()
   if (mainWindow)
   {
     ModelEditor *modelEditor =
-        dynamic_cast<ModelEditor *>(mainWindow->GetEditor("model"));
+        dynamic_cast<ModelEditor *>(mainWindow->Editor("model"));
 
     if (modelEditor)
       modelEditor->RemoveEntity(this->inspectName);

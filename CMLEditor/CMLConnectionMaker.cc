@@ -342,7 +342,7 @@ bool CMLConnectionMaker::OnMouseRelease(const common::MouseEvent &_event)
         // Append to model SDF
         gazebo::gui::MainWindow *mainWindow = gui::get_main_window();
         gazebo::gui::ModelEditor *modelEditor = dynamic_cast<
-            gazebo::gui::ModelEditor *>(mainWindow->GetEditor("model"));
+            gazebo::gui::ModelEditor *>(mainWindow->Editor("model"));
         modelEditor->AppendPluginElement("simple_connections",
             "libSimpleConnectionsPlugin.so", connectionElem);*/
       }
@@ -363,7 +363,7 @@ void CMLConnectionMaker::InsertConnectionElement(ConnectionData *_connection)
   gazebo::gui::MainWindow *mainWindow = gui::get_main_window();
 
   gazebo::gui::ModelEditor *modelEditor =
-      dynamic_cast<gazebo::gui::ModelEditor *>(mainWindow->GetEditor("model"));
+      dynamic_cast<gazebo::gui::ModelEditor *>(mainWindow->Editor("model"));
 
   modelEditor->AppendPluginElement("simple_connections",
       "libSimpleConnectionsPlugin.so", connectionElem);
@@ -379,7 +379,7 @@ void CMLConnectionMaker::RemoveConnectionElement(ConnectionData *_connection)
   gazebo::gui::MainWindow *mainWindow = gui::get_main_window();
 
   gazebo::gui::ModelEditor *modelEditor =
-      dynamic_cast<gazebo::gui::ModelEditor *>(mainWindow->GetEditor("model"));
+      dynamic_cast<gazebo::gui::ModelEditor *>(mainWindow->Editor("model"));
 
   modelEditor->RemovePluginElement("simple_connections",
       "libSimpleConnectionsPlugin.so", connectionElem);
@@ -426,9 +426,9 @@ ConnectionData *CMLConnectionMaker::CreateConnection(
   connectVis->Load();
   rendering::DynamicLines *connectLine =
       connectVis->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
-  math::Vector3 origin = math::Vector3::Zero;
+  ignition::math::Vector3d origin = ignition::math::Vector3d::Zero;
   connectLine->AddPoint(origin);
-  connectLine->AddPoint(origin + math::Vector3(0, 0, 0.1));
+  connectLine->AddPoint(origin + ignition::math::Vector3d(0, 0, 0.1));
   connectVis->GetSceneNode()->setInheritScale(false);
   connectVis->GetSceneNode()->setInheritOrientation(false);
 
@@ -669,26 +669,27 @@ bool CMLConnectionMaker::OnMouseMove(const common::MouseEvent &_event)
   // extending the connect line to a child part
   if (this->selectedVis && this->mouseConnection && this->mouseConnection->line)
   {
-    math::Vector3 parentPos, currentPos;
+    ignition::math::Vector3d parentPos, currentPos;
     if (this->mouseConnection->parent)
-      parentPos = this->mouseConnection->parent->GetWorldPose().pos;
+      parentPos = this->mouseConnection->parent->GetWorldPose().pos.Ign();
 
     // Set end point to center of child part
     if (this->hoverVis)
     {
-      currentPos = this->hoverVis->GetWorldPose().pos - parentPos;
+      currentPos = this->hoverVis->GetWorldPose().pos.Ign() - parentPos;
     }
     // Set end point to mouse plane intersection
     else if (!this->hoverVis && vis->GetRootVisual() &&
              vis->GetRootVisual()->IsPlane())
     {
-      math::Vector3 pt;
-      camera->GetWorldPointOnPlane(_event.Pos().X(), _event.Pos().Y(),
-          math::Plane(math::Vector3(0, 0, 1)), pt);
+      ignition::math::Vector3d pt;
+      camera->WorldPointOnPlane(_event.Pos().X(), _event.Pos().Y(),
+          ignition::math::Planed(ignition::math::Vector3d(0, 0, 1)), pt);
 
-      currentPos = vis->GetRootVisual()->GetWorldPose().pos - parentPos + pt;
+      currentPos =
+          vis->GetRootVisual()->GetWorldPose().pos.Ign() - parentPos + pt;
     }
-    if (currentPos != math::Vector3::Zero)
+    if (currentPos != ignition::math::Vector3d::Zero)
       this->mouseConnection->line->SetPoint(1, currentPos);
   }
 
@@ -744,7 +745,7 @@ void CMLConnectionMaker::CreateHotSpot(ConnectionData *_connect)
   std::string hotSpotName = id;
 
   rendering::VisualPtr hotspotVisual(
-      new rendering::Visual(hotSpotName, camera->GetScene()->GetWorldVisual(),
+      new rendering::Visual(hotSpotName, camera->GetScene()->WorldVisual(),
       false));
 
   _connect->hotspot = hotspotVisual;
@@ -753,7 +754,8 @@ void CMLConnectionMaker::CreateHotSpot(ConnectionData *_connect)
   hotspotVisual->InsertMesh("unit_cylinder");
 
   Ogre::MovableObject *hotspotObj =
-      (Ogre::MovableObject*)(camera->GetScene()->GetManager()->createEntity(
+      (Ogre::MovableObject*)
+      (camera->GetScene()->OgreSceneManager()->createEntity(
       "__HOTSPOT__" + _connect->visual->GetName(), "unit_cylinder"));
 
   hotspotObj->getUserObjectBindings().setUserAny(Ogre::Any(hotSpotName));
