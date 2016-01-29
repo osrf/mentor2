@@ -1,8 +1,10 @@
 #!/bin/bash
 
-DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+#DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
-$DIR/stop.bash
+#$DIR/mentor2-stop.bash
+
+mentor2-stop
 
 
 #./stop.bash
@@ -15,6 +17,8 @@ if [ -f ${HOME}/local/share/simplegdk/setup.sh ]; then
   . ${HOME}/local/share/simplegdk/setup.sh
 elif [ -f /usr/local/share/simplegdk/setup.sh ]; then
   . /usr/local/share/simplegdk/setup.sh
+elif [ -f /usr/share/simplegdk/setup.sh ]; then
+  . /usr/local/simplegdk/setup.sh
 else
   echo "Warning: failed to find simplegdk's setup.sh.  You will need to source it manually."
 fi

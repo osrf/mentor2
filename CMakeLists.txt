@@ -80,6 +80,8 @@ add_subdirectory(CMLEditor)
 add_subdirectory(scoring)
 add_subdirectory(model_plugins)
 add_subdirectory(models)
+add_subdirectory(scripts)
+add_subdirectory(worlds)
 
 ########### Add uninstall target ###############
 configure_file(

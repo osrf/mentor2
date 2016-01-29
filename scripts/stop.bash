@@ -1,1 +1,3 @@
-killall gzserver gzclient
+#!/bin/bash
+
+mentor2-stop
