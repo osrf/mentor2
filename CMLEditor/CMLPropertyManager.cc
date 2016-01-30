@@ -52,7 +52,7 @@ void CMLPropertyManager::OnComponentProperyChanged()
   // std::cerr << " msg " << msg.DebugString() << std::endl;
 
   ModelEditor *modelEditor =
-        dynamic_cast<ModelEditor *>(gui::get_main_window()->GetEditor("model"));
+        dynamic_cast<ModelEditor *>(gui::get_main_window()->Editor("model"));
   if (modelEditor)
   {
     sdf::ElementPtr entitySDF = modelEditor->GetEntitySDF(msg.name());
