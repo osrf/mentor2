@@ -13,12 +13,12 @@ echo "Did you source?:  <your setup path>/share/simplegdk/setup.sh"
 echo "Did you source?:  <your setup path>/share/gazebo/setup.sh"
 
 # get simplegdk configuration.
-if [ -f ${HOME}/local/share/simplegdk/setup.sh ]; then
+if [ -f /usr/share/simplegdk/setup.sh ]; then
+  . /usr/share/simplegdk/setup.sh
+elif [ -f ${HOME}/local/share/simplegdk/setup.sh ]; then
   . ${HOME}/local/share/simplegdk/setup.sh
 elif [ -f /usr/local/share/simplegdk/setup.sh ]; then
   . /usr/local/share/simplegdk/setup.sh
-elif [ -f /usr/share/simplegdk/setup.sh ]; then
-  . /usr/simplegdk/setup.sh
 else
   echo "Warning: failed to find simplegdk's setup.sh.  You will need to source it manually."
 fi
