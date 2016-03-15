@@ -31,7 +31,6 @@ PowerSourcePlugin::PowerSourcePlugin()
   this->timeAccum = 0;
 }
 
-
 /////////////////////////////////////////////////
 PowerSourcePlugin::~PowerSourcePlugin()
 {
@@ -100,10 +99,10 @@ void PowerSourcePlugin::UpdateImpl(double _timeSinceLastUpdate)
       if (loop <0)
       {
         loop = 10;
-//        std::cout << "battery capacity " << this->remainingCapacity
-//            << std::endl;
-//        std::cout << "battery voltage " << this->currentVoltage
-//            << std::endl;
+        std::cout << "battery capacity " << this->remainingCapacity
+            << std::endl;
+        std::cout << "battery voltage " << this->currentVoltage
+            << std::endl;
       }
     }
   }

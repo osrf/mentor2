@@ -83,6 +83,33 @@ void GearboxPlugin::Reset()
 /////////////////////////////////////////////////
 void GearboxPlugin::UpdateImpl(double _timeSinceLastUpdate)
 {
+  physics::BasePtr b = this->parent;
+  while ( b->GetParent() &&
+       b->GetParent()->HasType(physics::Base::MODEL))
+  {
+     b =  b->GetParent();
+  }
+  if (b)
+  {
+//    std::cerr << " got b " << std::endl;
+    physics::ModelPtr rootModel =
+        boost::dynamic_pointer_cast<physics::Model>(b);
+    if (rootModel)
+    {
+//      std::cerr << " got rootModel " << std::endl;
+      physics::ModelPtr axle = rootModel->NestedModel("axle_wheels");
+      if (axle)
+      {
+//        std::cerr << " got axle " << std::endl;
+        physics::LinkPtr axleLink = axle->GetLink("link");
+//        std::cerr << axleLink->GetWorldLinearVel() << std::endl;
+      }
+    }
+  }
+
+
+
+
   if (this->gearboxJoint)
   {
     if (this->parentLinkJoint && this->childLinkJoint)
