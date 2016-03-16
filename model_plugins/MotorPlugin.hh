@@ -40,6 +40,9 @@ namespace gazebo
     /// \brief Initialize the plugin.
     public: virtual void Init();
 
+    /// \brief Reset the plugin.
+    public: virtual void Reset();
+
     /// Documentation Inherited
     protected: virtual void UpdateImpl(double _timeSinceLastUpdate);
 

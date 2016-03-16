@@ -42,6 +42,13 @@ MotorPlugin::~MotorPlugin()
 }
 
 /////////////////////////////////////////////////
+void MotorPlugin::Reset()
+{
+  if (this->joint)
+    this->joint->SetForce(0, 0);
+}
+
+/////////////////////////////////////////////////
 void MotorPlugin::LoadImpl(sdf::ElementPtr _sdf)
 {
   this->voltageMutex = new boost::recursive_mutex();
