@@ -130,6 +130,10 @@ CMLEditor::CMLEditor(MainWindow *_mainWindow)
   this->connections.push_back(gui::model::Events::ConnectJointRemoved(
       boost::bind(&CMLEditor::OnJointRemoved, this, _1)));
 
+  this->connections.push_back(
+      gui::model::Events::ConnectOpenNestedModelInspector(
+      boost::bind(&CMLEditor::OpenInspector, this, _1)));
+
   this->LoadModels();
 }
 
@@ -465,4 +469,11 @@ void CMLEditor::OnJointRemoved(const std::string &_jointId)
 
   restMsg.set_json(postStr);
   this->restPub->Publish(restMsg);
+}
+
+/////////////////////////////////////////////////
+void CMLEditor::OpenInspector(const std::string &_name)
+{
+  std::cerr << " open inspector " << _name << std::endl;
+  CMLManager::Instance()->ShowInspector(_name);
 }

@@ -32,7 +32,6 @@
 #include "SimpleModel.pb.h"
 
 #include "CMLPortInspector.hh"
-#include "CMLComponentInspector.hh"
 #include "CMLRender.hh"
 
 using namespace gazebo;

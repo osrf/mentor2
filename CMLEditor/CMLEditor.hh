@@ -81,6 +81,9 @@ namespace gazebo
       /// \param[in] _jointId Unique joint identifier.
       private: void OnJointRemoved(const std::string &_jointId);
 
+      /// \brief Callback when an inspector is to be opened.
+      private: void OpenInspector(const std::string &_name);
+
       /// \brief Qt callback when an entity is to be spawned
       private slots: void SpawnEntity();
 
