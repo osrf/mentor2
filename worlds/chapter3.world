@@ -127,8 +127,8 @@
                 <ode>
                   <min_depth>0.001</min_depth>
                   <max_vel>1</max_vel>
-                  <kp>1e5</kp>
-                  <kd>5</kd>
+                  <kp>1e6</kp>
+                  <kd>3</kd>
                 </ode>
               </contact>
             </surface>
@@ -155,8 +155,8 @@
                 <ode>
                   <min_depth>0.001</min_depth>
                   <max_vel>1</max_vel>
-                  <kp>1e5</kp>
-                  <kd>5</kd>
+                  <kp>1e6</kp>
+                  <kd>3</kd>
                 </ode>
               </contact>
             </surface>
