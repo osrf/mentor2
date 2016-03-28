@@ -2,7 +2,6 @@
 find_package(Protobuf REQUIRED)
 
 set (msgs
-  Event.proto
   SimpleConnection.proto
   SimpleModel.proto
   Variant.proto

@@ -9,7 +9,7 @@
 
 namespace gazebo
 {
-  class ModelPush : public ModelPlugin
+  class WheelSlipPlugin : public ModelPlugin
   {
     public: void Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/)
     {
@@ -51,10 +51,16 @@ namespace gazebo
   		  }
       }
 
+      this->node = transport::NodePtr(new transport::Node());
+      this->node->Init();
+
+      // Create a publisher on the Rest plugin topic
+      this->restPub = this->node->Advertise<gazebo::msgs::RestPost>("/gazebo/rest/rest_post");
+
       // Listen to the update event. This event is broadcast every
       // simulation iteration.
       this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-          boost::bind(&ModelPush::OnUpdate, this, _1));
+          boost::bind(&WheelSlipPlugin::OnUpdate, this, _1));
     }
 
     /////////////////////////////////////////////////
@@ -70,18 +76,19 @@ namespace gazebo
     private: double CalculateExpectedVMG(math::Vector3 axleAngularVel)
     {
     	// 2 pi radians = 360 degrees = 1 revolution
-//    	double rotationsPerSec = 2 * IGN_PI * fabs(axleAngularVel.x);
-    	double rotationsPerSec = fabs(axleAngularVel.x) / 360;
+    	double revsPerSec = fabs(axleAngularVel.x) / (2 * IGN_PI);
 
     	// Velocity made good in meters/second
-    	return rotationsPerSec * this->wheelCirc;
+    	return revsPerSec * this->wheelCirc;
     }
 
 
     // Called by the world update start event
     public: void OnUpdate(const common::UpdateInfo & /*_info*/)
     {
-//    	std::cout << "OnUpdate()..." << std::endl << std::flush;
+    	static int i = 0;
+    	static int n = 0;
+    	//    	std::cout << "OnUpdate()..." << std::endl << std::flush;
 
     	if (!this->axle)
     		return;
@@ -89,26 +96,45 @@ namespace gazebo
     	math::Vector3 model_wlv = this->modelLink->GetWorldLinearVel();
     	math::Vector3 axle_av = this->axle->GetRelativeAngularVel();
 
-    	math::Vector3 model_wla = this->modelLink->GetRelativeLinearAccel();
-
-
     	double vmg = this->CalculateExpectedVMG(axle_av);
+    	double diff = fabs(fabs(model_wlv.y) - vmg);
 
-/*    	std::cout << "axle: x=" << std::setw(6) << axle_av.x << " y=" << std::setw(6) << axle_av.y << " z=" << std::setw(6) << axle_av.z << " "
-    			  << "model: x=" << std::setw(6) << model_wlv.x << " y=" << std::setw(6) << model_wlv.y << " z=" << std::setw(6) << model_wlv.z << " "
-				  << "vmg: " << vmg << " m/s" << std::endl;*/
 
-//  static double c = 0;
-//  c this->modelLink->GetWorldPose().pos.y;
+//    	if ((++i % 5) == 0) {
+//			std::cout << "axle: x=" << std::setw(6) << axle_av.x << " y=" << std::setw(6) << axle_av.y << " z=" << std::setw(6) << axle_av.z << " "
+//					  << "model: x=" << std::setw(6) << model_wlv.x << " y=" << std::setw(6) << model_wlv.y << " z=" << std::setw(6) << model_wlv.z << " "
+//					  << "vmg: " << vmg << " m/s diff: " << diff << std::endl;
+//    	}
 
-  if (math::equal(std::fmod(this->model->GetWorld()->GetSimTime().Double(), 1.0), 0.0, 1e-4))
-  {
-    	std::cerr << "time: " << this->model->GetWorld()->GetSimTime().Double() << std::endl;
-    	std::cout << " model: v " << std::setw(6) << model_wlv.x << " y=" << std::setw(6) << model_wlv.y << " z=" << std::setw(6) << model_wlv.z << std::endl;
-    	std::cout << " model: a " << model_wla.x << " y=" << std::setw(6) << model_wla.y << " z=" << std::setw(6) << model_wla.z << std::endl;
-    	std::cerr<< " pose: " << this->modelLink->GetWorldPose().pos << std::endl;
-  }
+    	if (n++ >= 500) {
 
+			std::string parentScopedName("parent");
+			std::string _parentPort("123");
+			std::string childScopedName("child");
+			std::string _childPort("456");
+
+			std::string postStr;
+
+			postStr = "\"type\": \"connection\",";
+			postStr += "\"name\": \"simple_connection\",";
+			postStr += "\"data\": {";
+			postStr += "\"parent\": \"" + parentScopedName + "\",";
+			postStr += "\"parent_port\": \"" + _parentPort + "\",";
+			postStr += "\"child\": \"" + childScopedName + "\",";
+			postStr += "\"child_port\": \"" + _childPort + "\"";
+			postStr += "}";
+
+			gazebo:msgs::RestPost restMsg;
+			restMsg.set_route("/events/new");
+
+			std::cout << ">>> publishing msg " << postStr << std::endl;
+
+			restMsg.set_json(postStr);
+			this->restPub->Publish(restMsg);
+
+    	    n = 0;
+
+    	}
 
     }
 
@@ -126,8 +152,14 @@ namespace gazebo
     // Circumference of wheel
     private: double wheelCirc;
 
+    // Pointer to the node
+    private: transport::NodePtr node;
+
+    /// \brief a way to send messages to the MOOC topic (to the REST)
+    private: transport::PublisherPtr restPub;
+
   };
 
   // Register this plugin with the simulator
-  GZ_REGISTER_MODEL_PLUGIN(ModelPush)
+  GZ_REGISTER_MODEL_PLUGIN(WheelSlipPlugin)
 }

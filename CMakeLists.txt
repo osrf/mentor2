@@ -77,7 +77,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS} -std=c++11")
 
 add_subdirectory(msgs)
 add_subdirectory(CMLEditor)
-add_subdirectory(scoring)
+#add_subdirectory(scoring)
 add_subdirectory(model_plugins)
 add_subdirectory(models)
 add_subdirectory(scripts)

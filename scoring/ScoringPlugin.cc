@@ -43,7 +43,7 @@ void ScoringPlugin::OnRequest(ConstRequestPtr &_msg)
     if(models.erase(modelName) == 1)
     {
       ScoringEvents::spawnModel(modelName, false);
-    } 
+    }
   }
 }
 
@@ -60,7 +60,7 @@ void ScoringPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
   node->Init(_parent->GetName());
 
   // Create a publisher on the Rest plugin topic
-  pub = node->Advertise<Event_msgs::msgs::RestPost>("/gazebo/event/rest_post");
+  pub = node->Advertise<gazebo::msgs::RestPost>("/gazebo/event/rest_post");
 
   // Subscribe to model spawning
   spawnSub = node->Subscribe("~/model/info", &ScoringPlugin::OnModelInfo, this );
@@ -75,7 +75,7 @@ void ScoringPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
   cout << "\nReading scoring regions" << endl;
   while(child)
   {
-   
+
     Region* r = new Region;
     r->Load(child);
     RegionPtr region;
@@ -110,12 +110,12 @@ void ScoringPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
     }
     else if (eventType == "existence" )
     {
-      event.reset(new ExistenceEventSource(this->pub, this->world) ); 
+      event.reset(new ExistenceEventSource(this->pub, this->world) );
     }
     else
     {
       string m;
-      m = "Unknown event type: \"" + eventType + "\" in scoring plugin"; 
+      m = "Unknown event type: \"" + eventType + "\" in scoring plugin";
       throw ScoreException(m.c_str());
     }
     if (event)

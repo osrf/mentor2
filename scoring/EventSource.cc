@@ -88,7 +88,7 @@ void EventSource::Emit(const char* data )
   {
     std::cout << "scoring/EventSource::Emit()  event fired " << this->name << " " << data << "" << std::endl;
     // publish to MOOC topic
-    Event_msgs::msgs::RestPost msg;
+    gazebo::msgs::RestPost msg;
     msg.set_route("/events/new");
     string json("{");
     json += "\"type\": \"";
@@ -96,7 +96,7 @@ void EventSource::Emit(const char* data )
     json += "\", ";
     json += "\"name\": \"";
     json += this->name + "\", ";
-    json += " \"data\": "; 
+    json += " \"data\": ";
     json += data;
     json += "}";
     msg.set_json(json.c_str() );
@@ -113,8 +113,8 @@ bool EventSource::IsActive()
 
 
 ////////////////////////////////////////////////////////////////////////////////
-MotionEventSource::MotionEventSource(transport::PublisherPtr _pub, 
-                                      physics::WorldPtr _world) 
+MotionEventSource::MotionEventSource(transport::PublisherPtr _pub,
+                                      physics::WorldPtr _world)
   :EventSource(_pub, "motion", _world)
 {
 }
@@ -130,4 +130,3 @@ bool MotionEventSource::Update()
 {
   return false;
 }
-
