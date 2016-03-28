@@ -83,6 +83,15 @@ namespace gazebo
 
     /// \brief Pointer to the child link's joint.
     private: physics::JointPtr childLinkJoint;
+
+    /// \brief A sliding window to applied torques
+    private: std::vector<double> torques;
+
+    /// \brief Sum of all torqes in the window.
+    private: double torqueSum;
+
+    /// \brief Current torque index.
+    private: unsigned int torqueIndex;
   };
 }
 

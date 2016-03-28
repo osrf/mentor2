@@ -34,6 +34,8 @@ GearboxPlugin::GearboxPlugin()
   this->efficiency = 1.0;
   this->parentLinkName = "";
   this->childLinkName = "";
+  this->torques.resize(5);
+  this->torqueSum = 0;
 }
 
 /////////////////////////////////////////////////
@@ -71,13 +73,10 @@ void GearboxPlugin::Reset()
     std::cerr << " gearbox reset " << std::endl;
   }
 
-  if (this->parentLinkJoint)
-  {
-  }
-
-  if (this->childLinkJoint)
-  {
-  }
+  this->torques.clear();
+  this->torques.resize(5);
+  this->torqueIndex = 0;
+  this->torqueSum = 0;
 }
 
 /////////////////////////////////////////////////
@@ -129,14 +128,14 @@ void GearboxPlugin::UpdateImpl(double _timeSinceLastUpdate)
 
       // double torque = childWrench.body2Torque.GetLength();
 
-/*      std::cerr << "child body1Torque " <<  childWrench.body1Torque
-          << std::endl;
-      std::cerr << "child body2Torque " << childWrench.body2Torque
-          << std::endl;
-      std::cerr << "parent body1Torque "  << parentWrench.body1Torque
-          << std::endl;
-      std::cerr << "parent body2Torque "  << parentWrench.body2Torque
-          << std::endl;*/
+//      std::cerr << "child body1Torque " <<  childWrench.body1Torque
+//          << std::endl;
+//      std::cerr << "child body2Torque " << childWrench.body2Torque
+//          << std::endl;
+//      std::cerr << "parent body1Torque "  << parentWrench.body1Torque
+//          << std::endl;
+//      std::cerr << "parent body2Torque "  << parentWrench.body2Torque
+//          << std::endl;
 
 //      std::cerr << "projected torque: " << childWrench.body2Torque <<
 //            " vs " << torque << " vs " <<
@@ -148,15 +147,33 @@ void GearboxPlugin::UpdateImpl(double _timeSinceLastUpdate)
       torque = parentWrench.body2Torque.GetLength();
 //      std::cerr << "torque " << torque << std::endl;
 
-      this->childLinkJoint->SetParam("friction", 0,
-          (1-this->efficiency)*fabs(torque));
+      // smooth out applied friction, seems to produce more consistent
+      // behavior.
+      double idx = this->torqueIndex % this->torques.size();
+      double oldTorque = 0;
+      double windowSize = idx;
+      if (this->torqueIndex >= this->torques.size())
+      {
+        oldTorque = this->torques[idx];
+        windowSize = this->torques.size();
+      }
 
+      this->torques[idx] = torque;
+      this->torqueSum + torque;
+      this->torqueIndex++;
+      double avgTorque =
+          (this->torqueSum - oldTorque) / windowSize;
+
+      this->childLinkJoint->SetParam("friction", 0,
+          (1-this->efficiency)*fabs(avgTorque));
+
+//      std::cerr << "friction " <<
+//            (1-this->efficiency)*fabs(avgTorque) << std::endl;
     }
     return;
   }
 
   // GearboxPlugin: Dynamically creates a gearbox joint between two links
-
 
   std::string rootModelName;
   physics::BasePtr entity = this->parent;
@@ -302,6 +319,7 @@ void GearboxPlugin::UpdateImpl(double _timeSinceLastUpdate)
   jointSDF->GetElement("parent")->Set(this->parentLinkName);
   jointSDF->GetElement("child")->Set(this->childLinkName);
   jointSDF->GetElement("gearbox_ratio")->Set(this->gearRatio);
+//      this->gearRatio * this->efficiency);
   jointSDF->GetElement("gearbox_reference_body")->Set(
       this->parent->GetLink()->GetName());
 
@@ -311,8 +329,8 @@ void GearboxPlugin::UpdateImpl(double _timeSinceLastUpdate)
   sdf::ElementPtr axis2Elem = jointSDF->GetElement("axis2");
   axis2Elem->GetElement("xyz")->Set(childLinkAxis);
 
-  std::cerr << "gear ratio " << this->gearRatio << std::endl;
-  std::cerr << "efficiency " << this->efficiency << std::endl;
+//  std::cerr << "gear ratio " << this->gearRatio  << std::endl;
+//  std::cerr << "efficiency " << this->efficiency << std::endl;
 
   this->gearboxJoint->Load(jointSDF);
   this->gearboxJoint->Init();
