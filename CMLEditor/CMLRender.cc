@@ -18,6 +18,8 @@
 #include <gazebo/common/common.hh>
 #include <gazebo/rendering/rendering.hh>
 
+#include <gazebo/msgs/msgs.hh>
+
 #include <gazebo/gui/gui.hh>
 #include <gazebo/gui/qt.h>
 #include <gazebo/gui/model/ModelEditorEvents.hh>
@@ -27,7 +29,6 @@
 #include "CMLEvents.hh"
 #include "CMLConnectionMaker.hh"
 
-#include "Event.pb.h"
 #include "SimpleConnection.pb.h"
 #include "SimpleModel.pb.h"
 
@@ -74,7 +75,7 @@ CMLRender::CMLRender()
       "~/simple/connection");
 
   this->restPub =
-      this->node->Advertise<Event_msgs::msgs::RestPost>(
+      this->node->Advertise<gazebo::msgs::RestPost>(
       "/gazebo/rest/rest_post");
 
   this->requestSub = this->node->Subscribe("~/request",
@@ -291,7 +292,7 @@ void CMLRender::OnConnectionCreated(const std::string &_parent,
   msg.set_child_port(_childPort);
   this->connectionPub->Publish(msg);
 
-  Event_msgs::msgs::RestPost restMsg;
+  gazebo::msgs::RestPost restMsg;
   restMsg.set_route("/events/new");
 
   // remove model preview prefix

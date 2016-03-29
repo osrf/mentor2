@@ -17,6 +17,8 @@
 
 #include <sdf/sdf.hh>
 
+#include <gazebo/msgs/msgs.hh>
+
 #include <gazebo/common/ModelDatabase.hh>
 #include <gazebo/gui/qt.h>
 #include <gazebo/gui/TimePanel.hh>
@@ -26,7 +28,6 @@
 #include <gazebo/gui/model/ModelEditorEvents.hh>
 #include <gazebo/gui/model/ModelEditor.hh>
 
-#include "Event.pb.h"
 #include "SimpleModel.pb.h"
 #include "SimpleConnection.pb.h"
 
@@ -109,7 +110,7 @@ CMLEditor::CMLEditor(MainWindow *_mainWindow)
   this->node->Init();
 
   this->restPub =
-      this->node->Advertise<Event_msgs::msgs::RestPost>(
+      this->node->Advertise<gazebo::msgs::RestPost>(
       "/gazebo/rest/rest_post");
 
   this->connections.push_back(gui::model::Events::ConnectNestedModelInserted(
@@ -319,7 +320,7 @@ void CMLEditor::OnNestedModelInserted(const std::string &_name)
     }
   }
 
-  Event_msgs::msgs::RestPost restMsg;
+  gazebo::msgs::RestPost restMsg;
   restMsg.set_route("/events/new");
 
   std::string postStr;
@@ -338,7 +339,7 @@ void CMLEditor::OnNestedModelRemoved(const std::string &_name)
 {
   CMLManager::Instance()->RemoveSimpleModel(_name);
 
-  Event_msgs::msgs::RestPost restMsg;
+  gazebo::msgs::RestPost restMsg;
   restMsg.set_route("/events/new");
 
   std::string postStr;
@@ -374,7 +375,7 @@ void CMLEditor::SpawnEntity()
 /////////////////////////////////////////////////
 void CMLEditor::OnLinkInserted(const std::string &_linkId)
 {
-  Event_msgs::msgs::RestPost restMsg;
+  gazebo::msgs::RestPost restMsg;
   restMsg.set_route("/events/new");
 
   // remove model preview prefix
@@ -399,7 +400,7 @@ void CMLEditor::OnJointInserted(const std::string &_jointId,
     const std::string &_jointName, const std::string &_type,
     const std::string &_parentName, const std::string &_childName)
 {
-  Event_msgs::msgs::RestPost restMsg;
+  gazebo::msgs::RestPost restMsg;
   restMsg.set_route("/events/new");
 
   // remove model preview prefix
@@ -433,7 +434,7 @@ void CMLEditor::OnJointInserted(const std::string &_jointId,
 /////////////////////////////////////////////////
 void CMLEditor::OnLinkRemoved(const std::string &_linkId)
 {
-  Event_msgs::msgs::RestPost restMsg;
+  gazebo::msgs::RestPost restMsg;
   restMsg.set_route("/events/new");
 
   // remove model preview prefix
@@ -456,7 +457,7 @@ void CMLEditor::OnLinkRemoved(const std::string &_linkId)
 /////////////////////////////////////////////////
 void CMLEditor::OnJointRemoved(const std::string &_jointId)
 {
-  Event_msgs::msgs::RestPost restMsg;
+  gazebo::msgs::RestPost restMsg;
   restMsg.set_route("/events/new");
 
   std::string postStr;
