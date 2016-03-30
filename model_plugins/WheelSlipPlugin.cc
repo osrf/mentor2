@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <math.h>
 #include <gazebo/msgs/msgs.hh>
+#include <ctime>
+#include <sstream>
 
 namespace gazebo
 {
@@ -14,8 +16,6 @@ namespace gazebo
   {
     public: void Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/)
     {
-    	std::cout << "Load()...." << std::endl << std::flush;
-
       // Store the pointer to the model
       this->model = _parent;
 
@@ -68,7 +68,6 @@ namespace gazebo
     public: void Init()
     {
     	ModelPlugin::Init();
-    	std::cout << "Init()..." << std::endl << std::flush;
 
     	std::cout.setf(std::ios::fixed, std::ios::floatfield);
     	std::cout.precision(3);
@@ -83,58 +82,76 @@ namespace gazebo
     	return revsPerSec * this->wheelCirc;
     }
 
-
     // Called by the world update start event
     public: void OnUpdate(const common::UpdateInfo & /*_info*/)
     {
-    	static int i = 0;
     	static int n = 0;
-    	//    	std::cout << "OnUpdate()..." << std::endl << std::flush;
 
     	if (!this->axle)
     		return;
 
-    	math::Vector3 model_wlv = this->modelLink->GetWorldLinearVel();
-    	math::Vector3 axle_av = this->axle->GetRelativeAngularVel();
+    	math::Vector3 Vl_model = this->modelLink->GetRelativeLinearVel();
+    	math::Vector3 Va_axle = this->axle->GetRelativeAngularVel();
 
-    	double vmg = this->CalculateExpectedVMG(axle_av);
-    	double diff = fabs(fabs(model_wlv.y) - vmg);
+    	double vmg = this->CalculateExpectedVMG(Va_axle);
+    	double diff = fabs(fabs(Vl_model.y) - vmg);
 
-
-//    	if ((++i % 5) == 0) {
+//    	if ((++n % 5) == 0) {
 //			std::cout << "axle: x=" << std::setw(6) << axle_av.x << " y=" << std::setw(6) << axle_av.y << " z=" << std::setw(6) << axle_av.z << " "
 //					  << "model: x=" << std::setw(6) << model_wlv.x << " y=" << std::setw(6) << model_wlv.y << " z=" << std::setw(6) << model_wlv.z << " "
 //					  << "vmg: " << vmg << " m/s diff: " << diff << std::endl;
 //    	}
 
-    	if (n++ >= 500) {
+    	bool slipping = (diff > 0.001);
 
-			std::string parentScopedName("HOMEBOY");
-			std::string _parentPort("123");
-			std::string childScopedName("PUNKIE");
-			std::string _childPort("456");
+    	if (slipping) {
+    		std::time_t now = time(NULL);
 
-			std::string postStr;
+    		if (abs(this->lastSlipMsgSent - now) > this->maxSlipMsgIntervalSecs) {
 
-			postStr = "\"type\": \"connection\",";
-			postStr += "\"name\": \"simple_connection\",";
-			postStr += "\"data\": {";
-			postStr += "\"parent\": \"" + parentScopedName + "\",";
-			postStr += "\"parent_port\": \"" + _parentPort + "\",";
-			postStr += "\"child\": \"" + childScopedName + "\",";
-			postStr += "\"child_port\": \"" + _childPort + "\"";
-			postStr += "}";
+    			std::stringstream postMsgStream;
 
-			gazebo::msgs::RestPost restMsg;
-			restMsg.set_route("/events/new");
+    			postMsgStream << "\"type\": \"traction\","
+    					      << "\"name\": \"wheel_slip\","
+						      << "\"data\": {"
+							  << "\"state\": \"slipping\","
+							  << "\"vehicle\": {"
+							  << "\"expected_velocity\": \"" << vmg << "\","
+							  << "\"actual_velocity\": \"" << Vl_model.y << "\""
+							  << "}"
+							  << "}";
 
-			std::cout << ">>> publishing msg " << postStr << std::endl;
+				gazebo::msgs::RestPost restPostMsg;
+				restPostMsg.set_route("/events/new");
 
-			restMsg.set_json(postStr);
-			this->restPub->Publish(restMsg);
+				restPostMsg.set_json(postMsgStream.str());
+				this->restPub->Publish(restPostMsg);
 
-    	    n = 0;
+				gzdbg << postMsgStream.str() << std::endl;
 
+    			this->lastSlipMsgSent = now;
+    		}
+    		this->wasSlipping = true;
+
+    	} else if (this->wasSlipping) {
+
+			std::stringstream postMsgStream;
+
+			postMsgStream << "\"type\": \"traction\","
+					   	  << "\"name\": \"wheel_slip\","
+					      << "\"data\": {"
+					      << "\"state\": \"gripping\""
+			              << "}";
+
+			gazebo::msgs::RestPost restPostMsg;
+			restPostMsg.set_route("/events/new");
+
+			restPostMsg.set_json(postMsgStream.str());
+			this->restPub->Publish(restPostMsg);
+
+			gzdbg << postMsgStream.str() << std::endl;
+
+			this->wasSlipping = false;
     	}
 
     }
@@ -158,6 +175,15 @@ namespace gazebo
 
     /// \brief a way to send messages to the MOOC topic (to the REST)
     private: transport::PublisherPtr restPub;
+
+    /// \brief Time when the last slip message was sent
+    private: std::time_t lastSlipMsgSent = 0;
+
+    /// \brief Max slip message interval in seconds
+    private: int maxSlipMsgIntervalSecs = 3;
+
+    /// \brief Whether or not the vehicle was slipping
+    private: bool wasSlipping = false;
 
   };
 
