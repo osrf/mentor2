@@ -10,6 +10,7 @@ set (plugins
   SwitchPlugin
   WheelPlugin
   SimpleConnectionsPlugin
+  TugOfWarPlugin
 )
 
 include_directories(

@@ -4,6 +4,7 @@ set (files
   chapter3.world
   chapter4.world
   chapter5.world
+  tow.world
 )
 
 install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/simplegdk-${SIMPLEGDK_VERSION}/worlds/)
