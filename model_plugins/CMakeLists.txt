@@ -11,6 +11,7 @@ set (plugins
   WheelPlugin
   SimpleConnectionsPlugin
   WheelSlipPlugin
+  TugOfWarPlugin
 )
 
 include_directories(
