@@ -596,6 +596,9 @@
           <target_port>negative</target_port>
         </connection>
       </plugin>
+
+      <plugin name="WheelSlip" filename="libWheelSlipPlugin.so"/>
+
     </model>
 
     <include>
