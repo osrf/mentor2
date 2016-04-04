@@ -38,6 +38,7 @@ TugOfWarPlugin::~TugOfWarPlugin()
     this->towJoint->Detach();
     this->towJoint.reset();
   }
+  this->updateConnection.reset();
 }
 
 /////////////////////////////////////////////////
@@ -71,21 +72,24 @@ void TugOfWarPlugin::Init()
       continue;
     this->towLink = m->GetLink(this->towLinkName);
     if (this->towLink)
+    {
+      this->towModel = m;
       break;
+    }
   }
 }
 
 /////////////////////////////////////////////////
 void TugOfWarPlugin::Update()
 {
-  if (!this->towLink || this->towJoint)
+  if (!this->towLink || !this->towModel || this->towJoint || !this->model)
     return;
-
 
   std::string parentLinkName =
       this->model->GetName() + "::" + this->towLinkName;
+
   std::string childLinkName =
-      this->towLink->GetModel()->GetName() + "::" + this->towLinkName;
+      this->towModel->GetName() + "::" + this->towLinkName;
 
   std::cerr << " creating joint " << parentLinkName << ", " <<
       childLinkName << std::endl;

@@ -55,6 +55,9 @@ namespace gazebo
    /// \brief The link that the fixed joint will be attached to.
     private: physics::LinkPtr towLink;
 
+   /// \brief The model that the fixed joint will be attached to.
+    private: physics::ModelPtr towModel;
+
     /// \brief Pointer to the model.
     public: physics::ModelPtr model;
 
