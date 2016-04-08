@@ -116,8 +116,8 @@
             <surface>
               <friction>
                 <ode>
-                  <mu>0.735</mu>
-                  <mu2>0.735</mu2>
+                  <mu>0.760</mu>
+                  <mu2>0.760</mu2>
                   <fdir1>0 1 0</fdir1>
                   <slip1>0.0</slip1>
                   <slip2>0.0</slip2>
@@ -144,8 +144,8 @@
             <surface>
               <friction>
                 <ode>
-                  <mu>0.735</mu>
-                  <mu2>0.735</mu2>
+                  <mu>0.760</mu>
+                  <mu2>0.760</mu2>
                   <fdir1>0 1 0</fdir1>
                   <slip1>0.0</slip1>
                   <slip2>0.0</slip2>
@@ -442,8 +442,8 @@
               <upper>1000000000000000</upper>
             </limit>
             <dynamics>
-              <friction>0.0001</friction>
-              <damping>0.000001</damping>
+<!--              <friction>0.0003</friction>-->
+              <damping>0.0000003</damping>
             </dynamics>
           </axis>
         </joint>
@@ -470,7 +470,8 @@
           <properties>
             <resistance>5</resistance>
             <back_emf>0.00356</back_emf>
-            <torque_constant>0.0064</torque_constant>
+<!--            <torque_constant>0.00064</torque_constant>-->
+            <torque_constant>0.0020</torque_constant>
           </properties>
 
           <shaft_joint>motor_shaft_joint</shaft_joint>
@@ -520,7 +521,7 @@
           <properties>
             <parent>axle_wheels::link</parent>
             <child>motor::motor_shaft_link</child>
-            <gear_ratio>1.0</gear_ratio>
+            <gear_ratio>760.0</gear_ratio>
             <efficiency>0.92</efficiency>
           </properties>
         </plugin>

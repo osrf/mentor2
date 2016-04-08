@@ -34,8 +34,7 @@ GearboxPlugin::GearboxPlugin()
   this->efficiency = 1.0;
   this->parentLinkName = "";
   this->childLinkName = "";
-  this->torques.resize(5);
-  this->torqueSum = 0;
+  this->torques.resize(5, 0);
 }
 
 /////////////////////////////////////////////////
@@ -73,10 +72,16 @@ void GearboxPlugin::Reset()
     std::cerr << " gearbox reset " << std::endl;
   }
 
+  if (this->childLinkJoint)
+    this->childLinkJoint->Reset();
+
+  if (this->parentLinkJoint)
+    this->parentLinkJoint->Reset();
+
   this->torques.clear();
-  this->torques.resize(5);
+  this->torques.resize(5, 0);
   this->torqueIndex = 0;
-  this->torqueSum = 0;
+//  this->torqueSum = 0;
 }
 
 /////////////////////////////////////////////////
@@ -101,14 +106,14 @@ void GearboxPlugin::UpdateImpl(double _timeSinceLastUpdate)
 
       // double torque = childWrench.body2Torque.GetLength();
 
-//      std::cerr << "child body1Torque " <<  childWrench.body1Torque
-//          << std::endl;
-//      std::cerr << "child body2Torque " << childWrench.body2Torque
-//          << std::endl;
-//      std::cerr << "parent body1Torque "  << parentWrench.body1Torque
-//          << std::endl;
-//      std::cerr << "parent body2Torque "  << parentWrench.body2Torque
-//          << std::endl;
+/*      std::cerr << "child body1Torque " <<  childWrench.body1Torque
+          << std::endl;
+      std::cerr << "child body2Torque " << childWrench.body2Torque
+          << std::endl;
+      std::cerr << "parent body1Torque "  << parentWrench.body1Torque
+          << std::endl;
+      std::cerr << "parent body2Torque "  << parentWrench.body2Torque
+          << std::endl;*/
 
 //      std::cerr << "projected torque: " << childWrench.body2Torque <<
 //            " vs " << torque << " vs " <<
@@ -117,14 +122,15 @@ void GearboxPlugin::UpdateImpl(double _timeSinceLastUpdate)
 //      std::cerr << "projected torque: " << torque << std::endl;
 
       // TODO override torque for now.
-      torque = parentWrench.body2Torque.GetLength();
-//      std::cerr << "torque " << torque << std::endl;
+//      torque = parentWrench.body2Torque.GetLength();
+      torque = childWrench.body2Torque.GetLength();
+
 
       // smooth out applied friction, seems to produce more consistent
       // behavior.
       double idx = this->torqueIndex % this->torques.size();
       double oldTorque = 0;
-      double windowSize = idx;
+      double windowSize = idx+1;
       if (this->torqueIndex >= this->torques.size())
       {
         oldTorque = this->torques[idx];
@@ -132,16 +138,30 @@ void GearboxPlugin::UpdateImpl(double _timeSinceLastUpdate)
       }
 
       this->torques[idx] = torque;
-      this->torqueSum + torque;
-      this->torqueIndex++;
-      double avgTorque =
-          (this->torqueSum - oldTorque) / windowSize;
 
+      this->torqueIndex++;
+//      double avgTorque =
+//          (this->torqueSum - oldTorque) / windowSize;
+
+      double torqueSum = std::accumulate(this->torques.begin(),
+          this->torques.end(), 0.0);
+      double avgTorque = torqueSum / windowSize;
+
+//      for (auto i : this->torques)
+//        std::cerr << i << " ";
+//      std::cerr << std::endl;;
+
+//      std::cerr << " applied " <<  this->childLinkJoint->GetForce(0) << std::endl;
+
+
+      double f = (1-this->efficiency)*fabs(avgTorque);
       this->childLinkJoint->SetParam("friction", 0,
           (1-this->efficiency)*fabs(avgTorque));
 
-//      std::cerr << "friction " <<
-//            (1-this->efficiency)*fabs(avgTorque) << std::endl;
+//      std::cerr << "torque " << torque << " vs " << avgTorque
+//              << "  vs  " << f << std::endl;
+
+//      std::cerr << "friction " << f << std::endl;
     }
     return;
   }

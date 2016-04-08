@@ -139,7 +139,8 @@ void MotorPlugin::UpdateImpl(double _timeSinceLastUpdate)
   if (this->joint)
   {
     this->joint->SetForce(0, torque);
-    //std::cerr << this->parent->GetName() << " " << torque << std::endl;
+    // std::cerr << " motor setting toruqe " << this->parent->GetName()
+    //     << " " << torque << std::endl;
   }
 
   Simple_msgs::msgs::Variant torqueMsg;
