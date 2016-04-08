@@ -54,5 +54,6 @@ add_library(CMLEditorPlugin SHARED ${sources} ${headers_MOC} ${headers} ${resour
 target_link_libraries(CMLEditorPlugin
     SimpleMsgs
     ${GAZEBO_LIBRARIES}
+    ${QT_LIBRARIES}
     ${OGRE_LIBRARIES})
 install (TARGETS CMLEditorPlugin DESTINATION ${SIMPLEGDK_PLUGIN_INSTALL_DIR})

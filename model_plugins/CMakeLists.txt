@@ -19,9 +19,11 @@ include_directories(
   ${CMAKE_CURRENT_BINARY_DIR}/../msgs
 )
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
+
 foreach (src ${plugins})
   add_library(${src} SHARED ${src}.cc SimpleModelPlugin.cc)
-  target_link_libraries(${src} ${GAZEBO_libraries} SimpleMsgs)
+  target_link_libraries(${src} ${GAZEBO_LIBRARIES} SimpleMsgs)
   install (TARGETS ${src} DESTINATION ${SIMPLEGDK_PLUGIN_INSTALL_DIR})
   #gz_install_includes("plugins" ${src}.hh)
 endforeach (src ${plugins})
