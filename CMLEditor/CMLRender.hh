@@ -51,6 +51,11 @@ namespace gazebo
       /// \brief Disable the mouse and key event handlers.
       public: void DisableEventHandlers();
 
+      /// \brief Key event filter callback when key is pressed.
+      /// \param[in] _event The key event.
+      /// \return True if the event was handled
+      private: bool OnKeyPress(const common::KeyEvent &_event);
+
       /// \brief Mouse event filter callback when mouse button is pressed.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled

@@ -134,6 +134,8 @@ void CMLRender::EnableEventHandlers()
       boost::bind(&CMLRender::OnMouseRelease, this, _1));
   MouseEventHandler::Instance()->AddDoubleClickFilter("CML_Render",
       boost::bind(&CMLRender::OnMouseDoubleClick, this, _1));
+  KeyEventHandler::Instance()->AddPressFilter("CML_Render",
+      boost::bind(&CMLRender::OnKeyPress, this, _1));
 }
 
 /////////////////////////////////////////////////
@@ -142,6 +144,7 @@ void CMLRender::DisableEventHandlers()
   this->active = false;
   MouseEventHandler::Instance()->RemoveReleaseFilter("CML_Render");
   MouseEventHandler::Instance()->RemoveDoubleClickFilter("CML_Render");
+  KeyEventHandler::Instance()->RemovePressFilter("CML_Render");
 }
 
 /////////////////////////////////////////////////
@@ -149,6 +152,20 @@ void CMLRender::OnRequest(ConstRequestPtr &_msg)
 {
   if (_msg->request() == "entity_delete")
     CMLConnectionMaker::Instance()->RemoveConnectionsByEntity(_msg->data());
+}
+
+/////////////////////////////////////////////////
+bool CMLRender::OnKeyPress(const common::KeyEvent &_event)
+{
+  if (_event.key == Qt::Key_Delete)
+  {
+    if (!this->inspectName.empty())
+    {
+      CMLConnectionMaker::Instance()->RemoveConnectionsByEntity(
+          this->inspectName);
+    }
+  }
+  return false;
 }
 
 /////////////////////////////////////////////////
@@ -162,31 +179,32 @@ bool CMLRender::OnMouseRelease(const common::MouseEvent &_event)
   rendering::ScenePtr scene = camera->GetScene();
   rendering::VisualPtr vis = camera->GetVisual(_event.Pos());
 
-  if (_event.Button() == common::MouseEvent::RIGHT)
+  this->inspectName = "";
+  if (vis)
   {
-    if (vis)
+    unsigned int depth = 2;
+    rendering::VisualPtr modelVis;
+    while (depth < vis->GetDepth())
     {
-      unsigned int depth = 2;
-      rendering::VisualPtr modelVis;
-      while (depth < vis->GetDepth())
-      {
-        rendering::VisualPtr childVis = vis->GetNthAncestor(depth);
-        if (!childVis)
-          break;
+      rendering::VisualPtr childVis = vis->GetNthAncestor(depth);
+      if (!childVis)
+        break;
 
-        std::string name = childVis->GetName();
-        Simple_msgs::msgs::SimpleModel msg;
-        msg = CMLManager::Instance()->GetModelInfo(name);
-        if (msg.key_size() > 0)
-          modelVis = childVis;
-        depth++;
-      }
+      std::string name = childVis->GetName();
+      Simple_msgs::msgs::SimpleModel msg;
+      msg = CMLManager::Instance()->GetModelInfo(name);
+      if (msg.key_size() > 0)
+        modelVis = childVis;
+      depth++;
+    }
 
-      if (!modelVis)
-        return false;
+    if (!modelVis)
+      return false;
 
-      this->inspectName = modelVis->GetName();
+    this->inspectName = modelVis->GetName();
 
+    if (_event.Button() == common::MouseEvent::RIGHT)
+    {
       QMenu menu;
       if (this->inspectAct)
       {
@@ -196,16 +214,6 @@ bool CMLRender::OnMouseRelease(const common::MouseEvent &_event)
       connect(deleteAct, SIGNAL(triggered()), this, SLOT(OnDelete()));
       menu.addAction(deleteAct);
       menu.exec(QCursor::pos());
-
-/*        ModelRightMenu *contextMenu = gui::get_context_menu();
-      if (contextMenu)
-      {
-        std::vector<QAction *> menuAction;
-        menuAction.push_back(this->inspectAct);
-        contextMenu->Run(name, QCursor::pos(), menuAction);
-        return true;
-      }
-      else*/
       return true;
     }
   }
@@ -324,6 +332,9 @@ void CMLRender::OnDelete()
   MainWindow *mainWindow = gui::get_main_window();
   if (mainWindow)
   {
+    CMLConnectionMaker::Instance()->RemoveConnectionsByEntity(
+        this->inspectName);
+
     ModelEditor *modelEditor =
         dynamic_cast<ModelEditor *>(mainWindow->Editor("model"));
 
@@ -340,7 +351,6 @@ void CMLRender::OnOpenInspector()
   CMLManager::Instance()->ShowInspector(this->inspectName);
   this->inspectName = "";
 }
-
 
 /////////////////////////////////////////////////
 void CMLRender::OnEditModel(const std::string &/*_modelName*/,
