@@ -638,6 +638,7 @@
         <child>tow</child>
       </joint>
 
+      <plugin name="WheelSlip" filename="libWheelSlipPlugin.so"/>
 
     </model>
 
@@ -1271,6 +1272,8 @@
           <target_port>negative</target_port>
         </connection>
       </plugin>
+
+      <plugin name="WheelSlip" filename="libWheelSlipPlugin.so"/>
     </model>
 
   </world>

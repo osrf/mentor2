@@ -521,7 +521,7 @@
           <properties>
             <parent>axle_wheels::link</parent>
             <child>motor::motor_shaft_link</child>
-            <gear_ratio>760.0</gear_ratio>
+            <gear_ratio>1.0</gear_ratio>
             <efficiency>0.92</efficiency>
           </properties>
         </plugin>
