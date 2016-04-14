@@ -82,6 +82,7 @@ CMLRender::CMLRender()
     &CMLRender::OnRequest, this);
 
   this->inspectName = "";
+  this->inspectTopLevelName = "";
   this->inspectAct = new QAction(tr("Open Inspector"), this);
   connect(this->inspectAct, SIGNAL(triggered()), this,
       SLOT(OnOpenInspector()));
@@ -134,8 +135,6 @@ void CMLRender::EnableEventHandlers()
       boost::bind(&CMLRender::OnMouseRelease, this, _1));
   MouseEventHandler::Instance()->AddDoubleClickFilter("CML_Render",
       boost::bind(&CMLRender::OnMouseDoubleClick, this, _1));
-  KeyEventHandler::Instance()->AddPressFilter("CML_Render",
-      boost::bind(&CMLRender::OnKeyPress, this, _1));
 }
 
 /////////////////////////////////////////////////
@@ -144,7 +143,6 @@ void CMLRender::DisableEventHandlers()
   this->active = false;
   MouseEventHandler::Instance()->RemoveReleaseFilter("CML_Render");
   MouseEventHandler::Instance()->RemoveDoubleClickFilter("CML_Render");
-  KeyEventHandler::Instance()->RemovePressFilter("CML_Render");
 }
 
 /////////////////////////////////////////////////
@@ -152,20 +150,6 @@ void CMLRender::OnRequest(ConstRequestPtr &_msg)
 {
   if (_msg->request() == "entity_delete")
     CMLConnectionMaker::Instance()->RemoveConnectionsByEntity(_msg->data());
-}
-
-/////////////////////////////////////////////////
-bool CMLRender::OnKeyPress(const common::KeyEvent &_event)
-{
-  if (_event.key == Qt::Key_Delete)
-  {
-    if (!this->inspectName.empty())
-    {
-      CMLConnectionMaker::Instance()->RemoveConnectionsByEntity(
-          this->inspectName);
-    }
-  }
-  return false;
 }
 
 /////////////////////////////////////////////////
@@ -180,6 +164,7 @@ bool CMLRender::OnMouseRelease(const common::MouseEvent &_event)
   rendering::VisualPtr vis = camera->GetVisual(_event.Pos());
 
   this->inspectName = "";
+  this->inspectTopLevelName = "";
   if (vis)
   {
     unsigned int depth = 2;
@@ -202,6 +187,9 @@ bool CMLRender::OnMouseRelease(const common::MouseEvent &_event)
       return false;
 
     this->inspectName = modelVis->GetName();
+    rendering::VisualPtr topLevelVis = vis->GetNthAncestor(2);
+    if (topLevelVis)
+      this->inspectTopLevelName = topLevelVis->GetName();
 
     if (_event.Button() == common::MouseEvent::RIGHT)
     {
@@ -327,21 +315,30 @@ void CMLRender::OnConnectionCreated(const std::string &_parent,
 }
 
 /////////////////////////////////////////////////
-void CMLRender::OnDelete()
+void CMLRender::RemoveEntity(const std::string &_name)
 {
+  // this function is called when user invokes the delete option in
+  // context menu, or the ModelCreator fires the nestedModelRemoved event.
+
   MainWindow *mainWindow = gui::get_main_window();
   if (mainWindow)
   {
-    CMLConnectionMaker::Instance()->RemoveConnectionsByEntity(
-        this->inspectName);
+    CMLConnectionMaker::Instance()->RemoveConnectionsByEntity(_name);
 
     ModelEditor *modelEditor =
         dynamic_cast<ModelEditor *>(mainWindow->Editor("model"));
 
     if (modelEditor)
-      modelEditor->RemoveEntity(this->inspectName);
+      modelEditor->RemoveEntity(_name);
   }
+}
 
+/////////////////////////////////////////////////
+void CMLRender::OnDelete()
+{
+  this->RemoveEntity(this->inspectTopLevelName);
+
+  this->inspectTopLevelName = "";
   this->inspectName = "";
 }
 
@@ -349,6 +346,7 @@ void CMLRender::OnDelete()
 void CMLRender::OnOpenInspector()
 {
   CMLManager::Instance()->ShowInspector(this->inspectName);
+  this->inspectTopLevelName = "";
   this->inspectName = "";
 }
 

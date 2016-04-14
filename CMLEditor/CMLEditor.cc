@@ -339,6 +339,8 @@ void CMLEditor::OnNestedModelRemoved(const std::string &_name)
 {
   CMLManager::Instance()->RemoveSimpleModel(_name);
 
+  this->renderProxy->RemoveEntity(_name);
+
   gazebo::msgs::RestPost restMsg;
   restMsg.set_route("/events/new");
 
