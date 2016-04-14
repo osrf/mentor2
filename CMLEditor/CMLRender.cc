@@ -369,6 +369,9 @@ void CMLRender::OnEditModel(const std::string &/*_modelName*/,
       sdf::ElementPtr pluginElem = modelElem->GetElement("plugin");
       if (pluginElem->HasElement("connection"))
       {
+        model::Events::requestModelPluginRemoval(
+            pluginElem->Get<std::string>("name"));
+
         sdf::ElementPtr connectionElem = pluginElem->GetElement("connection");
         while (connectionElem)
         {
@@ -376,8 +379,8 @@ void CMLRender::OnEditModel(const std::string &/*_modelName*/,
               connectionElem, _modelPreviewName);
           connectionElem = connectionElem->GetNextElement("connection");
         }
+
       }
     }
   }
-
 }
