@@ -1,7 +1,51 @@
 <?xml version="1.0" ?>
 <sdf version="1.5">
 
-  <model name="vehicle">
+  <model name="vehicle_weight_rear">
+
+    <link name="weight">
+      <pose>0.0 -0.095 0.0252 0 0 0</pose>
+      <inertial>
+        <mass>0.3</mass>
+        <inertia>
+          <ixx>0.0001</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.0001</iyy>
+          <iyz>0</iyz>
+          <izz>0.0001</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <pose>0.0 0.0 0 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.02 0.02 0.02</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <pose>0 0 0.0 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.02 0.02 0.02</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Yellow</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+
+    <joint name="chassis_v2_weight_joint" type="fixed">
+      <parent>chassis_v2::link</parent>
+      <child>weight</child>
+    </joint>
+
+
     <link name="link">
       <pose>0.0 0.060 0.034 0 0 0</pose>
       <inertial>
@@ -551,7 +595,7 @@
     </joint>
 
 
-    <joint name="chassis_v2_weight_joint" type="fixed">
+    <joint name="chassis_v2_link_joint" type="fixed">
       <parent>chassis_v2::link</parent>
       <child>link</child>
     </joint>

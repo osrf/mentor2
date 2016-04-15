@@ -18,6 +18,7 @@ set (dirs
   region_event_box
   vehicle
   vehicle_no_motor
+  vehicle_weight_rear
   vrc_driving_terrain
   vrc_driving_terrain_v2
   wheel_ramps
