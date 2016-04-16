@@ -91,8 +91,6 @@ void TugOfWarPlugin::Update()
   std::string childLinkName =
       this->towModel->GetName() + "::" + this->towLinkName;
 
-  std::cerr << " creating joint " << parentLinkName << ", " <<
-      childLinkName << std::endl;
 
   physics::WorldPtr world = this->model->GetWorld();
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
@@ -106,8 +104,6 @@ void TugOfWarPlugin::Update()
   jointSDF->GetElement("child")->Set(childLinkName);
   this->towJoint->Load(jointSDF);
   this->towJoint->Init();
-  std::cerr << " create tow joint done " << parentLinkName << ", " <<
-      childLinkName << std::endl;
 }
 
 /////////////////////////////////////////////////
