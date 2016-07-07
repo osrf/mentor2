@@ -1,0 +1,207 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+
+<!--    <include>
+      <uri>model://motor</uri>
+      <pose>1.0 -0.2 0.92 0 0 0</pose>
+    </include>-->
+
+
+    <include>
+      <uri>model://car</uri>
+      <pose>0 0 0.55 0 0 0</pose>
+    </include>
+
+    <model name="motor">
+      <pose>1.0 -0.2 0.92 0 0 0</pose>
+      <link name="link">
+        <pose>0.0 0 0.0 0 0 1.57079632679</pose>
+        <self_collide>false</self_collide>
+        <collision name="collision">
+          <pose>0 0 0.0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>model://motor/meshes/motor.dae</uri>
+              <scale>0.01 0.01 0.01</scale>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <pose>0 0 0.0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>model://motor/meshes/motor.dae</uri>
+              <scale>0.01 0.01 0.01</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+
+      <link name="motor_core_link">
+        <pose>0.02 0 0.0 0 0 0</pose>
+        <self_collide>false</self_collide>
+        <gravity>false</gravity>
+        <collision name="collision">
+          <pose>0.0 0 0.0 1.57079632679 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.05</radius>
+              <length>0.05</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <pose>0.0 0 0.0 1.57079632679 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.05</radius>
+              <length>0.05</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+
+      <link name="motor_shaft_link">
+        <pose>0.02 0 0.0 0 0 0</pose>
+        <self_collide>false</self_collide>
+        <gravity>false</gravity>
+<!--        <visual name='visual_2'>
+          <pose>0.0 0.2 0.0 0 0.0 0.0</pose>
+          <geometry>
+            <box>
+              <size>.01 .02 .03</size>
+            </box>
+          </geometry>
+        </visual>-->
+        <collision name="collision">
+          <pose>0.0 0 0.0 1.57079632679 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.005</radius>
+              <length>0.20</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <pose>0.0 0 0.0 1.57079632679 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.005</radius>
+              <length>0.20</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Wood</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+
+      <joint name="motor_shaft_joint" type="revolute">
+        <parent>motor_core_link</parent>
+        <child>motor_shaft_link</child>
+        <axis>
+          <xyz>0 1 0</xyz>
+          <limit>
+            <lower>-1000000</lower>
+            <upper>1000000</upper>
+          </limit>
+        </axis>
+      </joint>
+
+      <joint name="motor_joint" type="revolute">
+        <parent>motor_core_link</parent>
+        <child>link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>0</lower>
+            <upper>0</upper>
+          </limit>
+        </axis>
+      </joint>
+    </model>
+
+
+    <model name="gearbox">
+      <pose>1.0 0.2 0.92 0 0 0</pose>
+      <link name="gearbox_link">
+        <collision name="gearbox_collision">
+          <geometry>
+            <box>
+              <size>0.15 0.15 0.15</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="gearbox_visual">
+          <geometry>
+            <box>
+              <size>0.15 0.15 0.15</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Red</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+
+      <joint name="motor_chassis" type="revolute">
+        <parent>motor::motor_core_link</parent>
+        <child>car::chassis</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>0</lower>
+            <upper>0</upper>
+          </limit>
+        </axis>
+      </joint>
+
+      <joint name="gearbox_chassis" type="revolute">
+        <parent>gearbox::gearbox_link</parent>
+        <child>car::chassis</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>0</lower>
+            <upper>0</upper>
+          </limit>
+        </axis>
+      </joint>
+
+      <plugin filename="libGearboxPlugin.so" name="gearbox">
+        <properties>
+          <parent>motor::motor_shaft_link</parent>
+          <child>car::axle</child>
+          <gear_ratio>0.05</gear_ratio>
+        </properties>
+      </plugin>
+    </model>
+  </world>
+</sdf>

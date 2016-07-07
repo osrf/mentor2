@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 enable_testing()
 
-project (simplegdk)
+project (mentor2)
 include(ExternalProject)
 
 set (SIMPLEGDK_MAJOR_VERSION 0)
 set (SIMPLEGDK_MINOR_VERSION 1)
-set (SIMPLEGDK_PATCH_VERSION 0)
+set (SIMPLEGDK_PATCH_VERSION 7)
 set (SIMPLEGDK_VERSION ${SIMPLEGDK_MAJOR_VERSION}.${SIMPLEGDK_MINOR_VERSION})
 set (SIMPLEGDK_VERSION_FULL ${SIMPLEGDK_MAJOR_VERSION}.${SIMPLEGDK_MINOR_VERSION}.${SIMPLEGDK_PATCH_VERSION})
 message (STATUS "${PROJECT_NAME} version ${SIMPLEGDK_VERSION_FULL}")
@@ -35,12 +35,16 @@ if (NOT CMAKE_BUILD_TYPE)
 endif (NOT CMAKE_BUILD_TYPE)
 
 # find gazebo
+find_package(GAZEBO)
+
 include (FindPkgConfig)
 if (PKG_CONFIG_FOUND)
-  pkg_check_modules(GAZEBO gazebo>=3.0.0 REQUIRED)
+  if (NOT GAZEBO_FOUND)
+    pkg_check_modules(GAZEBO gazebo>=3.0.0 REQUIRED)
+  endif ()
   pkg_check_modules(OGRE OGRE)
   pkg_check_modules(OGRE-Terrain OGRE-Terrain)
-#  pkg_check_modules(GVC libgvc)
+  #pkg_check_modules(GVC libgvc)
 else()
   message(FATAL_ERROR "pkg-config is required; please install it")
 endif()
@@ -53,10 +57,6 @@ if (NOT QT4_FOUND)
   MESSAGE("Qt4 not found")
 endif()
 
-#find_package (Graphviz)
-#if (NOT QT4_FOUND)
-#  MESSAGE("Graphviz not found")
-#endif()
 
 include(GNUInstallDirs)
 
@@ -73,12 +73,15 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${CMAKE_INSTALL_P
 # Also install the setup.sh in an unversioned location
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${CMAKE_INSTALL_PREFIX}/share/simplegdk/)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS} -std=c++11")
 
 add_subdirectory(msgs)
 add_subdirectory(CMLEditor)
-add_subdirectory(scoring)
+#add_subdirectory(scoring)
 add_subdirectory(model_plugins)
 add_subdirectory(models)
+add_subdirectory(scripts)
+add_subdirectory(worlds)
 
 ########### Add uninstall target ###############
 configure_file(

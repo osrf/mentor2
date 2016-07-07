@@ -45,6 +45,15 @@ namespace gazebo
       /// \brief Update callback on PreRender.
       public: void Update();
 
+      /// \brief Enable the mouse and key event handlers.
+      public: void EnableEventHandlers();
+
+      /// \brief Disable the mouse and key event handlers.
+      public: void DisableEventHandlers();
+
+      /// \brief Remove entity and its connections
+      public: void RemoveEntity(const std::string &_name);
+
       /// \brief Mouse event filter callback when mouse button is pressed.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
@@ -80,8 +89,24 @@ namespace gazebo
       /// \param[in] _msg The request message.
       private: void OnRequest(ConstRequestPtr &_msg);
 
+      /// \brief Callback when an existing model is to be edited in the  model
+      /// editor.
+      /// \param[in] _modelName Name of model to be edited.
+      /// \param[in] _modelPreviewName Name of the preview model visual created
+      /// in the editor
+      /// \param[in] _sdfData SDF string describing the model.
+      private: void OnEditModel(const std::string &_modelName,
+          const std::string &_modelPreviewName, const std::string &_sdfData);
+
       /// \brief Qt Callback to open component inspector
       private slots: void OnOpenInspector();
+
+      /// \brief Qt Callback when a component is to be deleted.
+      private slots: void OnDelete();
+
+      /// \brief Callback when the model editor mode has been toggled.
+      /// \param[in] _enabled True if the model editor mode is active.
+      private slots: void OnModelEditorMode(bool _enabled);
 
       /// \brief All the event connections.
       private: std::vector<event::ConnectionPtr> connections;
@@ -107,6 +132,12 @@ namespace gazebo
 
       /// \brief Name of component to be inspected.
       private: std::string inspectName;
+
+      /// \brief Name of top level component to be inspected.
+      private: std::string inspectTopLevelName;
+
+      /// \brief Is this render interface active or not.
+      private: bool active;
     };
   }
 }

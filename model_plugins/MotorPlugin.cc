@@ -32,13 +32,20 @@ MotorPlugin::MotorPlugin()
   this->backEmf = 0.0064;
   this->motorResistance = 5;
   this->torqueConstant = 0.0064;
-  //this->torqueConstant = 596;
+  //this->torqueConstant = 0.64;
 }
 
 /////////////////////////////////////////////////
 MotorPlugin::~MotorPlugin()
 {
   delete this->voltageMutex;
+}
+
+/////////////////////////////////////////////////
+void MotorPlugin::Reset()
+{
+  if (this->joint)
+    this->joint->SetForce(0, 0);
 }
 
 /////////////////////////////////////////////////
@@ -59,17 +66,29 @@ void MotorPlugin::Init()
   SimpleModelPlugin::Init();
 
   this->joint = this->parent->GetJoint(this->shaftJointName);
+  if (!joint)
+  {
+    gzerr << "Unable to find joint: " << this->shaftJointName << std::endl;
+    return;
+  }
+
   this->shaftLink = this->joint->GetJointLink(0);
 
-  this->torquePub = this->node->Advertise<Simple_msgs::msgs::Variant>(
-      "~/motor/torque");
+//  this->torquePub = this->node->Advertise<Simple_msgs::msgs::Variant>(
+//      "~/motor/torque");
 }
 
 /////////////////////////////////////////////////
 void MotorPlugin::UpdateImpl(double _timeSinceLastUpdate)
 {
   if (this->portTopics.empty())
-      return;
+  {
+    if (this->joint)
+    {
+      this->joint->SetForce(0, 0);
+    }
+    return;
+  }
 
   if (!this->voltageConnector0Sub)
   {
@@ -102,22 +121,27 @@ void MotorPlugin::UpdateImpl(double _timeSinceLastUpdate)
 
 
   double shaftRotationSpeed = 0.1;
-  if (this->shaftLink)
+
+  if (this->joint)
   {
     // in radians per seconds
-    shaftRotationSpeed = this->shaftLink->GetRelativeAngularVel().GetLength();
-    //std::cerr << "shaftRotationSpeed " << shaftRotationSpeed << std::endl;
+    shaftRotationSpeed = this->joint->GetVelocity(0);
+    // std::cerr << "shaftRotationSpeed " << shaftRotationSpeed << std::endl;
   }
   double emfVolt = this->backEmf * shaftRotationSpeed;
   double internalVoltage = voltage - emfVolt;
   double internalCurrent = internalVoltage / this->motorResistance;
   double torque = internalCurrent * this->torqueConstant;
 
-  std::cerr << " voltage " << voltage << ", torque " << torque
-      << ", shaftRotationSpeed " << shaftRotationSpeed << std::endl;
+//   std::cerr << " voltage " << voltage << ", torque " << torque
+//      << ", shaftRotationSpeed " << shaftRotationSpeed << std::endl;
 
   if (this->joint)
+  {
     this->joint->SetForce(0, torque);
+    // std::cerr << " motor setting toruqe " << this->parent->GetName()
+    //     << " " << torque << std::endl;
+  }
 
   Simple_msgs::msgs::Variant torqueMsg;
   torqueMsg.set_type(Simple_msgs::msgs::Variant::DOUBLE);

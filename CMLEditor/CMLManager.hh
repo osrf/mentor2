@@ -54,17 +54,25 @@ namespace gazebo
       public: void UpdateModelInfo(const std::string &_name,
           Simple_msgs::msgs::SimpleModel _info, bool _publish = true);
 
+      /// \brief Add a simple model to the manager
+      /// \param[in] _msg Simple model message describing the model.
+      public: void AddSimpleModel(Simple_msgs::msgs::SimpleModel _msg);
+
+      /// \brief Remove a simple model from the manager
+      /// \param[in] _name Name of the simple model.
+      public: void RemoveSimpleModel(const std::string &_name);
+
       /// \brief Show an inspector for configuring component properties.
       /// \param[in] _Name of component.
       /// \return True if the component exists.
       public: bool ShowInspector(const std::string &_name);
 
       /// \brief Callback when a response message is received.
-      /// \param[in] Pointer to the response message.
+      /// \param[in] _mgs Pointer to the response message.
       private: void OnResponse(ConstResponsePtr &_msg);
 
       /// \brief Callback when a simple model message is received.
-      /// \param[in] Pointer to the simple model message.
+      /// \param[in] _msg Pointer to the simple model message.
       private: void OnSimpleModel(ConstSimpleModelPtr &_msg);
 
       /// \brief Callback when a request message is received.

@@ -19,6 +19,11 @@
 
 namespace gazebo
 {
+  namespace gui
+  {
+    class CMLRender;
+  }
+
   class CMLEditorPlugin : public SystemPlugin
   {
     /// \brief Destructor

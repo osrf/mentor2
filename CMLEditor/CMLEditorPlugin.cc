@@ -19,8 +19,8 @@
 #include <gazebo/gui/GuiIface.hh>
 #include <gazebo/gui/MainWindow.hh>
 #include <gazebo/gui/GuiEvents.hh>
+#include <gazebo/gui/Actions.hh>
 
-#include "CMLRender.hh"
 #include "CMLEditor.hh"
 #include "CMLManager.hh"
 #include "CMLEditorPlugin.hh"
@@ -35,14 +35,11 @@ CMLEditorPlugin::~CMLEditorPlugin()
 /////////////////////////////////////////////////
 void CMLEditorPlugin::Load(int /*_argc*/, char ** /*_argv*/)
 {
-
-  std::cerr << " load plugin " << std::endl;
 }
 
 /////////////////////////////////////////////////
 void CMLEditorPlugin::Init()
 {
-  std::cerr << " init plugin " << std::endl;
   // keep tracks of simple models in the world
   gui::CMLManager::Instance()->Init();
 
@@ -58,11 +55,8 @@ void CMLEditorPlugin::OnMainWindowReady()
   // gazebo main window
   gui::MainWindow *mainWindow = gui::get_main_window();
 
-  // CML schematic view
+  // CML editor
   gui::CMLEditor *editor = new gui::CMLEditor(mainWindow);
-
-  // handle user interaction with the 3d render window
-  gui::CMLRender *renderProxy = new gui::CMLRender();
 }
 
 // Register this plugin with the simulator

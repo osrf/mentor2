@@ -37,6 +37,9 @@ namespace gazebo
     /// \brief Initialize the plugin.
     public: virtual void Init();
 
+    /// \brief Reset the plugin.
+    public: virtual void Reset();
+
     /// Documentation Inherited
     protected: void UpdateImpl(double _timeSinceLastUpdate);
 
@@ -54,6 +57,12 @@ namespace gazebo
 
     /// \brief true if the battery is discharging
     private: bool discharging;
+
+    /// \brief Capacity remaining.
+    private: double remainingCapacity;
+
+    /// \brief Current voltage.
+    private: double currentVoltage;
   };
 }
 

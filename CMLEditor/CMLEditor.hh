@@ -17,19 +17,26 @@
 #ifndef _CML_EDITOR_HH_
 #define _CML_EDITOR_HH_
 
+
+#include <sdf/sdf.hh>
+
+#include <gazebo/common/Events.hh>
 #include <gazebo/gui/qt.h>
-#include <gazebo/gui/Editor.hh>
+//#include <gazebo/gui/Editor.hh>
+
+#include "CMLRender.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class CMLEditorPalette;
-    class CMLEditorWidget;
+    class ModelEditor;
+    class MainWindow;
+    class CMLRender;
 
     /// \class CMLEditor CMLEditor.hh gui/gui.hh
     /// \brief Interface to the CML editor.
-    class CMLEditor : public Editor
+    class CMLEditor : public QObject/*: public Editor*/
     {
       Q_OBJECT
 
@@ -40,16 +47,67 @@ namespace gazebo
       /// \brief Destuctor.
       public: virtual ~CMLEditor();
 
-      /// \brief QT callback when entering CML edit mode
-      /// \param[in] _checked True if the menu item is checked
-      private slots: void OnEdit(bool _checked);
+      private: void Parse(sdf::ElementPtr _sdf, const std::string &_name);
 
-      /// \brief Create menus
-      //private: void CreateMenus();
+      private: void LoadModels();
 
-      private: gazebo::gui::CMLEditorPalette *CMLPalette;
+      /// \brief Callback when a nested mdoel is inserted.
+      /// \param[in] _node Name of nested model.
+      private: void OnNestedModelInserted(const std::string &_name);
 
-      private: gazebo::gui::CMLEditorWidget *CMLEditorWidget;
+      /// \brief Callback when a nested model is removed.
+      /// \param[in] _node Name of nested model.
+      private: void OnNestedModelRemoved(const std::string &_name);
+
+      /// \brief Callback when a link is inserted.
+      /// \param[in] _linkName Scoped link name.
+      private: void OnLinkInserted(const std::string &_linkId);
+
+      /// \brief Callback when a link is removed.
+      /// \param[in] _linkId Unique link identifying name.
+      private: void OnLinkRemoved(const std::string &_linkId);
+
+      /// \brief Callback when a joint is added.
+      /// \param[in] _jointId Unique joint identifying name.
+      /// \param[in] _jointName Scoped name which can be changed by the user.
+      /// \param[in] _type Type of joint.
+      /// \param[in] _parentName Scoped name of the parent link.
+      /// \param[in] _childName Scoped name of the child link.
+      private: void OnJointInserted(const std::string &_jointId,
+          const std::string &_jointName, const std::string &_type,
+          const std::string &_parentName, const std::string &_childName);
+
+      /// \brief Callback when a joint is removed.
+      /// \param[in] _jointId Unique joint identifier.
+      private: void OnJointRemoved(const std::string &_jointId);
+
+      /// \brief Callback when an inspector is to be opened.
+      private: void OpenInspector(const std::string &_name);
+
+      /// \brief Qt callback when an entity is to be spawned
+      private slots: void SpawnEntity();
+
+      /// \brief Qt callback when an electrical connection is to be created.
+      private slots: void OnElectricalConnection();
+
+      private: gazebo::gui::MainWindow *mainWindow;
+
+      private: std::string insertName;
+
+      private: std::map<std::string, sdf::SDFPtr> models;
+
+      private: ModelEditor *modelEditor;
+
+      private: CMLRender *renderProxy;
+
+      /// \brief Communication Node
+      private: transport::NodePtr node;
+
+      /// \brief Publish rest posts
+      private: transport::PublisherPtr restPub;
+
+      /// \brief A list of gazebo event connects.
+      private: std::vector<event::ConnectionPtr> connections;
     };
   }
 }

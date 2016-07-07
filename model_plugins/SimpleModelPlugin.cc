@@ -79,7 +79,10 @@ void SimpleModelPlugin::Update()
   double t = world->GetSimTime().Double();
   double timeSinceLastUpdate = t - this->timeOfLastUpdate;
 
-  this->UpdateImpl(timeSinceLastUpdate);
+  if (timeSinceLastUpdate < 0)
+    this->Reset();
+  else
+    this->UpdateImpl(timeSinceLastUpdate);
 
   this->timeOfLastUpdate = t;
 }
@@ -114,6 +117,7 @@ void SimpleModelPlugin::Load(sdf::ElementPtr _sdf)
       std::string key = childElem->GetName();
       std::string value = childElem->GetValue()->GetAsString();
       std::transform(value.begin(), value.end(), value.begin(), ::tolower);
+
       if (value == "true")
       {
         valueVariant.set_type(Simple_msgs::msgs::Variant::BOOL);
@@ -138,12 +142,28 @@ void SimpleModelPlugin::Load(sdf::ElementPtr _sdf)
           valueVariant.set_v_string(value);
         }
       }
+
+      /// FIXME hack
+      if (key == "closed")
+      {
+        valueVariant.set_type(Simple_msgs::msgs::Variant::BOOL);
+        if (value == "true" || value == "1")
+          valueVariant.set_v_bool(true);
+        else
+          valueVariant.set_v_bool(false);
+        //valueVariant.set_v_bool(boost::lexical_cast<bool>(value));
+      }
+
       this->properties[key] = valueVariant;
+      this->sdfElements[key] = childElem;
       childElem = childElem->GetNextElement("");
     }
   }
 
   this->LoadImpl(_sdf);
+
+
+  return;
 
   // DEBUG
   std::map<std::string, boost::any>::iterator portIt;
@@ -205,6 +225,8 @@ void SimpleModelPlugin::Init()
 
   this->initThread = new boost::thread(
       boost::bind(&SimpleModelPlugin::InitThread, this));
+
+  std::cerr << this->schematicType << " Init " << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -250,7 +272,6 @@ void SimpleModelPlugin::InitThread()
   Simple_msgs::msgs::SimpleModel simpleModelMsg;
   this->FillMsg(simpleModelMsg);
   this->simpleModelPub->Publish(simpleModelMsg);
-  std::cerr << " simple model init pub " << std::endl;
 
 }
 
@@ -345,13 +366,36 @@ void SimpleModelPlugin::FillMsg(Simple_msgs::msgs::SimpleModel &_msg)
 }
 
 /////////////////////////////////////////////////
-void SimpleModelPlugin::SetProperty(const std::string &_key,
+void SimpleModelPlugin::SetPropertyVariant(const std::string &_key,
     const Simple_msgs::msgs::Variant &_value)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->propertyMutex);
-  if (this->properties.find(_key) != this->properties.end())
+  switch (_value.type())
   {
-    this->properties[_key] = _value;
+    case  Simple_msgs::msgs::Variant::UINT32:
+    {
+      this->SetProperty(_key, _value.v_uint32());
+      break;
+    }
+    case  Simple_msgs::msgs::Variant::INT32:
+    {
+      this->SetProperty(_key, _value.v_int32());
+      break;
+    }
+    case  Simple_msgs::msgs::Variant::DOUBLE:
+    {
+      this->SetProperty(_key, _value.v_double());
+      break;
+    }
+    case  Simple_msgs::msgs::Variant::STRING:
+    {
+      this->SetProperty(_key, _value.v_string());
+      break;
+    }
+    case  Simple_msgs::msgs::Variant::BOOL:
+    {
+      this->SetProperty(_key, _value.v_bool());
+      break;
+    }
   }
 }
 
@@ -378,35 +422,7 @@ void SimpleModelPlugin::ProcessMsgs()
     for (unsigned int i = 0; i < msg.key_size(); ++i)
     {
       Simple_msgs::msgs::Variant valueMsg = msg.value(i);
-      this->SetProperty(msg.key(i), valueMsg);
-      /*switch (valueMsg.type())
-      {
-        case  Simple_msgs::msgs::Variant::UINT32:
-        {
-          this->SetProperty(msg.key(i), valueMsg.v_uint32());
-          break;
-        }
-        case  Simple_msgs::msgs::Variant::INT32:
-        {
-          this->SetProperty(msg.key(i), valueMsg.v_int32());
-          break;
-        }
-        case  Simple_msgs::msgs::Variant::DOUBLE:
-        {
-          this->SetProperty(msg.key(i), valueMsg.v_double());
-          break;
-        }
-        case  Simple_msgs::msgs::Variant::STRING:
-        {
-          this->SetProperty(msg.key(i), valueMsg.v_string());
-          break;
-        }
-        case  Simple_msgs::msgs::Variant::BOOL:
-        {
-          this->SetProperty(msg.key(i), valueMsg.v_bool());
-          break;
-        }
-      }*/
+      this->SetPropertyVariant(msg.key(i), valueMsg);
     }
 
   }
@@ -433,6 +449,8 @@ void SimpleModelPlugin::ProcessMsgs()
     this->portPubs[port] =
         this->node->Advertise<Simple_msgs::msgs::Variant>(topic);
     this->portTopics[port] = topic;
+
+    std::cerr << "creating topic " << topic << std::endl;
   }
 
   this->simpleConnectionMsgs.clear();

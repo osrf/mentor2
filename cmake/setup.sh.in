@@ -17,10 +17,10 @@ fi
 # Add our top-level directory to GAZEBO_RESOURCE_PATH
 # Add our worlds directory to GAZEBO_RESOURCE_PATH so that *.world files can be
 # found without giving a full path.
-# export GAZEBO_RESOURCE_PATH=@CMAKE_INSTALL_PREFIX@/share/@PROJECT_NAME@-@SIMPLEGDK_VERSION@/worlds:$GAZEBO_RESOURCE_PATH
+export GAZEBO_RESOURCE_PATH=@CMAKE_INSTALL_PREFIX@/share/simplegdk-@SIMPLEGDK_VERSION@/worlds:$GAZEBO_RESOURCE_PATH
 
 # add path to gazebo models from mentor2_resources
-export GAZEBO_MODEL_PATH=@CMAKE_INSTALL_PREFIX@/share/@PROJECT_NAME@-@SIMPLEGDK_VERSION@/models:$GAZEBO_MODEL_PATH
+export GAZEBO_MODEL_PATH=@CMAKE_INSTALL_PREFIX@/share/simplegdk-@SIMPLEGDK_VERSION@/models:$GAZEBO_MODEL_PATH
 
 # Add the directories containing our Gazebo plugins to GAZEBO_PLUGIN_PATH.
 export GAZEBO_PLUGIN_PATH=@SIMPLEGDK_PLUGIN_INSTALL_DIR@:$GAZEBO_PLUGIN_PATH

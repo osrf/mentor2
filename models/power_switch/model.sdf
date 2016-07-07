@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <sdf version="1.5">
-  <model name="switch">
+  <model name="power_switch">
     <pose>0 0 0.155 0 3.14 0</pose>
     <link name="body">
       <collision name="collision">
@@ -124,17 +124,9 @@
       </physics>
     </joint>
 
-    <joint name="stand_joint" type="revolute">
+    <joint name="stand_joint" type="fixed">
       <parent>body</parent>
       <child>stand</child>
-      <axis>
-        <xyz>0.0 0.0 1.0</xyz>
-        <limit>
-          <lower>-0.0</lower>
-          <upper>0.0</upper>
-        </limit>
-        <use_parent_model_frame>true</use_parent_model_frame>
-      </axis>
     </joint>
 
     <plugin filename="libSwitchPlugin.so" name="switch">
@@ -147,7 +139,7 @@
         <type>electrical</type>
       </port>
       <properties>
-        <closed>false</closed>
+        <closed>true</closed>
       </properties>
       <switch_joint>button_joint</switch_joint>
     </plugin>

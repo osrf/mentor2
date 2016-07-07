@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=MENTOR2_Chapter2
+Comment=Run Chapter2
+Exec=mentor2 chapter2.world
+Icon=
+Terminal=false
+Type=Application

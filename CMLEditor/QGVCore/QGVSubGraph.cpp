@@ -53,7 +53,7 @@ QGVNode *QGVSubGraph::addNode(const QString &label)
 		QGVNode *item = new QGVNode(new QGVNodePrivate(node), _scene);
     item->setLabel(label);
     _scene->addItem(item);
-    _scene->_nodes.append(item);
+    _scene->_nodes.insert(label, item);
     _nodes.append(item);
     return item;
 }
@@ -73,7 +73,7 @@ QGVSubGraph *QGVSubGraph::addSubGraph(const QString &name, bool cluster)
     }
 
 		QGVSubGraph *item = new QGVSubGraph(new QGVGraphPrivate(sgraph), _scene);
-    _scene->_subGraphs.append(item);
+    _scene->_subGraphs.insert(name, item);
     _scene->addItem(item);
     return item;
 }

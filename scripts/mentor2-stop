@@ -1,0 +1,1 @@
+killall gzserver gzclient

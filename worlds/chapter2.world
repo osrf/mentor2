@@ -1,0 +1,71 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="chapter2">
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+
+
+    <plugin name="SimEvents" filename="libSimEventsPlugin.so">
+      <session></session>
+
+      <region>
+        <name>slab_0</name>
+        <volume>
+          <min>-0.5 0.5  0</min>
+          <max>0.5 1.0 10</max>
+        </volume>
+      </region>
+
+      <region>
+        <name>slab_1</name>
+        <volume>
+          <min>-0.5 1.0  0</min>
+          <max>0.5 1.5 10</max>
+        </volume>
+      </region>
+
+      <region>
+        <name>slab_2</name>
+        <volume>
+          <min>-0.5 1.5  0</min>
+          <max>0.5 2.0 10</max>
+        </volume>
+      </region>
+
+      <region>
+        <name>slab_3</name>
+        <volume>
+          <min>-0.5 2.0  0</min>
+          <max>0.5 2.5 10</max>
+        </volume>
+      </region>
+
+      <event>
+        <name>state</name>
+        <type>sim_state</type>
+      </event>
+
+      <event>
+        <name>joint_velocity</name>
+        <type>joint</type>
+        <model>motor</model>
+        <joint>motor_shaft_joint</joint>
+        <range>
+          <type>velocity</type>
+          <min>0.5</min>
+          <max>1000000</max>
+        </range>
+      </event>
+
+    </plugin>
+
+
+  </world>
+</sdf>

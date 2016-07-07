@@ -89,14 +89,13 @@ Simple_msgs::msgs::SimpleModel CMLManager::GetModelInfo(
     const std::string &_name)
 {
   boost::recursive_mutex::scoped_lock lock(*this->modelInfoMutex);
+
   if (this->modelInfo.find(_name) != this->modelInfo.end())
     return this->modelInfo[_name];
-  else
-  {
-    // return empty msg for now if nothing is found.
-    Simple_msgs::msgs::SimpleModel empty;
-    return empty;
-  }
+
+  // return empty msg for now if nothing is found.
+  Simple_msgs::msgs::SimpleModel empty;
+  return empty;
 }
 
 /////////////////////////////////////////////////
@@ -126,7 +125,7 @@ void CMLManager::OnRequest(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 void CMLManager::OnResponse(ConstResponsePtr &_msg)
 {
-  std::cerr << " on response " << std::endl;
+  // std::cerr << " on response " << std::endl;
 
   if (!this->requestMsg || _msg->id() != this->requestMsg->id())
     return;
@@ -141,12 +140,39 @@ void CMLManager::OnResponse(ConstResponsePtr &_msg)
 /////////////////////////////////////////////////
 void CMLManager::OnSimpleModel(ConstSimpleModelPtr &_msg)
 {
-  std::cerr << " on simple model " << _msg->name()
-    << " " << _msg->schematic_type() << std::endl;
+  // std::cerr << " on simple model " << _msg->name()
+  //  << " " << _msg->schematic_type() << std::endl;
 
   // TODO ~/simple/model/info doesn't get messages so this doesn't get called.
   boost::recursive_mutex::scoped_lock lock(*this->modelInfoMutex);
   this->modelInfo[_msg->name()] = *_msg.get();
+}
+
+/////////////////////////////////////////////////
+void CMLManager::AddSimpleModel(Simple_msgs::msgs::SimpleModel _msg)
+{
+  // std::cerr << " add simple model " << _msg.name() << std::endl;
+
+  boost::recursive_mutex::scoped_lock lock(*this->modelInfoMutex);
+  this->modelInfo[_msg.name()] = _msg;
+}
+
+/////////////////////////////////////////////////
+void CMLManager::RemoveSimpleModel(const std::string &_name)
+{
+  // std::cerr << " remove simple model " << _name << std::endl;
+
+  boost::recursive_mutex::scoped_lock lock(*this->modelInfoMutex);
+
+  std::map<std::string, Simple_msgs::msgs::SimpleModel>::iterator it
+      = this->modelInfo.find(_name);
+  if (it != this->modelInfo.end())
+    this->modelInfo.erase(it);
+
+  std::map<std::string, CMLComponentInspector *>::iterator inspectIt =
+      this->propertyManager->componentInspectors.find(_name);
+  if (inspectIt != this->propertyManager->componentInspectors.end())
+    this->propertyManager->componentInspectors.erase(inspectIt);
 }
 
 /////////////////////////////////////////////////
@@ -173,6 +199,7 @@ bool CMLManager::ShowInspector(const std::string &_name)
     QObject::connect(inspector, SIGNAL(Applied()),
         this->propertyManager, SLOT(OnComponentProperyChanged()));
   }
+  inspector->move(QCursor::pos());
   inspector->show();
   return true;
 }

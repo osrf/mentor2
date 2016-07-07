@@ -1,0 +1,61 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <model name="axle_wheels">
+    <pose>0 0.040 0.028 0 0 0</pose>
+    <link name="link">
+      <inertial>
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>0.0001</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.0001</iyy>
+          <iyz>0</iyz>
+          <izz>0.0001</izz>
+        </inertia>
+      </inertial>
+      <collision name="axle_collision">
+        <pose>0 0 0.0 0 1.57079632679 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.0025</radius>
+            <length>0.08</length>
+          </cylinder>
+        </geometry>
+      </collision>
+      <collision name="wheel_0_collision">
+        <pose>-0.0405 0 0.0 0 1.57079632679 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.028</radius>
+            <length>0.02</length>
+          </cylinder>
+        </geometry>
+      </collision>
+      <collision name="wheel_1_collision">
+        <pose>0.0405 0 0.0 0 1.57079632679 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.028</radius>
+            <length>0.02</length>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <pose>0 0 0.0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://axle_wheels/meshes/axle_wheels.dae</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>
