@@ -1,6 +1,12 @@
 Gazebo Design Kit (GDK) for MENTOR2
 ===
 
+Dependencies
+===
+
+* Gazebo
+    * https://bitbucket.org/osrf/gazebo
+    * branch: `mentor2_v2`
 
 Installation
 ===
@@ -10,20 +16,8 @@ Installation
     cmake ..
     make install
 
-
-Dependencies
-===
-
-SDFormat >= 2.0.1
-Gazebo >= 4.0.1
-    branch: expose_mainwindow
-
 Running
 ===
 
-you should setup the environment by sourcing the setup.sh file. The location of the setup file depends on CMAKE_INSTALLATION_PREFIX.
- 
-     . /usr/local/share/simplegdk/setup.sh
-     
-run a Mentor2  world
-    run.sh ./test_scoring.world
+    # launch an example world file, e.g.
+    mentor2 chapter4.world.
